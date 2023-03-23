@@ -53,7 +53,7 @@ public class RealTimeConditions extends SkillCondition implements IEntityConditi
         if ( !timeCheck(maxHour, minHour, nowHour) ) return false;
         Bukkit.broadcastMessage("4 " + nowMinute);
         if ( !timeCheck(maxMinute, minMinute, nowMinute) ) return false;
-        Bukkit.broadcastMessage("5 " + nowSecond);
+        Bukkit.broadcastMessage("5 " + timeCheck(maxSecond, minSecond, nowSecond));
         return timeCheck(maxSecond, minSecond, nowSecond);
 
     }
