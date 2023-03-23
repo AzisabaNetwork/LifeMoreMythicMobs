@@ -1,0 +1,7 @@
+name: LifeMoreMechanics
+version: '${version}'
+main: lifemoremechanics.org.example.lifemoremechanics.LifeMoreMechanics
+api-version: 1.15
+
+depend: [MythicMobs]
+load: STARTUP
