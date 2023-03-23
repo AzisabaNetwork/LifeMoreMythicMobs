@@ -4,7 +4,6 @@ import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
 import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
 import io.lumine.xikage.mythicmobs.skills.SkillCondition;
 import io.lumine.xikage.mythicmobs.skills.conditions.IEntityCondition;
-import org.bukkit.Bukkit;
 
 import java.time.LocalDateTime;
 
@@ -23,6 +22,7 @@ public class RealTimeConditions extends SkillCondition implements IEntityConditi
     protected final int minHour;
     protected final int minMinute;
     protected final int minSecond;
+    protected final boolean invert;
 
     public boolean timeCheck(int max, int min, int value) {
 
@@ -42,24 +42,20 @@ public class RealTimeConditions extends SkillCondition implements IEntityConditi
         int nowMinute = nowTime.getMinute();
         int nowSecond = nowTime.getSecond();
 
-        Bukkit.broadcastMessage("0 " + nowYear);
-
-        if ( !timeCheck(maxYear, minYear, nowYear) ) return false;
-        Bukkit.broadcastMessage("1 " + nowMonth);
-        if ( !timeCheck(maxMonth, minMonth, nowMonth) ) return false;
-        Bukkit.broadcastMessage("2 " + nowDay);
-        if ( !timeCheck(maxDay, minDay, nowDay) ) return false;
-        Bukkit.broadcastMessage("3 " + nowHour);
-        if ( !timeCheck(maxHour, minHour, nowHour) ) return false;
-        Bukkit.broadcastMessage("4 " + nowMinute);
-        if ( !timeCheck(maxMinute, minMinute, nowMinute) ) return false;
-        Bukkit.broadcastMessage("5 " + timeCheck(maxSecond, minSecond, nowSecond));
-        return timeCheck(maxSecond, minSecond, nowSecond);
+        if ( !timeCheck(maxYear, minYear, nowYear) ) return invert;
+        if ( !timeCheck(maxMonth, minMonth, nowMonth) ) return invert;
+        if ( !timeCheck(maxDay, minDay, nowDay) ) return invert;
+        if ( !timeCheck(maxHour, minHour, nowHour) ) return invert;
+        if ( !timeCheck(maxMinute, minMinute, nowMinute) ) return invert;
+        if (!timeCheck(maxSecond, minSecond, nowSecond)) return invert;
+        return !invert;
 
     }
 
     public RealTimeConditions(MythicLineConfig config) {
         super(config.getLine());
+
+        this.invert = config.getBoolean(new String[] {"invert", "i", "逆転"}, false);
 
         this.maxYear = config.getInteger(new String[] {"maxyear", "maxy", "may", "年次"}, Integer.MAX_VALUE);
         this.maxMonth = config.getInteger(new String[] {"maxmonth", "maxm", "mamo", "月次"}, Integer.MAX_VALUE);
