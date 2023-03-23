@@ -3,6 +3,7 @@ package lifemoremechanics.org.example.lifemoremechanics;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicConditionLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMechanicLoadEvent;
 import lifemoremechanics.org.example.lifemoremechanics.Condition.RealTimeConditions;
+import lifemoremechanics.org.example.lifemoremechanics.Mechanic.ParticleVerticalRingMechanic;
 import lifemoremechanics.org.example.lifemoremechanics.Mechanic.TakeItemMechanic;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -33,8 +34,13 @@ public final class LifeMoreMechanics extends JavaPlugin implements Listener {
     @EventHandler
     public void onMythicMechanicLoad(MythicMechanicLoadEvent e)	{
 
-        if( e.getMechanicName().equalsIgnoreCase("takeinv") ) {
+        String mechanic = e.getMechanicName();
+
+        if( mechanic.equalsIgnoreCase("takeinv") ) {
             e.register(new TakeItemMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("particleverticalring") || mechanic.equalsIgnoreCase("pvr") || mechanic.equalsIgnoreCase("pvring") ) {
+            e.register(new ParticleVerticalRingMechanic(e.getConfig()));
         }
 
     }
@@ -47,4 +53,5 @@ public final class LifeMoreMechanics extends JavaPlugin implements Listener {
         }
 
     }
+
 }
