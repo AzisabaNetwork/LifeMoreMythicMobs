@@ -1,6 +1,8 @@
 package lifemoremechanics.org.example.lifemoremechanics;
 
+import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicConditionLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMechanicLoadEvent;
+import lifemoremechanics.org.example.lifemoremechanics.Condition.RealTimeConditions;
 import lifemoremechanics.org.example.lifemoremechanics.Mechanic.TakeItemMechanic;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -31,18 +33,18 @@ public final class LifeMoreMechanics extends JavaPlugin implements Listener {
     @EventHandler
     public void onMythicMechanicLoad(MythicMechanicLoadEvent e)	{
 
-        log.info(e.getMechanicName());
-
-        if( e.getMechanicName().equalsIgnoreCase("takeinv") )	{
-            Bukkit.broadcastMessage("takeitem getConfig");
+        if( e.getMechanicName().equalsIgnoreCase("takeinv") ) {
             e.register(new TakeItemMechanic(e.getConfig()));
         }
 
     }
 
+    @EventHandler
+    public void onMythicConditionLoad(MythicConditionLoadEvent e) {
 
+        if ( e.getConditionName().equalsIgnoreCase("realtime") ) {
+            e.register(new RealTimeConditions(e.getConfig()));
+        }
 
-
-
-
+    }
 }
