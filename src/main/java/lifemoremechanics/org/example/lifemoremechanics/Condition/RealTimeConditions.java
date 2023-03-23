@@ -72,4 +72,5 @@ public class RealTimeConditions extends SkillCondition implements IEntityConditi
         this.minSecond = config.getInteger(new String[] {"minsecond", "mins", "mis", "秒前"}, Integer.MIN_VALUE);
 
     }
+
 }
