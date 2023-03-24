@@ -22,7 +22,7 @@ public class ParticleVerticalRingMechanic extends SkillMechanic implements ITarg
     protected final double startXOffset;
     protected final double startYOffset;
     protected final double startZOffset;
-    protected final float startSideOffset;
+//    protected final float startSideOffset;
     protected final boolean ignoreEntityRotation;
     protected final boolean uniform;
     protected final Particle particle;
