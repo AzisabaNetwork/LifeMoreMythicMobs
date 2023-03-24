@@ -1,4 +1,4 @@
-package lifemoremechanics.org.example.lifemoremechanics.Mechanic;
+package lifemoremythicmobs.org.example.lifemoremythicmobs.mechanic;
 
 import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;

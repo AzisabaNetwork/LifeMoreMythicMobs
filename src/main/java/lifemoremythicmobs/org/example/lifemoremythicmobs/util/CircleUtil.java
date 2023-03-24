@@ -1,4 +1,4 @@
-package lifemoremechanics.org.example.lifemoremechanics.Util;
+package lifemoremythicmobs.org.example.lifemoremythicmobs.util;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import org.bukkit.Color;
@@ -14,14 +14,16 @@ public class CircleUtil {
         return pos.clone().add(v.clone().multiply(Math.cos(Math.toRadians(radian)) * radius).add(u.clone().multiply(Math.sin(Math.toRadians(radian)) * radius)));
     }
 
-    public static void spawnCircle(Location loc, int points, int radius, int rotx, int roty, int rotz, int amount, int speed, boolean ignoreEntityRotation, boolean uniform, Particle particle, String color) {
+    public static void spawnCircle(Location loc, int points, double radius, int rotx, int roty, int rotz, int amount, int speed, boolean ignoreEntityRotation, boolean uniform,
+                                   Particle particle, String color) {
 
         ParticleBuilder builder = particle.builder().count(amount).extra(speed);
         switch(particle) {
             case REDSTONE: builder.color(Color.fromRGB(Integer.parseInt(color, 16)));
             break;
         }
-        Vector v = ignoreEntityRotation ?new Vector(rotx, roty, rotz).normalize(): loc.getDirection().rotateAroundX(Math.toRadians(rotx)).rotateAroundY(Math.toRadians(roty)).rotateAroundZ(Math.toRadians(rotz));
+        Vector v = ignoreEntityRotation ?new Vector(rotx, roty, rotz).normalize(): loc.getDirection().
+                rotateAroundX(Math.toRadians(rotx)).rotateAroundY(Math.toRadians(roty)).rotateAroundZ(Math.toRadians(rotz));
         Vector u = v.clone().crossProduct(new Vector(0, 1, 0)).normalize();
         Vector w = v.clone().crossProduct(u).normalize();
         for (int i = 0; i < points; i++) {

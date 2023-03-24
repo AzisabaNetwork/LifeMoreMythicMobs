@@ -1,4 +1,4 @@
-package lifemoremechanics.org.example.lifemoremechanics.Condition;
+package lifemoremythicmobs.org.example.lifemoremythicmobs.condition;
 
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
 import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
