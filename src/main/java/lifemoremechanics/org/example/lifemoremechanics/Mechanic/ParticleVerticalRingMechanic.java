@@ -19,6 +19,10 @@ public class ParticleVerticalRingMechanic extends SkillMechanic implements ITarg
     protected final int points;
     protected final int amount;
     protected final int speed;
+    protected final double startXOffset;
+    protected final double startYOffset;
+    protected final double startZOffset;
+    protected final float startSideOffset;
     protected final boolean ignoreEntityRotation;
     protected final boolean uniform;
     protected final Particle particle;
@@ -34,6 +38,10 @@ public class ParticleVerticalRingMechanic extends SkillMechanic implements ITarg
         this.rotateX = config.getInteger(new String[]{"rotatex", "rotx"}, 1);
         this.rotateY = config.getInteger(new String[]{"rotatey", "roty"}, 1);
         this.rotateZ = config.getInteger(new String[]{"rotatez", "rotz"}, 1);
+        this.startXOffset = config.getDouble(new String[]{"startxoffset", "sxo"}, 0.0);
+        this.startYOffset = config.getDouble(new String[]{"startyoffset", "syo"}, 0.0);
+        this.startZOffset = config.getDouble(new String[]{"startzoffset", "szo"}, 0.0);
+//        this.startSideOffset = config.getFloat(new String[]{"startsideoffset", "sso"}, 0);
         this.ignoreEntityRotation = config.getBoolean(new String[]{"ignoreentityrotation", "ier", "i"}, true);
         this.uniform = config.getBoolean(new String[]{"uniform", "uni", "u"}, true);
         this.particle = Particle.valueOf(config.getString(new String[]{"particle", "pa"}, "REDSTONE").toUpperCase()
@@ -48,6 +56,10 @@ public class ParticleVerticalRingMechanic extends SkillMechanic implements ITarg
     @Override
     public boolean castAtLocation(SkillMetadata skillMetadata, AbstractLocation absLoc) {
         Location bukkitLocation = BukkitAdapter.adapt(absLoc);
+
+        bukkitLocation.setX(bukkitLocation.getX() + startXOffset);
+        bukkitLocation.setY(bukkitLocation.getY() + startYOffset);
+        bukkitLocation.setZ(bukkitLocation.getZ() + startZOffset);
 
         CircleUtil.spawnCircle(bukkitLocation, points, radius, rotateX, rotateY, rotateZ, amount, speed, ignoreEntityRotation, uniform, particle, color);
 
