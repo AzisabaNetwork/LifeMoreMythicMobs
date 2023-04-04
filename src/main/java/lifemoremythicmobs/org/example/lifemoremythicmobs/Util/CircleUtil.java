@@ -1,4 +1,4 @@
-package lifemoremythicmobs.org.example.lifemoremythicmobs.util;
+package lifemoremythicmobs.org.example.lifemoremythicmobs.Util;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import org.bukkit.Color;
