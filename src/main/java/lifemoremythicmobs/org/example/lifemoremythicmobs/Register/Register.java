@@ -4,10 +4,7 @@ import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicConditionLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMechanicLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicReloadedEvent;
 import lifemoremythicmobs.org.example.lifemoremythicmobs.Condition.RealTimeConditions;
-import lifemoremythicmobs.org.example.lifemoremythicmobs.Mechanic.BossBarMechanic;
-import lifemoremythicmobs.org.example.lifemoremythicmobs.Mechanic.ParticleVerticalRingMechanic;
-import lifemoremythicmobs.org.example.lifemoremythicmobs.Mechanic.RemoveBossBarMechanic;
-import lifemoremythicmobs.org.example.lifemoremythicmobs.Mechanic.TakeItemMechanic;
+import lifemoremythicmobs.org.example.lifemoremythicmobs.Mechanic.*;
 import lifemoremythicmobs.org.example.lifemoremythicmobs.Placeholder.MMIDPlaceholder;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,6 +27,9 @@ public class Register implements Listener {
         }
         if ( mechanic.equalsIgnoreCase("removebossbar") || mechanic.equalsIgnoreCase("bossbarremove") ) {
             e.register(new RemoveBossBarMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("modifybossbar") || mechanic.equalsIgnoreCase("bossbarmodify") ) {
+            e.register(new ModifyBossBarMechanic(e.getConfig()));
         }
 
     }
