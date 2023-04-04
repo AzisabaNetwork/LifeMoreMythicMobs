@@ -1,6 +1,6 @@
 package lifemoremythicmobs.org.example.lifemoremythicmobs;
 
-import lifemoremythicmobs.org.example.lifemoremythicmobs.register.Register;
+import lifemoremythicmobs.org.example.lifemoremythicmobs.Register.Register;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class LifeMoreMythicMobs extends JavaPlugin{
