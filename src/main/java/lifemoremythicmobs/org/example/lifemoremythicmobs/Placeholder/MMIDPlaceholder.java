@@ -1,10 +1,10 @@
-package lifemoremythicmobs.org.example.lifemoremythicmobs.placeholder;
+package lifemoremythicmobs.org.example.lifemoremythicmobs.Placeholder;
 
 import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
 import io.lumine.xikage.mythicmobs.skills.placeholders.Placeholder;
 import io.lumine.xikage.mythicmobs.skills.placeholders.PlaceholderManager;
-import lifemoremythicmobs.org.example.lifemoremythicmobs.util.ItemUtil;
+import lifemoremythicmobs.org.example.lifemoremythicmobs.Util.ItemUtil;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
