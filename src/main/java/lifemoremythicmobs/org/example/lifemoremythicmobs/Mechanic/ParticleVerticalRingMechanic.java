@@ -1,4 +1,4 @@
-package lifemoremythicmobs.org.example.lifemoremythicmobs.mechanic;
+package lifemoremythicmobs.org.example.lifemoremythicmobs.Mechanic;
 
 import io.lumine.xikage.mythicmobs.adapters.AbstractLocation;
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
@@ -6,7 +6,7 @@ import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
 import io.lumine.xikage.mythicmobs.skills.ITargetedLocationSkill;
 import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
-import lifemoremythicmobs.org.example.lifemoremythicmobs.util.CircleUtil;
+import lifemoremythicmobs.org.example.lifemoremythicmobs.Util.CircleUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 
