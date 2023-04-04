@@ -1,12 +1,14 @@
-package lifemoremythicmobs.org.example.lifemoremythicmobs.register;
+package lifemoremythicmobs.org.example.lifemoremythicmobs.Register;
 
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicConditionLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMechanicLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicReloadedEvent;
-import lifemoremythicmobs.org.example.lifemoremythicmobs.condition.RealTimeConditions;
-import lifemoremythicmobs.org.example.lifemoremythicmobs.mechanic.ParticleVerticalRingMechanic;
-import lifemoremythicmobs.org.example.lifemoremythicmobs.mechanic.TakeItemMechanic;
-import lifemoremythicmobs.org.example.lifemoremythicmobs.placeholder.MMIDPlaceholder;
+import lifemoremythicmobs.org.example.lifemoremythicmobs.Condition.RealTimeConditions;
+import lifemoremythicmobs.org.example.lifemoremythicmobs.Mechanic.BossBarMechanic;
+import lifemoremythicmobs.org.example.lifemoremythicmobs.Mechanic.ParticleVerticalRingMechanic;
+import lifemoremythicmobs.org.example.lifemoremythicmobs.Mechanic.RemoveBossBarMechanic;
+import lifemoremythicmobs.org.example.lifemoremythicmobs.Mechanic.TakeItemMechanic;
+import lifemoremythicmobs.org.example.lifemoremythicmobs.Placeholder.MMIDPlaceholder;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -17,11 +19,17 @@ public class Register implements Listener {
 
         String mechanic = e.getMechanicName();
 
-        if( mechanic.equalsIgnoreCase("takeinv") ) {
+        if ( mechanic.equalsIgnoreCase("takeinv") ) {
             e.register(new TakeItemMechanic(e.getConfig()));
         }
         if ( mechanic.equalsIgnoreCase("particleverticalring") || mechanic.equalsIgnoreCase("pvr") || mechanic.equalsIgnoreCase("pvring") ) {
             e.register(new ParticleVerticalRingMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("bossbar") ) {
+            e.register(new BossBarMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("removebossbar") || mechanic.equalsIgnoreCase("bossbarremove") ) {
+            e.register(new RemoveBossBarMechanic(e.getConfig()));
         }
 
     }
