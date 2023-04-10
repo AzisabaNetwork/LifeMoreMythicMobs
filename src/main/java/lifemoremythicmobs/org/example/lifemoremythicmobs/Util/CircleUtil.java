@@ -32,5 +32,5 @@ public class CircleUtil {
             builder.location(pos.toLocation(loc.getWorld())).spawn();
         }
     }
-
 }
+

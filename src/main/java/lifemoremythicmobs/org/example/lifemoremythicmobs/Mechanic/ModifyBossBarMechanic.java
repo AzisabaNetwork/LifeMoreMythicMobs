@@ -22,14 +22,18 @@ public class ModifyBossBarMechanic extends SkillMechanic implements ITargetedEnt
 
         this.progress = config.getDouble(new String[]{"progress", "pro", "p"}, -1);
         this.id = config.getString(new String[]{"id", "i"}, "def");
-        this.color = config.getString(new String[]{"id", "i"}).toUpperCase();
-        this.style = config.getString(new String[]{"style", "s"}).toUpperCase();
+        this.color = config.getString(new String[]{"id", "i"});
+        if ( config.getString(new String[]{"style", "s"}) != null ) {
+            this.style = config.getString(new String[]{"style", "s"}).toUpperCase();
+        } else {
+            this.style = null;
+        }
         this.title = config.getString(new String[]{"title", "t"});
 
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata skillMetadata, AbstractEntity abstractEntity) {
+    public boolean castAtEntity(SkillMetadata skillMetadata, AbstractEntity target) {
 
         BossBar bar = BossBarMechanic.bars.get(id);
 
@@ -45,7 +49,6 @@ public class ModifyBossBarMechanic extends SkillMechanic implements ITargetedEnt
         if ( title != null ) {
             bar.setTitle(title);
         }
-
 
         return true;
     }

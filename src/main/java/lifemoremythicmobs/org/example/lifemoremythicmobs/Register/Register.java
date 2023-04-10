@@ -28,7 +28,7 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("removebossbar") || mechanic.equalsIgnoreCase("bossbarremove") ) {
             e.register(new RemoveBossBarMechanic(e.getConfig()));
         }
-        if ( mechanic.equalsIgnoreCase("modifybossbar") || mechanic.equalsIgnoreCase("bossbarmodify") ) {
+        if ( mechanic.equalsIgnoreCase("modifybossbar") || mechanic.equalsIgnoreCase("bossbarmodify")) {
             e.register(new ModifyBossBarMechanic(e.getConfig()));
         }
 
