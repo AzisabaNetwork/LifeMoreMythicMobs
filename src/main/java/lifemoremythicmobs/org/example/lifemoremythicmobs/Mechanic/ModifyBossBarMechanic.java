@@ -22,7 +22,7 @@ public class ModifyBossBarMechanic extends SkillMechanic implements ITargetedEnt
 
         this.progress = config.getDouble(new String[]{"progress", "pro", "p"}, -1);
         this.id = config.getString(new String[]{"id", "i"}, "def");
-        this.color = config.getString(new String[]{"id", "i"});
+        this.color = config.getString(new String[]{"color", "c"});
         if ( config.getString(new String[]{"style", "s"}) != null ) {
             this.style = config.getString(new String[]{"style", "s"}).toUpperCase();
         } else {
