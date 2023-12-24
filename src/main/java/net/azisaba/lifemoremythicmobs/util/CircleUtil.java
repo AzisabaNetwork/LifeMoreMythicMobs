@@ -1,4 +1,4 @@
-package lifemoremythicmobs.org.example.lifemoremythicmobs.Util;
+package net.azisaba.lifemoremythicmobs.util;
 
 import com.destroystokyo.paper.ParticleBuilder;
 import org.bukkit.Color;
@@ -14,8 +14,19 @@ public class CircleUtil {
         return pos.clone().add(v.clone().multiply(Math.cos(Math.toRadians(radian)) * radius).add(u.clone().multiply(Math.sin(Math.toRadians(radian)) * radius)));
     }
 
-    public static void spawnCircle(Location loc, int points, double radius, int rotx, int roty, int rotz, int amount, int speed, boolean ignoreEntityRotation, boolean uniform,
-                                   Particle particle, String color) {
+    public static void spawnCircle(
+            Location loc,
+            int points,
+            double radius,
+            int rotx,
+            int roty,
+            int rotz,
+            int amount,
+            int speed,
+            boolean ignoreEntityRotation,
+            boolean uniform,
+            Particle particle,
+            String color) {
 
         ParticleBuilder builder = particle.builder().count(amount).extra(speed);
         switch(particle) {

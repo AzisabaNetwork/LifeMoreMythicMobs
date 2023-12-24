@@ -1,4 +1,4 @@
-package lifemoremythicmobs.org.example.lifemoremythicmobs.Condition;
+package net.azisaba.lifemoremythicmobs.condition;
 
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
 import io.lumine.xikage.mythicmobs.adapters.AbstractPlayer;

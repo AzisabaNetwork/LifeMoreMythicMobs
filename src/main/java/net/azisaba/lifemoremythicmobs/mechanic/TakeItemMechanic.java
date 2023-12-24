@@ -1,4 +1,4 @@
-package lifemoremythicmobs.org.example.lifemoremythicmobs.Mechanic;
+package net.azisaba.lifemoremythicmobs.mechanic;
 
 import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;

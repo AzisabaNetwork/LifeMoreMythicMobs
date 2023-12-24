@@ -1,6 +1,6 @@
 name: LifeMoreMythicMobs
-version: '${version}'
-main: lifemoremythicmobs.org.example.lifemoremythicmobs.LifeMoreMythicMobs
+version: @version@
+main: net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs
 api-version: 1.15
 
 depend: [MythicMobs]

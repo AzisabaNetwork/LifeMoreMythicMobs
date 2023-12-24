@@ -1,4 +1,4 @@
-package lifemoremythicmobs.org.example.lifemoremythicmobs.Mechanic;
+package net.azisaba.lifemoremythicmobs.mechanic;
 
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
@@ -6,7 +6,7 @@ import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
 import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
 import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
-import lifemoremythicmobs.org.example.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
