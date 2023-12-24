@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class ItemUtil {
         if (stack == null || stack.getType().isAir()) return null;
         NBTTagCompound tag = CraftItemStack.asNMSCopy(stack).getTag();
         if (tag == null) return null;
-        List<String> keys = Arrays.asList(keySeparatedByDot.split("\\."));
+        List<String> keys = new ArrayList<>(Arrays.asList(keySeparatedByDot.split("\\.")));
         keys.remove(keys.size() - 1);
         for (String key : keys) {
             tag = tag.getCompound(key);
