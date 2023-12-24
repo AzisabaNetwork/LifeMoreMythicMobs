@@ -14,8 +14,8 @@ import java.util.Set;
 
 public class ItemTagPlaceholder {
     public static final Set<String> TAGS = new HashSet<>(Arrays.asList(
-            "MYTHIC_TYPE", "CustomModelData", "Unbreakable", "HideFlags", "SkullOwnerOrig",
-            "display.Name", "display.Color", "display.Lore"
+            "MYTHIC_TYPE", "CustomModelData", "Unbreakable", "HideFlags", "SkullOwner.SkullOwnerOrig",
+            "display.Name", "display.color", "display.Lore"
     ));
 
     public static void register(PlaceholderManager manager) {
@@ -24,13 +24,13 @@ public class ItemTagPlaceholder {
                 Entity entity = BukkitAdapter.adapt(meta.getCaster().getEntity());
                 if (!(entity instanceof Player)) return null;
                 ItemStack stack = ((Player) entity).getInventory().getItemInMainHand();
-                return ItemUtil.resolveTagAsString(stack, tag);
+                return String.valueOf(ItemUtil.resolveTagAsString(stack, tag));
             }));
             manager.register("caster.offhand.tag." + tag, Placeholder.meta((meta, s) -> {
                 Entity entity = BukkitAdapter.adapt(meta.getCaster().getEntity());
                 if (!(entity instanceof Player)) return null;
                 ItemStack stack = ((Player) entity).getInventory().getItemInOffHand();
-                return ItemUtil.resolveTagAsString(stack, tag);
+                return String.valueOf(ItemUtil.resolveTagAsString(stack, tag));
             }));
         }
     }
