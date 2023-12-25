@@ -5,6 +5,7 @@ import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicConditionLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMechanicLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicReloadedEvent;
 import io.lumine.xikage.mythicmobs.skills.placeholders.PlaceholderManager;
+import net.azisaba.lifemoremythicmobs.condition.HasEmptyInventorySlotCondition;
 import net.azisaba.lifemoremythicmobs.condition.RealTimeConditions;
 import net.azisaba.lifemoremythicmobs.condition.ServerEqualsCondition;
 import net.azisaba.lifemoremythicmobs.condition.VarNotEqualsCondition;
@@ -37,6 +38,21 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("modifybossbar") || mechanic.equalsIgnoreCase("bossbarmodify")) {
             e.register(new ModifyBossBarMechanic(e.getConfig()));
         }
+        if ( mechanic.equalsIgnoreCase("SetVarDisplayName") || mechanic.equalsIgnoreCase("SetDisplayNameVar") ) {
+            e.register(new SetDisplayNameVarMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("SetVarLoreLine") || mechanic.equalsIgnoreCase("SetLoreLineVar") ) {
+            e.register(new SetLoreLineVarMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("VarSubstring") ) {
+            e.register(new VarSubstringMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("VarExtractNumber") ) {
+            e.register(new VarExtractNumberMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("VarReplaceRegex") ) {
+            e.register(new VarReplaceRegexMechanic(e.getConfig()));
+        }
 
     }
 
@@ -53,6 +69,9 @@ public class Register implements Listener {
         }
         if ( condition.equalsIgnoreCase("serverEquals") ) {
             e.register(new ServerEqualsCondition(e.getConfig()));
+        }
+        if ( condition.equalsIgnoreCase("HasEmptyInventorySlot") ) {
+            e.register(new HasEmptyInventorySlotCondition(e.getConfig().getLine()));
         }
     }
 

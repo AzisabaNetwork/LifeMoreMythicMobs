@@ -8,15 +8,12 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ItemTagPlaceholder {
-    public static final Set<String> TAGS = new HashSet<>(Arrays.asList(
-            "MYTHIC_TYPE", "CustomModelData", "Unbreakable", "HideFlags", "SkullOwner.SkullOwnerOrig",
-            "display.Name", "display.color", "display.Lore"
-    ));
+    public static final Set<String> TAGS = new HashSet<>(Collections.singletonList("CustomModelData"));
 
     public static void register(PlaceholderManager manager) {
         for (String tag : TAGS) {

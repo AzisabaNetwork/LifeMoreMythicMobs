@@ -81,4 +81,44 @@ public class ItemUtil {
         }
         return null;
     }
+
+    public static void setVariable(SkillMetadata skillMetadata, String varName, String value) {
+        if (varName.startsWith("caster.")) {
+            VariableRegistry registry = MythicMobs.inst().getVariableManager().getRegistry(VariableScope.CASTER, skillMetadata, skillMetadata.getCaster().getEntity());
+            String name = varName.startsWith("caster.var.") ? varName.substring("caster.var.".length()) : varName.substring("caster.".length());
+            registry.putString(name, value);
+        }
+        if (varName.startsWith("target.")) {
+            VariableRegistry registry = MythicMobs.inst().getVariableManager().getRegistry(VariableScope.CASTER, skillMetadata, skillMetadata.getTrigger());
+            String name = varName.startsWith("target.var.") ? varName.substring("target.var.".length()) : varName.substring("target.".length());
+            registry.putString(name, value);
+        }
+        if (varName.startsWith("skill.")) {
+            VariableRegistry registry = skillMetadata.getVariables();
+            String name = varName.startsWith("skill.var.") ? varName.substring("skill.var.".length()) : varName.substring("skill.".length());
+            registry.putString(name, value);
+        }
+        if (varName.startsWith("global.")) {
+            VariableRegistry registry = MythicMobs.inst().getVariableManager().getGlobalRegistry().get();
+            String name = varName.startsWith("global.var.") ? varName.substring("global.var.".length()) : varName.substring("global.".length());
+            registry.putString(name, value);
+        }
+    }
+
+    @Contract("null, _ -> !null")
+    public static String getLoreLine(@Nullable ItemStack stack, int lineNumber) {
+        if (stack == null || stack.getType().isAir()) return "";
+        if (!stack.hasItemMeta() || !stack.getItemMeta().hasLore()) return "";
+        List<String> lore = stack.getItemMeta().getLore();
+        if (lore == null) return "";
+        if (lore.size() <= lineNumber) return "";
+        return lore.get(lineNumber);
+    }
+
+    @Contract("null -> !null")
+    public static String getDisplayName(@Nullable ItemStack stack) {
+        if (stack == null || stack.getType().isAir()) return "";
+        if (!stack.hasItemMeta() || !stack.getItemMeta().hasDisplayName()) return "";
+        return stack.getItemMeta().getDisplayName();
+    }
 }
