@@ -6,10 +6,12 @@ import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMechanicLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicReloadedEvent;
 import io.lumine.xikage.mythicmobs.skills.placeholders.PlaceholderManager;
 import net.azisaba.lifemoremythicmobs.condition.RealTimeConditions;
+import net.azisaba.lifemoremythicmobs.condition.ServerEqualsCondition;
 import net.azisaba.lifemoremythicmobs.condition.VarNotEqualsCondition;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.placeholder.ItemTagPlaceholder;
 import net.azisaba.lifemoremythicmobs.placeholder.MMIDPlaceholder;
+import net.azisaba.lifemoremythicmobs.placeholder.ServerNamePlaceholder;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -49,7 +51,9 @@ public class Register implements Listener {
         if ( condition.equalsIgnoreCase("varNotEquals") ) {
             e.register(new VarNotEqualsCondition(e.getConfig()));
         }
-
+        if ( condition.equalsIgnoreCase("serverEquals") ) {
+            e.register(new ServerEqualsCondition(e.getConfig()));
+        }
     }
 
     @EventHandler
@@ -61,6 +65,7 @@ public class Register implements Listener {
         PlaceholderManager manager = MythicMobs.inst().getPlaceholderManager();
         MMIDPlaceholder.register(manager);
         ItemTagPlaceholder.register(manager);
+        ServerNamePlaceholder.register(manager);
     }
 
 }
