@@ -53,6 +53,9 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("VarReplaceRegex") ) {
             e.register(new VarReplaceRegexMechanic(e.getConfig()));
         }
+        if ( mechanic.equalsIgnoreCase("MMLuckEval") ) {
+            e.register(new MMLuckEvalMechanic(e.getConfig()));
+        }
 
     }
 
