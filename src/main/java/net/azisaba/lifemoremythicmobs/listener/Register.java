@@ -74,7 +74,7 @@ public class Register implements Listener {
             e.register(new ServerEqualsCondition(e.getConfig()));
         }
         if ( condition.equalsIgnoreCase("HasEmptyInventorySlot") ) {
-            e.register(new HasEmptyInventorySlotCondition(e.getConfig().getLine()));
+            e.register(new HasEmptyInventorySlotCondition(e.getConfig()));
         }
     }
 
