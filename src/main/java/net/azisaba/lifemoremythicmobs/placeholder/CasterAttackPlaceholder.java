@@ -11,8 +11,7 @@ import org.bukkit.entity.LivingEntity;
 import static io.lumine.xikage.mythicmobs.MythicMobs.inst;
 
 public class CasterAttackPlaceholder {
-    public static void attackRegister() {
-        PlaceholderManager manager = inst().getPlaceholderManager();
+    public static void register(PlaceholderManager manager) {
         manager.register("caster.attack", Placeholder.meta(((placeholderMeta, s) -> {
             Entity entity = BukkitAdapter.adapt(placeholderMeta.getCaster().getEntity());
             if (entity instanceof LivingEntity) {
