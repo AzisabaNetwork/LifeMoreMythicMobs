@@ -24,7 +24,7 @@ repositories {
 dependencies {
     compileOnly("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:24.0.1")
-    compileOnly("io.lumine:Mythic-Dist:4.13.0")
+    compileOnly("io.lumine.xikage:MythicMobs:4.12.0")
     compileOnly("org.spigotmc:spigot:1.15.2-R0.1-SNAPSHOT")
 }
 

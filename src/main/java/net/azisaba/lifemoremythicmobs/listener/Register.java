@@ -10,9 +10,7 @@ import net.azisaba.lifemoremythicmobs.condition.RealTimeConditions;
 import net.azisaba.lifemoremythicmobs.condition.ServerEqualsCondition;
 import net.azisaba.lifemoremythicmobs.condition.VarNotEqualsCondition;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
-import net.azisaba.lifemoremythicmobs.placeholder.ItemTagPlaceholder;
-import net.azisaba.lifemoremythicmobs.placeholder.MMIDPlaceholder;
-import net.azisaba.lifemoremythicmobs.placeholder.ServerNamePlaceholder;
+import net.azisaba.lifemoremythicmobs.placeholder.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -88,6 +86,8 @@ public class Register implements Listener {
         MMIDPlaceholder.register(manager);
         ItemTagPlaceholder.register(manager);
         ServerNamePlaceholder.register(manager);
+        CasterArmorPlaceholder.register(manager);
+        CasterAttackPlaceholder.register(manager);
     }
 
 }
