@@ -1,12 +1,14 @@
 package net.azisaba.lifemoremythicmobs.util;
 
 import io.lumine.xikage.mythicmobs.MythicMobs;
+import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
 import io.lumine.xikage.mythicmobs.skills.variables.VariableRegistry;
 import io.lumine.xikage.mythicmobs.skills.variables.VariableScope;
 import net.minecraft.server.v1_15_R1.NBTBase;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -120,5 +122,9 @@ public class ItemUtil {
         if (stack == null || stack.getType().isAir()) return "";
         if (!stack.hasItemMeta() || !stack.getItemMeta().hasDisplayName()) return "";
         return stack.getItemMeta().getDisplayName();
+    }
+
+    public static @NotNull VariableRegistry getPlayerVariable(@NotNull Player player) {
+        return MythicMobs.inst().getPlayerManager().getPlayerData(BukkitAdapter.adapt(player)).getVariables();
     }
 }

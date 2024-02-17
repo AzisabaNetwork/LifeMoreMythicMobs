@@ -5,10 +5,7 @@ import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicConditionLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMechanicLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicReloadedEvent;
 import io.lumine.xikage.mythicmobs.skills.placeholders.PlaceholderManager;
-import net.azisaba.lifemoremythicmobs.condition.HasEmptyInventorySlotCondition;
-import net.azisaba.lifemoremythicmobs.condition.RealTimeConditions;
-import net.azisaba.lifemoremythicmobs.condition.ServerEqualsCondition;
-import net.azisaba.lifemoremythicmobs.condition.VarNotEqualsCondition;
+import net.azisaba.lifemoremythicmobs.condition.*;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.placeholder.*;
 import org.bukkit.event.EventHandler;
@@ -73,6 +70,9 @@ public class Register implements Listener {
         }
         if ( condition.equalsIgnoreCase("HasEmptyInventorySlot") ) {
             e.register(new HasEmptyInventorySlotCondition(e.getConfig()));
+        }
+        if ( condition.equalsIgnoreCase("BowTension") ) {
+            e.register(new BowTensionCondition(e.getConfig()));
         }
     }
 
