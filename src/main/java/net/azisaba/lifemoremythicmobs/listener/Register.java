@@ -10,11 +10,12 @@ import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.placeholder.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
 public class Register implements Listener {
 
     @EventHandler
-    public void onMythicMechanicLoad(MythicMechanicLoadEvent e)	{
+    public void onMythicMechanicLoad(@NotNull MythicMechanicLoadEvent e)	{
 
         String mechanic = e.getMechanicName();
 
@@ -55,7 +56,7 @@ public class Register implements Listener {
     }
 
     @EventHandler
-    public void onMythicConditionLoad(MythicConditionLoadEvent e) {
+    public void onMythicConditionLoad(@NotNull MythicConditionLoadEvent e) {
 
         String condition = e.getConditionName();
 
@@ -73,6 +74,9 @@ public class Register implements Listener {
         }
         if ( condition.equalsIgnoreCase("BowTension") ) {
             e.register(new BowTensionCondition(e.getConfig()));
+        }
+        if ( condition.equalsIgnoreCase("PlayersInRadius") ) {
+            e.register(new PlayersInRadiusCondition(e.getConfig()));
         }
     }
 
