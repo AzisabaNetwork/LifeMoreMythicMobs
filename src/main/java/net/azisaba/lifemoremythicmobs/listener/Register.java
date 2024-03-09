@@ -78,6 +78,9 @@ public class Register implements Listener {
         if ( condition.equalsIgnoreCase("PlayersInRadius") ) {
             e.register(new PlayersInRadiusCondition(e.getConfig()));
         }
+        if ( condition.equalsIgnoreCase("DayOfWeek") ) {
+            e.register(new DayOfWeekCondition(e.getConfig()));
+        }
     }
 
     @EventHandler
