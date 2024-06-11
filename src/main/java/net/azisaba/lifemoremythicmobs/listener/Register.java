@@ -81,6 +81,9 @@ public class Register implements Listener {
         if ( condition.equalsIgnoreCase("DayOfWeek") ) {
             e.register(new DayOfWeekCondition(e.getConfig()));
         }
+        if ( condition.equalsIgnoreCase("isPet") ) {
+            e.register(new IsPetCondition(e.getConfig()));
+        }
     }
 
     @EventHandler

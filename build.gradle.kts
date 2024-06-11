@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "net.azisaba.lifemoremythicmobs"
-version = "2.3.3"
+version = "2.3.4"
 
 repositories {
     mavenCentral()
@@ -19,6 +19,14 @@ repositories {
     maven {
         url = uri("https://mvn.lumine.io/repository/maven-public/")
     }
+    maven {
+        name = "jitpack"
+        url = uri("https://jitpack.io")
+    }
+    maven {
+        name = "mypet"
+        url = uri("https://repo.mypet-plugin.de/")
+    }
 }
 
 dependencies {
@@ -26,6 +34,7 @@ dependencies {
     compileOnly("org.jetbrains:annotations:24.0.1")
     compileOnly("io.lumine.xikage:MythicMobs:4.12.0")
     compileOnly("org.spigotmc:spigot:1.15.2-R0.1-SNAPSHOT")
+    compileOnly("com.github.MyPetORG.MyPet:mypet-api:5c8ceeac6a")
 }
 
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(8))
