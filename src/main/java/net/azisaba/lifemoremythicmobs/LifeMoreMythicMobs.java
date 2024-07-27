@@ -5,6 +5,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.azisaba.lifemoremythicmobs.commands.RootCommand;
 import net.azisaba.lifemoremythicmobs.listener.BowForceListener;
+import net.azisaba.lifemoremythicmobs.listener.JoinListener;
 import net.azisaba.lifemoremythicmobs.listener.Register;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -25,6 +26,7 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
         Objects.requireNonNull(getCommand("lmmm")).setExecutor(new RootCommand());
         getServer().getPluginManager().registerEvents(new Register(), this);
         getServer().getPluginManager().registerEvents(new BowForceListener(), this);
+        getServer().getPluginManager().registerEvents(new JoinListener(this), this);
         Bukkit.getScheduler().runTask(this, Register::reloadPlaceholders);
 
         Bukkit.getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
