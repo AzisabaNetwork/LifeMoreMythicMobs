@@ -6,7 +6,6 @@ import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMechanicLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicReloadedEvent;
 import io.lumine.xikage.mythicmobs.skills.placeholders.PlaceholderManager;
 import net.azisaba.lifemoremythicmobs.condition.*;
-import net.azisaba.lifemoremythicmobs.condition.ItemInSlotCondition;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.placeholder.*;
 import org.bukkit.event.EventHandler;
