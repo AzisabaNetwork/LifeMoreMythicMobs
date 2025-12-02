@@ -6,6 +6,7 @@ import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMechanicLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicReloadedEvent;
 import io.lumine.xikage.mythicmobs.skills.placeholders.PlaceholderManager;
 import net.azisaba.lifemoremythicmobs.condition.*;
+import net.azisaba.lifemoremythicmobs.condition.ItemInSlotCondition;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.placeholder.*;
 import org.bukkit.event.EventHandler;
@@ -89,6 +90,16 @@ public class Register implements Listener {
         }
         if ( condition.equalsIgnoreCase("mmidContains") ) {
             e.register(new ItemMMIDContainsCondition(e.getConfig()));
+        }
+        if ( condition.equalsIgnoreCase("valCompare") ||
+                condition.equalsIgnoreCase("valCompares") ||
+                condition.equalsIgnoreCase("compareValues") ||
+                condition.equalsIgnoreCase("compareValue")
+        ) {
+            e.register(new ValCompareCondition(e.getConfig()));
+        }
+        if ( condition.equalsIgnoreCase("itemInSlot") ) {
+            e.register(new ItemInSlotCondition(e.getConfig()));
         }
     }
 
