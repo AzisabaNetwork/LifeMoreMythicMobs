@@ -18,6 +18,7 @@ public class SetLoreLineVarMechanic extends SkillMechanic implements ITargetedEn
     protected final String varName;
     protected final boolean stripColor;
     protected final boolean offhand;
+    protected final String slotType;
 
     public SetLoreLineVarMechanic(MythicLineConfig config) {
         super(config.getLine(), config);
@@ -26,6 +27,7 @@ public class SetLoreLineVarMechanic extends SkillMechanic implements ITargetedEn
         this.varName = config.getString(new String[] {"variable", "var", "v", "変数"});
         this.stripColor = config.getBoolean(new String[] {"stripcolor", "sc", "色削除"}, false);
         this.offhand = config.getBoolean(new String[] {"offhand", "o", "オフハンド"}, false);
+        this.slotType = config.getString(new String[] {"slot", "s", "スロット"}, "DEFAULT").toUpperCase();
     }
 
     @Override
@@ -35,8 +37,50 @@ public class SetLoreLineVarMechanic extends SkillMechanic implements ITargetedEn
         if (entity instanceof LivingEntity) {
             EntityEquipment equipment = ((LivingEntity) entity).getEquipment();
             if (equipment != null) {
-                ItemStack stack = offhand ? equipment.getItemInOffHand() : equipment.getItemInMainHand();
-                line = ItemUtil.getLoreLine(stack, lineNumber);
+                ItemStack stack = null;
+                boolean isArmorSlot = false;
+                if (!slotType.equals("DEFAULT")) {
+                    switch (slotType) {
+                        case "MAINHAND":
+                            stack = equipment.getItemInMainHand();
+                            break;
+                        case "OFFHAND":
+                            stack = equipment.getItemInOffHand();
+                            break;
+                        case "HEAD":
+                        case "HELMET":
+                            stack = equipment.getHelmet();
+                            isArmorSlot = true;
+                            break;
+                        case "CHEST":
+                        case "CHESTPLATE":
+                            stack = equipment.getChestplate();
+                            isArmorSlot = true;
+                            break;
+                        case "LEGS":
+                        case "LEGGINGS":
+                            stack = equipment.getLeggings();
+                            isArmorSlot = true;
+                            break;
+                        case "FEET":
+                        case "BOOTS":
+                            stack = equipment.getBoots();
+                            isArmorSlot = true;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if (stack == null && !isArmorSlot) {
+                    if (offhand) {
+                        stack = equipment.getItemInOffHand();
+                    } else {
+                        stack = equipment.getItemInMainHand();
+                    }
+                }
+                if (stack != null) {
+                    line = ItemUtil.getLoreLine(stack, lineNumber);
+                }
             }
         }
         if (stripColor) line = ChatColor.stripColor(line);

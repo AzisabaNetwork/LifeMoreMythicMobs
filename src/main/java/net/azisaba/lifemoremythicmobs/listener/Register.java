@@ -84,6 +84,12 @@ public class Register implements Listener {
         if ( condition.equalsIgnoreCase("isPet") ) {
             e.register(new IsPetCondition(e.getConfig()));
         }
+        if ( condition.equalsIgnoreCase("mmidStartsWith") ) {
+            e.register(new ItemMMIDStartsWithCondition(e.getConfig()));
+        }
+        if ( condition.equalsIgnoreCase("mmidContains") ) {
+            e.register(new ItemMMIDContainsCondition(e.getConfig()));
+        }
     }
 
     @EventHandler
