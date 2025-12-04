@@ -1,26 +1,27 @@
 # SetVarLoreLine
 ## Description
-プレイヤーのホットバーのスロット/オフハンドに持っているアイテムのLoreを変数に格納する
+プレイヤーの装備スロット，またはメインハンド・オフハンドに持っているアイテムのLoreを指定した変数に格納する．
 ## Attributes
-| Attribute | Aliases | Description | Default |
-| :-- | :-- | :-- | :-- |
-| variable | var, v, 変数 | 取得したLoreを格納する変数の名前 | null |
-| line | l, 行 | 取得したいLoreの行番号(0が一番上) | 0 |
-| stripcolor | sc, 色削除 | Loreに含まれるカラーコードを除去するか | false |
-| slot | s, スロット | ホットバーのスロットか、部位を指定する。 | "DEFAULT" |
-| offhand | o, オフハンド | slotが指定されていない場合に、オフハンドに所持しているアイテムを対象にするか<br>※ 恐らく`slot=OFFHAND`の方が良いので、非推奨 | false |
-
+| Attribute  | Aliases          | Description                                                         | Default  |
+|:-----------|:-----------------|:--------------------------------------------------------------------|:---------|
+| variable   | `var`, `v`, `変数` | 取得したLoreを格納する変数の名前                                                  | null     |
+| line       | `l`, `行`         | 取得したいLoreの行番号<br>0を指定した場合，1行目が返されます)                                | 0        |
+| stripcolor | `sc`, `色削除`      | Loreに含まれるカラーコードを除去するかどうか                                            | false    |
+| slot       | `s`, `スロット`      | Loreを取得したい装備部位またはスロットを指定する                                          | MAINHAND |
+| offhand    | `o`, `オフハンド`     | `slot`が指定されていないときに，オフハンドのアイテムを対象にするかどうか<br/>※`slot="OFFHAND"`の使用を推奨 | false    |
 ## Examples
+> オフハンドに所持しているアイテムのLoreの上から2番目(インデックス`1`)を取得し，カラーコードを削除して`<caster.var.cl7_ohItemLore>`に格納する．
 ```yml
  Skills:
- - SetVarLoreLine{var=caster.cl7_ohItemLore;sc=true;line=1;slot=OFFHAND}
+   - SetVarLoreLine{var=caster.c17_ohItemLore;sc=true;line=1;slot=OFFHAND}
 ```
-> オフハンドに所持しているアイテムのLoreの、上から2番目を`<caster.var.cl7_ohItemLore>`に格納する
+<br/>
+
+> 胴体に所持しているアイテムのLoreの上から2番目を(インデックス`1`)を取得し，`<caster.var.cl7_ohItemLore>`に格納する．
 ```yml
  Skills:
- - SetVarLoreLine{var=caster.cl7_ohItemLore;sc=true;line=1;slot=CHEST}
+   - SetVarLoreLine{var=caster.cl7_ohItemLore;sc=true;line=1;slot=CHEST}
 ```
-> 胴体に所持しているアイテムのLoreの、上から2番目を`<caster.var.cl7_ohItemLore>`に格納する
 
 ## Aliases
 - SetLoreLineVar
