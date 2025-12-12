@@ -15,7 +15,8 @@ import java.util.stream.Collectors;
 
 public class RootCommand implements TabExecutor {
     private static final List<SubCommand> commands = Arrays.asList(
-            new FindMythicItemCommand()
+            new FindMythicItemCommand(),
+            new FindMythicMobCommand()
     );
 
     @Override
@@ -49,13 +50,16 @@ public class RootCommand implements TabExecutor {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
-            return commands.stream().map(SubCommand::getName).collect(Collectors.toList());
+            return commands.stream()
+                    .map(SubCommand::getName)
+                    .filter(name -> name.toLowerCase().startsWith(args[0].toLowerCase()))
+                    .collect(Collectors.toList());
         }
-        if (args.length == 2 && sender instanceof Player) {
+        if (args.length >= 2 && sender instanceof Player) {
             return commands.stream()
                     .filter(subCommand -> subCommand.getName().equalsIgnoreCase(args[0]))
                     .findFirst()
-                    .map(subCommand -> subCommand.suggest((Player) sender, args))
+                    .map(subCommand -> subCommand.suggest((Player) sender, Arrays.copyOfRange(args, 1, args.length)))
                     .orElse(Collections.emptyList());
         }
         return Collections.emptyList();
