@@ -72,6 +72,9 @@ public class Register implements Listener {
         if ( condition.equalsIgnoreCase("HasEmptyInventorySlot") ) {
             e.register(new HasEmptyInventorySlotCondition(e.getConfig()));
         }
+        if ( condition.equalsIgnoreCase("HasItem") ) {
+            e.register(new HasItemCondition(e.getConfig()));
+        }
         if ( condition.equalsIgnoreCase("BowTension") ) {
             e.register(new BowTensionCondition(e.getConfig()));
         }

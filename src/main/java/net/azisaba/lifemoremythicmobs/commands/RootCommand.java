@@ -1,5 +1,6 @@
 package net.azisaba.lifemoremythicmobs.commands;
 
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -14,10 +15,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class RootCommand implements TabExecutor {
-    private static final List<SubCommand> commands = Arrays.asList(
-            new FindMythicItemCommand(),
-            new FindMythicMobCommand()
-    );
+
+    private final LifeMoreMythicMobs plugin;
+    private final List<SubCommand> commands;
+
+    public RootCommand(LifeMoreMythicMobs plugin) {
+        this.plugin = plugin;
+        this.commands = Arrays.asList(
+                new FindMythicItemCommand(plugin),
+                new FindMythicMobCommand(plugin)
+        );
+    }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {

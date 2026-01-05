@@ -26,7 +26,7 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
         if (!Objects.requireNonNull(getConfig().getString("server-override", "")).isEmpty()) {
             server = getConfig().getString("server-override", "");
         }
-        Objects.requireNonNull(getCommand("lmmm")).setExecutor(new RootCommand());
+        Objects.requireNonNull(getCommand("lmmm")).setExecutor(new RootCommand(this));
         getServer().getPluginManager().registerEvents(new Register(), this);
         getServer().getPluginManager().registerEvents(new BowForceListener(), this);
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
