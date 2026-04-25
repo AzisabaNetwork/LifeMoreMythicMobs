@@ -15,19 +15,19 @@ LifeMoreMythicMobsで追加されたスキル群の説明。
 ## Mechanics
 具体的なMechanicの記述法は[wiki](https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Skills/Mechanics)を見よう！
 
-| Mechanic                                                           | Description             |
-|:-------------------------------------------------------------------|:------------------------|
-| [takeinv](docs/mechanics/takeinv.md)                               | インベントリからアイテムを削除します      |
-| [particleVerticalRing](docs/mechanics/particleverticalring.md)     | particleRingの向きが違うバージョン |
-| bossbar                                                            | ボスバーを表示します。非推奨          |
-| removebossbar[! copy.md](docs/mechanics/%21%20copy.md)             | bossbarで作ったやつを削除します     |
-| modifybossbar                                                      | bossbarで作ったやつをいじれます     |
-| [nullRecovery](docs/mechanics/nullRecovery.md)                     | ヒール量を指定させた値の量低下させます     |
-| [slotJam](docs/mechanics/slotJam.md)                               | プレイヤーのホットバースロットを固定させます  |
-| [fakeSoundDistortion](docs/mechanics/fakeSoundDistortion.md)       | サウンドを指定したピッチを動的に変化させる   |
-| [setFirstPersonView](docs/mechanics/setFirstPersonView.md)         | プレイヤーの視点を指定した座標へ移す      |
-| [fakeWorldBorder](docs/mechanics/fakeWorldBorder.md)               | ワールドボーダーを表示する           |
-| [skyRotation](docs/mechanics/skyRotation.md)                       | 空を爆速で変化させる              |
+| Mechanic                                                       | Description             |
+|:---------------------------------------------------------------|:------------------------|
+| [takeinv](docs/mechanics/takeinv.md)                           | インベントリからアイテムを削除します      |
+| [particleVerticalRing](docs/mechanics/particleverticalring.md) | particleRingの向きが違うバージョン |
+| bossbar                                                        | ボスバーを表示します。非推奨          |
+| removebossbar                                                  | bossbarで作ったやつを削除します     |
+| modifybossbar                                                  | bossbarで作ったやつをいじれます     |
+| [nullRecovery](docs/mechanics/nullRecovery.md)                 | ヒール量を指定させた値の量低下させます     |
+| [slotJam](docs/mechanics/slotJam.md)                           | プレイヤーのホットバースロットを固定させます  |
+| [fakeSoundDistortion](docs/mechanics/fakeSoundDistortion.md)   | サウンドを指定したピッチを動的に変化させる   |
+| [setFirstPersonView](docs/mechanics/setFirstPersonView.md)     | プレイヤーの視点を指定した座標へ移す      |
+| [fakeWorldBorder](docs/mechanics/fakeWorldBorder.md)           | ワールドボーダーを表示する           |
+| [skyRotation](docs/mechanics/skyRotation.md)                   | 空を爆速で変化させる              |
 
 ---
 
