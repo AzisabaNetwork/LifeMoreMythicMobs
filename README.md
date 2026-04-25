@@ -15,13 +15,19 @@ LifeMoreMythicMobsで追加されたスキル群の説明。
 ## Mechanics
 具体的なMechanicの記述法は[wiki](https://git.mythiccraft.io/mythiccraft/MythicMobs/-/wikis/Skills/Mechanics)を見よう！
 
-| Mechanic | Description |
-|:---------------------------------------------------------------|:--|
-| [takeinv](docs/mechanics/takeinv.md) | インベントリからアイテムを削除します |
-| [particleVerticalRing](docs/mechanics/particleverticalring.md) | particleRingの向きが違うバージョン |
-| bossbar | ボスバーを表示します。非推奨 |
-| removebossbar | bossbarで作ったやつを削除します |
-| modifybossbar | bossbarで作ったやつをいじれます |
+| Mechanic                                                            | Description             |
+|:--------------------------------------------------------------------|:------------------------|
+| [takeinv](docs/mechanics/takeinv.md)                                | インベントリからアイテムを削除します      |
+| [particleVerticalRing](docs/mechanics/particleverticalring.md)      | particleRingの向きが違うバージョン |
+| bossbar                                                             | ボスバーを表示します。非推奨          |
+| removebossbar[! copy.md](docs/mechanics/%21%20copy.md)              | bossbarで作ったやつを削除します     |
+| modifybossbar                                                       | bossbarで作ったやつをいじれます     |
+| [nullRecovery](docs/mechanics/nullRecovery.md)                      | ヒール量を指定させた値の量低下させます     |
+| [slotJam](docs/mechanics/slotJam.md)                                | プレイヤーのホットバースロットを固定させます  |
+| [fakeSoundDistortion](docs/mechanics/fakeSoundDistortion.md)        | サウンドを指定したピッチを動的に変化させる   |
+| [setFirstPersonView](docs/mechanics/setFirstPersonView.md)          | プレイヤーの視点を指定した座標へ移す      |
+| [fakeWorldBorder](docs/mechanics/fakeWorldBorder.md)fakeWorldBorder | ワールドボーダーを表示する           |
+| [skyRotation](docs/mechanics/skyRotation.md)                        | 空を爆速で変化させる              |
 
 ---
 
@@ -31,14 +37,14 @@ wikiのMetaMechanicsに書いてあるものと、恐らく同じような効果
 > これらのスキルメカニクスは特別な高度な機能を持ち、そのほとんどは他のスキルを呼び出すために使用されます。  
 > ターゲットを指定した場合、これらによって呼び出される他のすべてのスキルは（該当する場合）そのターゲットを「継承」します。(DeepL)
 
-| Mechanic | Description |
+| Mechanic                                                 | Description                               |
 |:---------------------------------------------------------|:------------------------------------------|
-| [MMLuckEval](docs/mechanics/MMLuckEval.md) | <font color=#e6798c>わ...わかんないっピ...</font> |
-| [SetVarDisplayName](docs/mechanics/SetVarDisplayName.md) | アイテムのDisplayを変数に入れます |
-| [SetVarLoreLine](docs/mechanics/SetVarLoreLine.md) | アイテムのLoreを変数に入れます |
-| [VarSubstring](docs/mechanics/VarSubstring.md) | 変数から文字列を抽出します |
-| [VarExtractNumber](docs/mechanics/VarExtractNumber.md) | 変数から数値のみを抽出します |
-| [VarReplaceRegex](docs/mechanics/VarReplaceRegex.md) | 変数の文字列を設定された正規表現に基づいて置換します |
+| [MMLuckEval](docs/mechanics/MMLuckEval.md)               | <font color=#e6798c>わ...わかんないっピ...</font> |
+| [SetVarDisplayName](docs/mechanics/SetVarDisplayName.md) | アイテムのDisplayを変数に入れます                      |
+| [SetVarLoreLine](docs/mechanics/SetVarLoreLine.md)       | アイテムのLoreを変数に入れます                         |
+| [VarSubstring](docs/mechanics/VarSubstring.md)           | 変数から文字列を抽出します                             |
+| [VarExtractNumber](docs/mechanics/VarExtractNumber.md)   | 変数から数値のみを抽出します                            |
+| [VarReplaceRegex](docs/mechanics/VarReplaceRegex.md)     | 変数の文字列を設定された正規表現に基づいて置換します                |
 
 ---
 
