@@ -49,10 +49,27 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("VarReplaceRegex") ) {
             e.register(new VarReplaceRegexMechanic(e.getConfig()));
         }
+        if ( mechanic.equalsIgnoreCase("nullrecovery") ) {
+            e.register(new NullRecoveryMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("slotjam") ) {
+            e.register(new SlotJamMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("fakesounddistortion") || mechanic.equalsIgnoreCase("fakesound") ) {
+            e.register(new FakeSoundDistortionMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("setFirstPersonView") || mechanic.equalsIgnoreCase("sfpv") ) {
+            e.register(new SetFirstPersonViewMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("fakeWorldBorder") || mechanic.equalsIgnoreCase("fakeborder")  ) {
+            e.register(new FakeWorldBorderMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("skyRotation") || mechanic.equalsIgnoreCase("skyrotate")  ) {
+            e.register(new SkyRotationMechanic(e.getConfig()));
+        }
         if ( mechanic.equalsIgnoreCase("MMLuckEval") ) {
             e.register(new MMLuckEvalMechanic(e.getConfig()));
         }
-
     }
 
     @EventHandler
