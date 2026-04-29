@@ -1,0 +1,147 @@
+package net.azisaba.lifemoremythicmobs.mechanic;
+
+import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
+import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
+import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
+import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
+import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
+import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
+import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderInt;
+import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderString;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.plugin.Plugin;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class LockInventoryMechanic extends SkillMechanic implements ITargetedEntitySkill {
+
+    private static final Map<String, InventoryLock> activeLocks = new ConcurrentHashMap<>();
+
+    protected final PlaceholderString slots;
+    protected final PlaceholderInt duration;
+
+    public LockInventoryMechanic(MythicLineConfig config) {
+        super(config.getLine(), config);
+        this.slots = PlaceholderString.of(config.getString(new String[]{"slots", "s"}, "0"));
+        this.duration = PlaceholderInt.of(config.getString(new String[]{"duration", "d"}, "200"));
+    }
+
+    @Override
+    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
+        if (!(BukkitAdapter.adapt(target) instanceof Player)) return false;
+
+        Player player = (Player) BukkitAdapter.adapt(target);
+        String resolvedSlots = this.slots.get(data, target);
+        int lockDuration = this.duration.get(data, target);
+
+        Set<Integer> targetSlots = parseSlots(resolvedSlots);
+        if (targetSlots.isEmpty()) return false;
+
+        String id = player.getUniqueId() + ":" + resolvedSlots;
+
+        if (activeLocks.containsKey(id)) {
+            activeLocks.get(id).refresh(lockDuration);
+        } else {
+            new InventoryLock(player, id, targetSlots, lockDuration);
+        }
+        return true;
+    }
+
+    private Set<Integer> parseSlots(String input) {
+        Set<Integer> slots = new HashSet<>();
+        for (String part : input.split(",")) {
+            if (part.contains("-")) {
+                String[] range = part.split("-");
+                try {
+                    int start = Integer.parseInt(range[0].trim());
+                    int end = Integer.parseInt(range[1].trim());
+                    for (int i = Math.min(start, end); i <= Math.max(start, end); i++) {
+                        slots.add(i);
+                    }
+                } catch (Exception ignored) {}
+            } else {
+                try {
+                    slots.add(Integer.parseInt(part.trim()));
+                } catch (Exception ignored) {}
+            }
+        }
+        return slots;
+    }
+
+    private static class InventoryLock implements Listener, Runnable {
+        private final Player player;
+        private final String id;
+        private final Set<Integer> lockedSlots;
+        private int ticksRemaining;
+        private int taskId = -1;
+
+        public InventoryLock(Player player, String id, Set<Integer> slots, int duration) {
+            this.player = player;
+            this.id = id;
+            this.lockedSlots = slots;
+            this.ticksRemaining = duration;
+
+            Plugin plugin = Bukkit.getPluginManager().getPlugin("MythicMobs");
+            if (plugin != null) {
+                activeLocks.put(id, this);
+                Bukkit.getPluginManager().registerEvents(this, plugin);
+                this.taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this, 0L, 1L);
+            }
+        }
+
+        public void refresh(int duration) {
+            this.ticksRemaining = duration;
+        }
+
+        @Override
+        public void run() {
+            if (!player.isOnline() || ticksRemaining <= 0) {
+                stop();
+                return;
+            }
+            ticksRemaining--;
+        }
+
+        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+        public void onInventoryClick(InventoryClickEvent event) {
+            if (!event.getWhoClicked().getUniqueId().equals(player.getUniqueId())) return;
+
+            if (lockedSlots.contains(event.getSlot()) ||
+                    lockedSlots.contains(event.getRawSlot()) ||
+                    lockedSlots.contains(event.getHotbarButton())) {
+                event.setCancelled(true);
+            }
+        }
+
+        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+        public void onInventoryDrag(InventoryDragEvent event) {
+            if (!event.getWhoClicked().getUniqueId().equals(player.getUniqueId())) return;
+
+            for (int slot : event.getInventorySlots()) {
+                if (lockedSlots.contains(slot)) {
+                    event.setCancelled(true);
+                    break;
+                }
+            }
+        }
+
+        private void stop() {
+            if (taskId != -1) {
+                Bukkit.getScheduler().cancelTask(taskId);
+                taskId = -1;
+            }
+            HandlerList.unregisterAll(this);
+            activeLocks.remove(id);
+        }
+    }
+}

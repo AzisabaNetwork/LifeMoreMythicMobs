@@ -4,10 +4,12 @@ import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicConditionLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMechanicLoadEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicReloadedEvent;
+import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicTargeterLoadEvent;
 import io.lumine.xikage.mythicmobs.skills.placeholders.PlaceholderManager;
 import net.azisaba.lifemoremythicmobs.condition.*;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.placeholder.*;
+import net.azisaba.lifemoremythicmobs.targetter.SphereTargeter;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
@@ -64,11 +66,32 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("fakeWorldBorder") || mechanic.equalsIgnoreCase("fakeborder")  ) {
             e.register(new FakeWorldBorderMechanic(e.getConfig()));
         }
-        if ( mechanic.equalsIgnoreCase("skyRotation") || mechanic.equalsIgnoreCase("skyrotate")  ) {
+        if ( mechanic.equalsIgnoreCase("skyRotation") || mechanic.equalsIgnoreCase("skyrotate") ) {
             e.register(new SkyRotationMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("fakeblock") ) {
+            e.register(new FakeBlockMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("onDeath") || mechanic.equalsIgnoreCase("onDeathAura") ) {
+            e.register(new OnDeathAuraMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("modifyAttribute") || mechanic.equalsIgnoreCase("modAttribute") ) {
+            e.register(new ModifyAttributeMechanic(e.getConfig()));
         }
         if ( mechanic.equalsIgnoreCase("MMLuckEval") ) {
             e.register(new MMLuckEvalMechanic(e.getConfig()));
+        }
+        if (mechanic.equalsIgnoreCase("varOnSwing") || mechanic.equalsIgnoreCase("vOnSwing") ) {
+            e.register(new VarOnInteractAuraMechanic(e.getConfig(), true));
+        }
+        if (mechanic.equalsIgnoreCase("varOnUse") || mechanic.equalsIgnoreCase("vOnUse") ) {
+            e.register(new VarOnInteractAuraMechanic(e.getConfig(), false));
+        }
+        if (mechanic.equalsIgnoreCase("LockInventory") || mechanic.equalsIgnoreCase("LockInv") ) {
+            e.register(new LockInventoryMechanic(e.getConfig()));
+        }
+        if (mechanic.equalsIgnoreCase("newRandomSkill") || mechanic.equalsIgnoreCase("nRandomSkill") ) {
+            e.register(new NewRandomSkillMechanic(e.getConfig()));
         }
     }
 
@@ -134,6 +157,15 @@ public class Register implements Listener {
         ServerNamePlaceholder.register(manager);
         CasterArmorPlaceholder.register(manager);
         CasterAttackPlaceholder.register(manager);
+    }
+
+    @EventHandler
+    public void onMythicTargeterLoad(@NotNull MythicTargeterLoadEvent e) {
+        String targeter = e.getTargeterName();
+
+        if ( targeter.equalsIgnoreCase("Sphere") ) {
+            e.register(new SphereTargeter(e.getConfig()));
+        }
     }
 
 }

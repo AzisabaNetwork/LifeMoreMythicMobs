@@ -8,8 +8,6 @@ import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
-import static io.lumine.xikage.mythicmobs.MythicMobs.inst;
-
 public class CasterArmorPlaceholder {
     public static void register(PlaceholderManager manager) {
         manager.register("caster.armor", Placeholder.meta(((placeholderMeta, s) -> {
