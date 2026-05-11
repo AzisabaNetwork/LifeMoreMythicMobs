@@ -75,7 +75,7 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("onDeath") || mechanic.equalsIgnoreCase("onDeathAura") ) {
             e.register(new OnDeathAuraMechanic(e.getConfig()));
         }
-        if ( mechanic.equalsIgnoreCase("modifyAttribute") || mechanic.equalsIgnoreCase("modAttribute") ) {
+        if ( mechanic.equalsIgnoreCase("modifyPlayerAttribute") || mechanic.equalsIgnoreCase("modPAttribute") ) {
             e.register(new ModifyAttributeMechanic(e.getConfig()));
         }
         if ( mechanic.equalsIgnoreCase("MMLuckEval") ) {
@@ -157,6 +157,7 @@ public class Register implements Listener {
         ServerNamePlaceholder.register(manager);
         CasterArmorPlaceholder.register(manager);
         CasterAttackPlaceholder.register(manager);
+        CasterLuckPlaceholder.register(manager);
     }
 
     @EventHandler
