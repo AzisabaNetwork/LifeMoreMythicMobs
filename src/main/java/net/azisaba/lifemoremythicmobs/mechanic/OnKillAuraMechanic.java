@@ -2,9 +2,11 @@ package net.azisaba.lifemoremythicmobs.mechanic;
 
 import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
+import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
 import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
 import io.lumine.xikage.mythicmobs.skills.*;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
@@ -16,21 +18,21 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntitySkill {
+public class OnKillAuraMechanic extends SkillMechanic implements ITargetedEntitySkill {
 
-    private static final Map<String, DeathAura> activeAuras = new ConcurrentHashMap<>();
+    private static final Map<String, KillAura> activeAuras = new ConcurrentHashMap<>();
 
     protected final String auraName;
-    protected final String onDeathSkill;
+    protected final String onKillSkill;
     protected final String onTickSkill;
     protected final String onEndSkill;
     protected final int duration;
     protected final int tickInterval;
 
-    public OnDeathAuraMechanic(MythicLineConfig config) {
+    public OnKillAuraMechanic(MythicLineConfig config) {
         super(config.getLine(), config);
-        this.auraName = config.getString(new String[]{"auraName", "aura", "n"}, "death_aura");
-        this.onDeathSkill = config.getString(new String[]{"onDeath", "od"}, null);
+        this.auraName = config.getString(new String[]{"auraName", "aura", "n"}, "kill_aura");
+        this.onKillSkill = config.getString(new String[]{"onKill", "ok"}, null);
         this.onTickSkill = config.getString(new String[]{"onTick", "ot"}, null);
         this.onEndSkill = config.getString(new String[]{"onEnd", "oe"}, null);
         this.duration = config.getInteger(new String[]{"duration", "d"}, 200);
@@ -53,18 +55,18 @@ public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntit
             return true;
         }
 
-        new DeathAura(target, data, id);
+        new KillAura(target, data, id);
         return true;
     }
 
-    private class DeathAura implements Listener, Runnable {
+    private class KillAura implements Listener, Runnable {
         private final AbstractEntity target;
         private final SkillMetadata data;
         private final String id;
         private int ticksRemaining;
         private final int taskId;
 
-        public DeathAura(AbstractEntity target, SkillMetadata data, String id) {
+        public KillAura(AbstractEntity target, SkillMetadata data, String id) {
             this.target = target;
             this.data = data;
             this.id = id;
@@ -92,17 +94,17 @@ public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntit
             }
 
             if (onTickSkill != null && ticksRemaining % tickInterval == 0) {
-                executeSkill(onTickSkill);
+                executeSkill(onTickSkill, target);
             }
 
             ticksRemaining--;
         }
 
         @EventHandler(priority = EventPriority.MONITOR)
-        public void onDeath(EntityDeathEvent event) {
-            if (event.getEntity().getUniqueId().equals(target.getUniqueId())) {
-                executeSkill(onDeathSkill);
-                stop(false);
+        public void onKill(EntityDeathEvent event) {
+            LivingEntity victim = event.getEntity();
+            if (victim.getKiller() != null && victim.getKiller().getUniqueId().equals(target.getUniqueId())) {
+                executeSkill(onKillSkill, BukkitAdapter.adapt(victim));
             }
         }
 
@@ -110,15 +112,19 @@ public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntit
             Bukkit.getScheduler().cancelTask(taskId);
             HandlerList.unregisterAll(this);
             activeAuras.remove(id);
-            if (timeOut) executeSkill(onEndSkill);
+            if (timeOut) executeSkill(onEndSkill, target);
         }
 
-        private void executeSkill(String skillName) {
+        private void executeSkill(String skillName, AbstractEntity trigger) {
             if (skillName == null || skillName.isEmpty()) return;
             Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(skillName);
             maybeSkill.ifPresent(skill -> {
                 SkillMetadata clone = data.deepClone();
-                clone.setTrigger(target);
+                if (trigger != null) {
+                    clone.setTrigger(trigger);
+                } else {
+                    clone.setTrigger(target);
+                }
                 skill.execute(clone);
             });
         }

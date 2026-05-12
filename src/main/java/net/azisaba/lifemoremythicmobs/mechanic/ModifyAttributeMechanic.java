@@ -1,12 +1,11 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
+import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
 import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
-import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
-import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderDouble;
+import io.lumine.xikage.mythicmobs.skills.*;
+import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderString;
 import io.lumine.xikage.mythicmobs.utils.Schedulers;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
@@ -16,6 +15,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,24 +23,42 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
 
     private static final Map<String, AttributeModTask> activeMods = new ConcurrentHashMap<>();
 
-    protected final PlaceholderDouble amount;
+    protected final PlaceholderString amountStr;
     protected final int duration;
     protected final String auraName;
     protected final String attributeName;
     protected final boolean fixed;
+    protected final boolean capAtZero;
+
+    protected final String onTickSkill;
+    protected final String onEndSkill;
+    protected final int tickInterval;
 
     public ModifyAttributeMechanic(MythicLineConfig config) {
         super(config.getLine(), config);
-        this.amount = PlaceholderDouble.of(config.getString(new String[]{"amount", "a"}, "0.0"));
+        this.amountStr = PlaceholderString.of(config.getString(new String[]{"amount", "a"}, "0.0"));
         this.duration = config.getInteger(new String[]{"duration", "d"}, 100);
-        this.auraName = config.getString(new String[]{"auraName", "n"}, "attr_mod");
-        this.fixed = config.getBoolean(new String[]{"fixed", "f"}, false);
+        this.auraName = config.getString(new String[]{"auraName", "aura", "n"}, "attr_mod");
+        this.fixed = config.getBoolean(new String[]{"fixed", "fix", "f"}, false);
+        this.capAtZero = config.getBoolean(new String[]{"capAtZero", "cap", "c"}, true);
         this.attributeName = config.getString(new String[]{"type", "t", "attribute"}, "GENERIC_ARMOR").toUpperCase();
+        this.onTickSkill = config.getString(new String[]{"onTick", "ot"}, null);
+        this.onEndSkill = config.getString(new String[]{"onEnd", "oe"}, null);
+        this.tickInterval = config.getInteger(new String[]{"tickInterval", "ti"}, 1);
+    }
+
+    public static void remove(AbstractEntity target, String auraName) {
+        String uuidStr = target.getUniqueId().toString();
+        activeMods.forEach((id, task) -> {
+            if (id.startsWith(uuidStr) && id.endsWith(":" + auraName)) {
+                task.stop();
+            }
+        });
     }
 
     @Override
     public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
-        double val = this.amount.get(data, target);
+        String resolvedAmount = this.amountStr.get(data, target);
 
         Schedulers.sync().run(() -> {
             if (!(BukkitAdapter.adapt(target) instanceof LivingEntity)) return;
@@ -58,7 +76,7 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
                 activeMods.get(id).stop();
             }
 
-            new AttributeModTask(entity, targetAttr, id, val, duration);
+            new AttributeModTask(entity, targetAttr, id, resolvedAmount, duration, data);
         });
         return true;
     }
@@ -69,9 +87,7 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
                 try { return Attribute.valueOf("GENERIC_" + name); } catch (Exception ignored) {}
             }
             return Attribute.valueOf(name);
-        } catch (Exception e) {
-            return null;
-        }
+        } catch (Exception e) { return null; }
     }
 
     private class AttributeModTask implements Runnable {
@@ -79,14 +95,16 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
         private final Attribute attribute;
         private final String id;
         private final AttributeModifier modifier;
+        private final SkillMetadata data;
         private int ticksRemaining;
         private int taskId = -1;
 
-        public AttributeModTask(LivingEntity entity, Attribute attribute, String id, double amount, int duration) {
+        public AttributeModTask(LivingEntity entity, Attribute attribute, String id, String amountInput, int duration, SkillMetadata data) {
             this.entity = entity;
             this.attribute = attribute;
             this.id = id;
             this.ticksRemaining = duration;
+            this.data = data;
 
             AttributeInstance attrInstance = entity.getAttribute(attribute);
             if (attrInstance == null) {
@@ -94,9 +112,36 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
                 return;
             }
 
-            double finalAmount = fixed ? (amount - attrInstance.getBaseValue()) : amount;
+            double baseValue = attrInstance.getBaseValue();
+            double currentValue = attrInstance.getValue();
 
-            this.modifier = new AttributeModifier(UUID.randomUUID(), auraName, finalAmount, AttributeModifier.Operation.ADD_NUMBER);
+            double parsedVal;
+            try {
+                parsedVal = Double.parseDouble(amountInput.replaceAll("[^0-9.\\-]", ""));
+            } catch (Exception e) { parsedVal = 0; }
+
+            double targetTotal;
+            boolean isPercent = amountInput.endsWith("%");
+
+            if (amountInput.startsWith("+")) {
+                double add = isPercent ? (currentValue * (parsedVal / 100.0)) : parsedVal;
+                targetTotal = currentValue + add;
+            } else if (amountInput.startsWith("-")) {
+                double sub = isPercent ? (currentValue * (Math.abs(parsedVal) / 100.0)) : Math.abs(parsedVal);
+                targetTotal = currentValue - sub;
+            } else if (isPercent) {
+                targetTotal = baseValue * (parsedVal / 100.0);
+            } else if (fixed) {
+                targetTotal = parsedVal;
+            } else {
+                targetTotal = baseValue + parsedVal;
+            }
+
+            if (capAtZero && targetTotal < 0) targetTotal = 0;
+
+            double finalModAmount = targetTotal - baseValue;
+
+            this.modifier = new AttributeModifier(UUID.randomUUID(), auraName, finalModAmount, AttributeModifier.Operation.ADD_NUMBER);
 
             for (AttributeModifier m : attrInstance.getModifiers()) {
                 if (m.getName().equals(auraName)) {
@@ -121,6 +166,9 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
                 stop();
                 return;
             }
+            if (onTickSkill != null && ticksRemaining % tickInterval == 0) {
+                executeSkill(onTickSkill);
+            }
             ticksRemaining--;
         }
 
@@ -133,7 +181,20 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
             if (attr != null && modifier != null) {
                 attr.removeModifier(modifier);
             }
+            if (ticksRemaining <= 0) {
+                executeSkill(onEndSkill);
+            }
             activeMods.remove(id);
+        }
+
+        private void executeSkill(String skillName) {
+            if (skillName == null || skillName.isEmpty()) return;
+            Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(skillName);
+            maybeSkill.ifPresent(skill -> {
+                SkillMetadata clone = data.deepClone();
+                clone.setTrigger(BukkitAdapter.adapt(entity));
+                skill.execute(clone);
+            });
         }
     }
 }

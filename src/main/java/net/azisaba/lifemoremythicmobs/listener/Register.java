@@ -75,6 +75,12 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("onDeath") || mechanic.equalsIgnoreCase("onDeathAura") ) {
             e.register(new OnDeathAuraMechanic(e.getConfig()));
         }
+        if ( mechanic.equalsIgnoreCase("onKill") || mechanic.equalsIgnoreCase("onKillAura") ) {
+            e.register(new OnKillAuraMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("removeCustomAura") || mechanic.equalsIgnoreCase("removeCAura") ) {
+            e.register(new RemoveCustomAuraMechanic(e.getConfig()));
+        }
         if ( mechanic.equalsIgnoreCase("modifyPlayerAttribute") || mechanic.equalsIgnoreCase("modPAttribute") ) {
             e.register(new ModifyAttributeMechanic(e.getConfig()));
         }
@@ -92,6 +98,12 @@ public class Register implements Listener {
         }
         if (mechanic.equalsIgnoreCase("newRandomSkill") || mechanic.equalsIgnoreCase("nRandomSkill") ) {
             e.register(new NewRandomSkillMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("changeItemNBT") ) {
+            e.register(new ChangeItemNBTMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("getItemNBT") ) {
+            e.register(new GetItemNBTMechanic(e.getConfig()));
         }
     }
 

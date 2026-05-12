@@ -16,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Map;
@@ -29,12 +30,14 @@ public class SlotJamMechanic extends SkillMechanic implements ITargetedEntitySki
     protected final PlaceholderInt duration;
     protected final boolean lockToCurrent;
     protected final int targetSlot;
+    protected final boolean blockSwap;
 
     public SlotJamMechanic(MythicLineConfig config) {
         super(config.getLine(), config);
         this.duration = PlaceholderInt.of(config.getString(new String[]{"duration", "d"}, "100"));
         this.lockToCurrent = config.getBoolean(new String[]{"lockCurrent", "lc"}, true);
         this.targetSlot = config.getInteger(new String[]{"slot", "s"}, 0);
+        this.blockSwap = config.getBoolean(new String[]{"blockswap", "bs", "swap"}, true);
     }
 
     @Override
@@ -48,7 +51,7 @@ public class SlotJamMechanic extends SkillMechanic implements ITargetedEntitySki
         if (activeJams.containsKey(player.getUniqueId())) {
             activeJams.get(player.getUniqueId()).refresh(dur, slotToLock);
         } else {
-            new SlotJamTask(player, dur, slotToLock);
+            new SlotJamTask(player, dur, slotToLock, blockSwap);
         }
         return true;
     }
@@ -57,12 +60,14 @@ public class SlotJamMechanic extends SkillMechanic implements ITargetedEntitySki
         private final Player player;
         private int ticksRemaining;
         private int lockedSlot;
+        private final boolean blockSwap;
         private final int taskId;
 
-        public SlotJamTask(Player player, int duration, int slot) {
+        public SlotJamTask(Player player, int duration, int slot, boolean blockSwap) {
             this.player = player;
             this.ticksRemaining = duration;
             this.lockedSlot = slot;
+            this.blockSwap = blockSwap;
 
             Plugin plugin = Bukkit.getPluginManager().getPlugin("MythicMobs");
             activeJams.put(player.getUniqueId(), this);
@@ -102,6 +107,13 @@ public class SlotJamMechanic extends SkillMechanic implements ITargetedEntitySki
             boolean isHotbarSwap = (event.getHotbarButton() == lockedSlot);
 
             if (isTargetSlot || isHotbarSwap) {
+                event.setCancelled(true);
+            }
+        }
+
+        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+        public void onSwapHandItems(PlayerSwapHandItemsEvent event) {
+            if (event.getPlayer().getUniqueId().equals(player.getUniqueId()) && blockSwap) {
                 event.setCancelled(true);
             }
         }

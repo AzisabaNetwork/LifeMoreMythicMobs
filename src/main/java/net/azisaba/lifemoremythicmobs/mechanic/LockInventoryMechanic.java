@@ -16,6 +16,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashSet;
@@ -29,11 +30,13 @@ public class LockInventoryMechanic extends SkillMechanic implements ITargetedEnt
 
     protected final PlaceholderString slots;
     protected final PlaceholderInt duration;
+    protected final boolean blockSwap;
 
     public LockInventoryMechanic(MythicLineConfig config) {
         super(config.getLine(), config);
         this.slots = PlaceholderString.of(config.getString(new String[]{"slots", "s"}, "0"));
         this.duration = PlaceholderInt.of(config.getString(new String[]{"duration", "d"}, "200"));
+        this.blockSwap = config.getBoolean(new String[]{"blockswap", "bs", "swap"}, true);
     }
 
     @Override
@@ -52,7 +55,7 @@ public class LockInventoryMechanic extends SkillMechanic implements ITargetedEnt
         if (activeLocks.containsKey(id)) {
             activeLocks.get(id).refresh(lockDuration);
         } else {
-            new InventoryLock(player, id, targetSlots, lockDuration);
+            new InventoryLock(player, id, targetSlots, lockDuration, blockSwap);
         }
         return true;
     }
@@ -82,14 +85,16 @@ public class LockInventoryMechanic extends SkillMechanic implements ITargetedEnt
         private final Player player;
         private final String id;
         private final Set<Integer> lockedSlots;
+        private final boolean blockSwap;
         private int ticksRemaining;
         private int taskId = -1;
 
-        public InventoryLock(Player player, String id, Set<Integer> slots, int duration) {
+        public InventoryLock(Player player, String id, Set<Integer> slots, int duration, boolean blockSwap) {
             this.player = player;
             this.id = id;
             this.lockedSlots = slots;
             this.ticksRemaining = duration;
+            this.blockSwap = blockSwap;
 
             Plugin plugin = Bukkit.getPluginManager().getPlugin("MythicMobs");
             if (plugin != null) {
@@ -132,6 +137,15 @@ public class LockInventoryMechanic extends SkillMechanic implements ITargetedEnt
                     event.setCancelled(true);
                     break;
                 }
+            }
+        }
+
+        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+        public void onSwapHandItems(PlayerSwapHandItemsEvent event) {
+            if (!event.getPlayer().getUniqueId().equals(player.getUniqueId())) return;
+
+            if (blockSwap) {
+                event.setCancelled(true);
             }
         }
 

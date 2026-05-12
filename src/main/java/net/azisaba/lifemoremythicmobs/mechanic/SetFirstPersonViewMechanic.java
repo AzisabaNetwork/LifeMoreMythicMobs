@@ -28,7 +28,6 @@ public class SetFirstPersonViewMechanic extends SkillMechanic implements ITarget
     protected final PlaceholderFloat yaw;
     protected final PlaceholderFloat pitch;
     protected final boolean useTargetRotation;
-    // 座標に加える高さのオフセット (デフォルト1.6 = プレイヤーの目の高さ)
     protected final double yOffset;
 
     public SetFirstPersonViewMechanic(MythicLineConfig config) {
@@ -37,7 +36,6 @@ public class SetFirstPersonViewMechanic extends SkillMechanic implements ITarget
         this.yaw = PlaceholderFloat.of(config.getString(new String[]{"yaw", "y"}, "0"));
         this.pitch = PlaceholderFloat.of(config.getString(new String[]{"pitch", "p"}, "0"));
         this.useTargetRotation = config.getBoolean(new String[]{"useTargetRotation", "utr"}, false);
-        // コンフィグから高さを調整可能にする (デフォルトは1.6)
         this.yOffset = config.getDouble(new String[]{"yOffset", "yo"}, 1.6);
     }
 
@@ -46,7 +44,6 @@ public class SetFirstPersonViewMechanic extends SkillMechanic implements ITarget
         if (!data.getCaster().getEntity().isPlayer()) return false;
         Player player = (Player) BukkitAdapter.adapt(data.getCaster().getEntity());
 
-        // エンティティの足元座標を取得し、yOffsetを足して「頭の高さ」にする
         Location loc = BukkitAdapter.adapt(target.getLocation()).add(0, yOffset, 0);
         applyRotation(data, loc);
 
@@ -58,7 +55,6 @@ public class SetFirstPersonViewMechanic extends SkillMechanic implements ITarget
         if (!data.getCaster().getEntity().isPlayer()) return false;
         Player player = (Player) BukkitAdapter.adapt(data.getCaster().getEntity());
 
-        // 指定された座標にyOffsetを足して調整
         Location loc = BukkitAdapter.adapt(target).add(0, yOffset, 0);
         applyRotation(data, loc);
 
@@ -94,13 +90,11 @@ public class SetFirstPersonViewMechanic extends SkillMechanic implements ITarget
             this.originalGameMode = player.getGameMode();
             this.returnLocation = player.getLocation();
 
-            // 頭の高さに調整された座標で召喚
             this.cameraAnchor = (ArmorStand) cameraLoc.getWorld().spawnEntity(cameraLoc, EntityType.ARMOR_STAND);
             cameraAnchor.setVisible(false);
             cameraAnchor.setGravity(false);
             cameraAnchor.setMarker(true);
             cameraAnchor.setAI(false);
-            // マーカー化したアーマースタンドの向きを固定
             cameraAnchor.setRotation(cameraLoc.getYaw(), cameraLoc.getPitch());
 
             player.setGameMode(GameMode.SPECTATOR);

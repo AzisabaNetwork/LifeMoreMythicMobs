@@ -2,6 +2,7 @@ package net.azisaba.lifemoremythicmobs.mechanic;
 
 import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
+import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
 import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
 import io.lumine.xikage.mythicmobs.skills.*;
 import org.bukkit.Bukkit;
@@ -23,18 +24,29 @@ public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEnti
     protected final String auraName;
     protected final String onStart;
     protected final String onHeal;
+    protected final String onTickSkill;
     protected final String onEnd;
     protected final int duration;
+    protected final int tickInterval;
     protected final String amount;
 
     public NullRecoveryMechanic(MythicLineConfig config) {
         super(config.getLine(), config);
-        this.auraName = config.getString(new String[]{"auraName", "n", "名前"}, "default");
+        this.auraName = config.getString(new String[]{"auraName", "aura", "n", "名前"}, "default");
         this.onStart = config.getString(new String[]{"onStart", "os"}, null);
         this.onHeal = config.getString(new String[]{"onHeal", "oh"}, null);
+        this.onTickSkill = config.getString(new String[]{"onTick", "ot"}, null);
         this.onEnd = config.getString(new String[]{"onEnd", "oe"}, null);
         this.duration = config.getInteger(new String[]{"duration", "d", "持続時間"}, 100);
+        this.tickInterval = config.getInteger(new String[]{"tickInterval", "ti"}, 1);
         this.amount = config.getString(new String[]{"amount", "a", "量"}, "100%");
+    }
+
+    public static void remove(AbstractEntity target, String auraName) {
+        String identifier = target.getUniqueId().toString() + ":" + auraName;
+        if (activeAuras.containsKey(identifier)) {
+            activeAuras.get(identifier).stop();
+        }
     }
 
     @Override
@@ -83,6 +95,10 @@ public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEnti
             if (target.isDead() || ticksRemaining <= 0) {
                 stop();
                 return;
+            }
+
+            if (onTickSkill != null && ticksRemaining % tickInterval == 0) {
+                executeSkill(onTickSkill);
             }
 
             double currentHealth = target.getHealth();
