@@ -6,20 +6,23 @@ import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
+import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderString; // 追加
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 
+import java.util.Objects;
+
 public class ChangeItemNBTMechanic extends SkillMechanic implements ITargetedEntitySkill {
     protected final String tag;
-    protected final String value;
+    protected final PlaceholderString value;
 
     public ChangeItemNBTMechanic(MythicLineConfig config) {
         super(config.getLine(), config);
         this.tag = config.getString(new String[]{"tag", "t"}, "DefaultTag");
-        this.value = config.getString(new String[]{"val", "v"}, "0");
+        this.value = PlaceholderString.of(config.getString(new String[]{"val", "v"}, "0"));
     }
 
     @Override
@@ -29,12 +32,15 @@ public class ChangeItemNBTMechanic extends SkillMechanic implements ITargetedEnt
         Player player = (Player) BukkitAdapter.adapt(target);
         ItemStack item = player.getInventory().getItemInMainHand();
 
-        if (item == null || item.getType() == Material.AIR) return false;
+        if (item.getType() == Material.AIR) return false;
+
+        // 変数・プレースホルダーを解決
+        String resolvedValue = this.value.get(data, target);
 
         net.minecraft.server.v1_15_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
         NBTTagCompound compound = nmsItem.hasTag() ? nmsItem.getTag() : new NBTTagCompound();
 
-        compound.setString(tag, value);
+        Objects.requireNonNull(compound).setString(tag, resolvedValue);
         nmsItem.setTag(compound);
 
         player.getInventory().setItemInMainHand(CraftItemStack.asBukkitCopy(nmsItem));
