@@ -21,18 +21,53 @@ public class ItemInSlotCondition extends SkillCondition implements IEntityCondit
 
     private final boolean invert;
     private final String mmid;
-    private final int requiredCount;
+    private String operator = ">=";
+    private int requiredCount = 1;
     private final List<Integer> slotsToCheck;
 
     public ItemInSlotCondition(MythicLineConfig config) {
         super(config.getLine());
 
         this.mmid = config.getString(new String[]{"mmid", "id"}, "null");
-        this.requiredCount = config.getInteger(new String[]{"count", "c"}, 1);
         this.invert = config.getBoolean(new String[]{"invert", "i", "逆転"}, false);
-
+        String countRaw = config.getString(new String[]{"count", "c"}, ">=1");
+        parseCount(countRaw);
         String slotsString = config.getString(new String[]{"slots", "s"});
         this.slotsToCheck = parseSlots(slotsString);
+    }
+
+    private void parseCount(String raw) {
+        if (raw == null || raw.isEmpty()) return;
+
+        if (raw.startsWith(">=")) {
+            this.operator = ">=";
+            this.requiredCount = Integer.parseInt(raw.substring(2));
+        } else if (raw.startsWith("<=")) {
+            this.operator = "<=";
+            this.requiredCount = Integer.parseInt(raw.substring(2));
+        } else if (raw.startsWith("==")) {
+            this.operator = "==";
+            this.requiredCount = Integer.parseInt(raw.substring(2));
+        } else if (raw.startsWith("!=")) {
+            this.operator = "!=";
+            this.requiredCount = Integer.parseInt(raw.substring(2));
+        } else if (raw.startsWith(">")) {
+            this.operator = ">";
+            this.requiredCount = Integer.parseInt(raw.substring(1));
+        } else if (raw.startsWith("<")) {
+            this.operator = "<";
+            this.requiredCount = Integer.parseInt(raw.substring(1));
+        } else if (raw.startsWith("=")) {
+            this.operator = "==";
+            this.requiredCount = Integer.parseInt(raw.substring(1));
+        } else {
+            this.operator = ">=";
+            try {
+                this.requiredCount = Integer.parseInt(raw);
+            } catch (NumberFormatException e) {
+                this.requiredCount = 1;
+            }
+        }
     }
 
     @Override
@@ -57,9 +92,21 @@ public class ItemInSlotCondition extends SkillCondition implements IEntityCondit
                 }
             }
         }
-        boolean result = foundCount >= this.requiredCount;
 
+        boolean result = compare(foundCount);
         return this.invert != result;
+    }
+
+    private boolean compare(int found) {
+        switch (this.operator) {
+            case ">=": return found >= this.requiredCount;
+            case "<=": return found <= this.requiredCount;
+            case ">":  return found > this.requiredCount;
+            case "<":  return found < this.requiredCount;
+            case "==": return found == this.requiredCount;
+            case "!=": return found != this.requiredCount;
+            default:   return found >= this.requiredCount;
+        }
     }
 
     private String getMMIDFromNBT(ItemStack item) {
