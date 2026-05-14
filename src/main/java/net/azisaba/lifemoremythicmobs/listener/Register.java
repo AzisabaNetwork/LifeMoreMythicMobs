@@ -105,6 +105,9 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("getItemNBT") ) {
             e.register(new GetItemNBTMechanic(e.getConfig()));
         }
+        if ( mechanic.equalsIgnoreCase("CastVariable") || mechanic.equalsIgnoreCase("castVar") ) {
+            e.register(new VariableCastMechanic(e.getConfig()));
+        }
     }
 
     @EventHandler
