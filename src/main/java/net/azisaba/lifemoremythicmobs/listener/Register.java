@@ -173,6 +173,7 @@ public class Register implements Listener {
         CasterArmorPlaceholder.register(manager);
         CasterAttackPlaceholder.register(manager);
         CasterLuckPlaceholder.register(manager);
+        PvELevelPlaceholder.register(manager);
     }
 
     @EventHandler
