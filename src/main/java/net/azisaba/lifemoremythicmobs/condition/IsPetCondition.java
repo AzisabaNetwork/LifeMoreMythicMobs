@@ -3,11 +3,10 @@ package net.azisaba.lifemoremythicmobs.condition;
 import de.Keyle.MyPet.MyPetApi;
 import de.Keyle.MyPet.api.entity.MyPet;
 import de.Keyle.MyPet.api.entity.MyPetBukkitEntity;
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.SkillCondition;
-import io.lumine.xikage.mythicmobs.skills.conditions.IEntityCondition;
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.conditions.IEntityCondition;
+import io.lumine.mythic.core.skills.SkillCondition;
 
 import java.util.Optional;
 
@@ -25,7 +24,7 @@ public class IsPetCondition extends SkillCondition implements IEntityCondition {
         boolean matched = false;
         for (MyPet pet : MyPetApi.getMyPetManager().getAllActiveMyPets()) {
             Optional<MyPetBukkitEntity> opt = pet.getEntity();
-            if (!opt.isPresent()) {
+            if (opt.isEmpty()) {
                 continue;
             }
             if (opt.get().getUniqueId().equals(abstractEntity.getUniqueId()) ||

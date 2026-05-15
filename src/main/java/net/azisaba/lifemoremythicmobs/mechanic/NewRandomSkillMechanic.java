@@ -1,10 +1,15 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.*;
-import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderDouble;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.api.skills.Skill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +20,8 @@ public class NewRandomSkillMechanic extends SkillMechanic implements ITargetedEn
 
     private final List<SkillEntry> skillList = new ArrayList<>();
 
-    public NewRandomSkillMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public NewRandomSkillMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
 
         String rawSkills = config.getString(new String[]{"skills", "s"}, "");
         for (String entry : rawSkills.split(",")) {
@@ -28,8 +33,8 @@ public class NewRandomSkillMechanic extends SkillMechanic implements ITargetedEn
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
-        if (skillList.isEmpty()) return false;
+    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
+        if (skillList.isEmpty()) return SkillResult.CONDITION_FAILED;
 
         double totalWeight = 0;
         double[] resolvedWeights = new double[skillList.size()];
@@ -40,7 +45,7 @@ public class NewRandomSkillMechanic extends SkillMechanic implements ITargetedEn
             totalWeight += weight;
         }
 
-        if (totalWeight <= 0) return false;
+        if (totalWeight <= 0) return SkillResult.CONDITION_FAILED;
 
         double randomValue = ThreadLocalRandom.current().nextDouble() * totalWeight;
         double currentWeight = 0;
@@ -52,16 +57,16 @@ public class NewRandomSkillMechanic extends SkillMechanic implements ITargetedEn
             }
         }
 
-        return false;
+        return SkillResult.CONDITION_FAILED;
     }
 
-    private boolean executeSkill(String name, SkillMetadata data) {
-        Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(name);
+    private SkillResult executeSkill(String name, SkillMetadata data) {
+        Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(name);
         if (maybeSkill.isPresent()) {
             maybeSkill.get().execute(data.deepClone());
-            return true;
+            return SkillResult.SUCCESS;
         }
-        return false;
+        return SkillResult.CONDITION_FAILED;
     }
 
     private static class SkillEntry {

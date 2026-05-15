@@ -1,9 +1,14 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.*;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.api.skills.Skill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -27,8 +32,8 @@ public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntit
     protected final int duration;
     protected final int tickInterval;
 
-    public OnDeathAuraMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public OnDeathAuraMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
         this.auraName = config.getString(new String[]{"auraName", "aura", "n"}, "death_aura");
         this.onDeathSkill = config.getString(new String[]{"onDeath", "od"}, null);
         this.onTickSkill = config.getString(new String[]{"onTick", "ot"}, null);
@@ -45,16 +50,16 @@ public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntit
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
+    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
         String id = target.getUniqueId().toString() + ":" + this.auraName;
 
         if (activeAuras.containsKey(id)) {
             activeAuras.get(id).refresh(this.duration);
-            return true;
+            return SkillResult.SUCCESS;
         }
 
         new DeathAura(target, data, id);
-        return true;
+        return SkillResult.SUCCESS;
     }
 
     private class DeathAura implements Listener, Runnable {
@@ -115,7 +120,7 @@ public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntit
 
         private void executeSkill(String skillName) {
             if (skillName == null || skillName.isEmpty()) return;
-            Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(skillName);
+            Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
             maybeSkill.ifPresent(skill -> {
                 SkillMetadata clone = data.deepClone();
                 clone.setTrigger(target);

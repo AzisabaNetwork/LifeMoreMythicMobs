@@ -1,13 +1,15 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
-import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
-import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderInt;
-import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderString;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderInt;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,23 +34,23 @@ public class LockInventoryMechanic extends SkillMechanic implements ITargetedEnt
     protected final PlaceholderInt duration;
     protected final boolean blockSwap;
 
-    public LockInventoryMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public LockInventoryMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
         this.slots = PlaceholderString.of(config.getString(new String[]{"slots", "s"}, "0"));
         this.duration = PlaceholderInt.of(config.getString(new String[]{"duration", "d"}, "200"));
         this.blockSwap = config.getBoolean(new String[]{"blockswap", "bs", "swap"}, true);
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
-        if (!(BukkitAdapter.adapt(target) instanceof Player)) return false;
+    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
+        if (!(BukkitAdapter.adapt(target) instanceof Player)) return SkillResult.CONDITION_FAILED;
 
         Player player = (Player) BukkitAdapter.adapt(target);
         String resolvedSlots = this.slots.get(data, target);
         int lockDuration = this.duration.get(data, target);
 
         Set<Integer> targetSlots = parseSlots(resolvedSlots);
-        if (targetSlots.isEmpty()) return false;
+        if (targetSlots.isEmpty()) return SkillResult.CONDITION_FAILED;
 
         String id = player.getUniqueId() + ":" + resolvedSlots;
 
@@ -57,7 +59,7 @@ public class LockInventoryMechanic extends SkillMechanic implements ITargetedEnt
         } else {
             new InventoryLock(player, id, targetSlots, lockDuration, blockSwap);
         }
-        return true;
+        return SkillResult.SUCCESS;
     }
 
     private Set<Integer> parseSlots(String input) {

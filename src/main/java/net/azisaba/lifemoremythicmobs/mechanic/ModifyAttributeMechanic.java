@@ -1,13 +1,20 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.*;
-import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderString;
-import io.lumine.xikage.mythicmobs.utils.Schedulers;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.api.skills.Skill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.bukkit.utils.Schedulers;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
@@ -34,8 +41,8 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
     protected final String onEndSkill;
     protected final int tickInterval;
 
-    public ModifyAttributeMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public ModifyAttributeMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
         this.amountStr = PlaceholderString.of(config.getString(new String[]{"amount", "a"}, "0.0"));
         this.duration = config.getInteger(new String[]{"duration", "d"}, 100);
         this.auraName = config.getString(new String[]{"auraName", "aura", "n"}, "attr_mod");
@@ -57,7 +64,7 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
+    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
         String resolvedAmount = this.amountStr.get(data, target);
 
         Schedulers.sync().run(() -> {
@@ -70,7 +77,7 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
             AttributeInstance attrInstance = entity.getAttribute(targetAttr);
             if (attrInstance == null) return;
 
-            String id = entity.getUniqueId() + ":" + targetAttr.name() + ":" + auraName;
+            String id = entity.getUniqueId() + ":" + targetAttr.getKey().getKey().toUpperCase() + ":" + auraName;
 
             if (activeMods.containsKey(id)) {
                 activeMods.get(id).stop();
@@ -78,16 +85,15 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
 
             new AttributeModTask(entity, targetAttr, id, resolvedAmount, duration, data);
         });
-        return true;
+        return SkillResult.SUCCESS;
     }
 
     private Attribute parseAttribute(String name) {
-        try {
-            if (!name.startsWith("GENERIC_")) {
-                try { return Attribute.valueOf("GENERIC_" + name); } catch (Exception ignored) {}
-            }
-            return Attribute.valueOf(name);
-        } catch (Exception e) { return null; }
+        String formatted = name.toLowerCase();
+        if (!formatted.startsWith("generic_") && !formatted.contains(":")) {
+            formatted = "generic_" + formatted;
+        }
+        return Registry.ATTRIBUTE.get(NamespacedKey.minecraft(formatted.replace("generic_generic_", "generic_")));
     }
 
     private class AttributeModTask implements Runnable {
@@ -141,7 +147,8 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
 
             double finalModAmount = targetTotal - baseValue;
 
-            this.modifier = new AttributeModifier(UUID.randomUUID(), auraName, finalModAmount, AttributeModifier.Operation.ADD_NUMBER);
+            NamespacedKey mKey = new NamespacedKey("lifemore", auraName.toLowerCase().replaceAll("[^a-z0-9/._-]", ""));
+            this.modifier = new AttributeModifier(mKey, finalModAmount, AttributeModifier.Operation.ADD_NUMBER);
 
             for (AttributeModifier m : attrInstance.getModifiers()) {
                 if (m.getName().equals(auraName)) {
@@ -189,7 +196,7 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
 
         private void executeSkill(String skillName) {
             if (skillName == null || skillName.isEmpty()) return;
-            Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(skillName);
+            Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
             maybeSkill.ifPresent(skill -> {
                 SkillMetadata clone = data.deepClone();
                 clone.setTrigger(BukkitAdapter.adapt(entity));

@@ -1,10 +1,14 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.*;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.api.skills.Skill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,8 +34,8 @@ public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEnti
     protected final int tickInterval;
     protected final String amount;
 
-    public NullRecoveryMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public NullRecoveryMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
         this.auraName = config.getString(new String[]{"auraName", "aura", "n", "名前"}, "default");
         this.onStart = config.getString(new String[]{"onStart", "os"}, null);
         this.onHeal = config.getString(new String[]{"onHeal", "oh"}, null);
@@ -50,16 +54,16 @@ public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEnti
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata skillMetadata, AbstractEntity abstractEntity) {
+    public SkillResult castAtEntity(SkillMetadata skillMetadata, AbstractEntity abstractEntity) {
         String identifier = abstractEntity.getUniqueId().toString() + ":" + this.auraName;
 
         if (activeAuras.containsKey(identifier)) {
             activeAuras.get(identifier).refresh(this.duration);
-            return true;
+            return SkillResult.SUCCESS;
         }
 
         new NullRecoveryAura(abstractEntity, skillMetadata, identifier);
-        return true;
+        return SkillResult.SUCCESS;
     }
 
     private class NullRecoveryAura implements Listener, Runnable {
@@ -139,7 +143,7 @@ public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEnti
 
         private void executeSkill(String skillName) {
             if (skillName == null || skillName.isEmpty()) return;
-            Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(skillName);
+            Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
             maybeSkill.ifPresent(skill -> {
                 SkillMetadata clone = data.deepClone();
                 clone.setTrigger(target);

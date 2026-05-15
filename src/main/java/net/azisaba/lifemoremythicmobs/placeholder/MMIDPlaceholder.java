@@ -1,8 +1,8 @@
 package net.azisaba.lifemoremythicmobs.placeholder;
 
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.skills.placeholders.Placeholder;
-import io.lumine.xikage.mythicmobs.skills.placeholders.PlaceholderManager;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.placeholders.Placeholder;
 import net.azisaba.lifemoremythicmobs.util.ItemUtil;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

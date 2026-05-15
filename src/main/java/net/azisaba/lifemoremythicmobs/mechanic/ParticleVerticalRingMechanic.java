@@ -1,11 +1,13 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractLocation;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.ITargetedLocationSkill;
-import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
+import io.lumine.mythic.api.adapters.AbstractLocation;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedLocationSkill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import net.azisaba.lifemoremythicmobs.util.CircleUtil;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -29,8 +31,8 @@ public class ParticleVerticalRingMechanic extends SkillMechanic implements ITarg
     protected final Particle particle;
     protected final String color;
 
-    public ParticleVerticalRingMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public ParticleVerticalRingMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
 
         this.radius = config.getDouble(new String[]{"radius", "r"}, 3.0);
         this.points = config.getInteger(new String[]{"points", "po"}, 10);
@@ -56,7 +58,7 @@ public class ParticleVerticalRingMechanic extends SkillMechanic implements ITarg
 
 
     @Override
-    public boolean castAtLocation(SkillMetadata skillMetadata, AbstractLocation absLoc) {
+    public SkillResult castAtLocation(SkillMetadata skillMetadata, AbstractLocation absLoc) {
         Location bukkitLocation = BukkitAdapter.adapt(absLoc);
 
         bukkitLocation.setX(bukkitLocation.getX() + startXOffset);
@@ -65,6 +67,6 @@ public class ParticleVerticalRingMechanic extends SkillMechanic implements ITarg
 
         CircleUtil.spawnCircle(bukkitLocation, points, radius, rotateX, rotateY, rotateZ, amount, speed, ignoreEntityRotation, uniform, particle, color);
 
-        return true;
+        return SkillResult.SUCCESS;
     }
 }

@@ -1,15 +1,17 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
-import io.lumine.xikage.mythicmobs.skills.Skill;
-import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
-import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderString;
-import io.lumine.xikage.mythicmobs.skills.variables.Variable;
-import io.lumine.xikage.mythicmobs.skills.variables.VariableType;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.api.skills.Skill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import io.lumine.mythic.core.skills.variables.Variable;
+import io.lumine.mythic.core.skills.variables.VariableType;
 
 import java.util.Optional;
 
@@ -17,16 +19,16 @@ public class CallWithArgsMechanic extends SkillMechanic implements ITargetedEnti
     private final String skillName;
     private final PlaceholderString argsString;
 
-    public CallWithArgsMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public CallWithArgsMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
         this.skillName = config.getString(new String[]{"skill", "s"});
         this.argsString = PlaceholderString.of(config.getString(new String[]{"args", "a"}));
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
-        Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(skillName);
-        if (!maybeSkill.isPresent()) return false;
+    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
+        Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
+        if (!maybeSkill.isPresent()) return SkillResult.CONDITION_FAILED;
 
         SkillMetadata newData = data.deepClone();
         String resolvedArgs = argsString.get(data, target);
@@ -42,8 +44,7 @@ public class CallWithArgsMechanic extends SkillMechanic implements ITargetedEnti
                 }
             }
         }
-
         maybeSkill.get().execute(newData);
-        return true;
+        return SkillResult.SUCCESS;
     }
 }

@@ -1,12 +1,11 @@
 package net.azisaba.lifemoremythicmobs.condition;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.SkillCondition;
-import io.lumine.xikage.mythicmobs.skills.conditions.IEntityCondition;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.conditions.IEntityCondition;
+import io.lumine.mythic.core.skills.SkillCondition;
+import net.azisaba.lifemoremythicmobs.util.ItemUtil;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,40 +33,16 @@ public class HasItemCondition extends SkillCondition implements IEntityCondition
     public boolean check(AbstractEntity abstractEntity) {
         if (!abstractEntity.isPlayer()) return false;
         Player player = (Player) abstractEntity.getBukkitEntity();
-        ItemStack[] contents;
-        switch (where) {
-            case "INV":
-            case "INVENTORY":
-                contents = player.getInventory().getContents();
-                break;
-            case "OFFHAND":
-                contents = new ItemStack[]{player.getInventory().getItemInOffHand()};
-                break;
-            case "HELMET":
-            case "HEAD":
-                contents = new ItemStack[]{player.getInventory().getHelmet()};
-                break;
-            case "CHEST":
-            case "CHESTPLATE":
-                contents = new ItemStack[]{player.getInventory().getChestplate()};
-                break;
-            case "LEGS":
-            case "LEGGINGS":
-                contents = new ItemStack[]{player.getInventory().getLeggings()};
-                break;
-            case "BOOTS":
-            case "FEET":
-                contents = new ItemStack[]{player.getInventory().getBoots()};
-                break;
-            case "ARMOR":
-                contents = player.getInventory().getArmorContents();
-                break;
-            case "HAND":
-            case "MAINHAND":
-            default:
-                contents = new ItemStack[]{player.getInventory().getItemInMainHand()};
-                break;
-        }
+        ItemStack[] contents = switch (where) {
+            case "INV", "INVENTORY" -> player.getInventory().getContents();
+            case "OFFHAND" -> new ItemStack[]{player.getInventory().getItemInOffHand()};
+            case "HELMET", "HEAD" -> new ItemStack[]{player.getInventory().getHelmet()};
+            case "CHEST", "CHESTPLATE" -> new ItemStack[]{player.getInventory().getChestplate()};
+            case "LEGS", "LEGGINGS" -> new ItemStack[]{player.getInventory().getLeggings()};
+            case "BOOTS", "FEET" -> new ItemStack[]{player.getInventory().getBoots()};
+            case "ARMOR" -> player.getInventory().getArmorContents();
+            default -> new ItemStack[]{player.getInventory().getItemInMainHand()};
+        };
         int foundTotal = 0;
         for (ItemStack item : contents) {
             if (item == null || item.getType() == Material.AIR) continue;
@@ -79,23 +54,11 @@ public class HasItemCondition extends SkillCondition implements IEntityCondition
     }
 
     private boolean matchesAny(ItemStack item) {
-        String mmId = getMMIDFromNBT(item);
+        String mmId = ItemUtil.getMythicType(item);
         for (String key : targetItems) {
             if (mmId != null && mmId.equalsIgnoreCase(key)) return true;
             if (item.getType().name().equalsIgnoreCase(key)) return true;
         }
         return false;
-    }
-
-    private String getMMIDFromNBT(ItemStack item) {
-        try {
-            net.minecraft.server.v1_15_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
-            if (!nmsItem.hasTag()) return null;
-            NBTTagCompound tag = nmsItem.getTag();
-            if (tag == null || !tag.hasKey("MYTHIC_TYPE")) return null;
-            return tag.getString("MYTHIC_TYPE");
-        } catch (Exception e) {
-            return null;
-        }
     }
 }

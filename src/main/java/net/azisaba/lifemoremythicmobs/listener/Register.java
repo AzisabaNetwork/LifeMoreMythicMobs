@@ -1,11 +1,14 @@
 package net.azisaba.lifemoremythicmobs.listener;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicConditionLoadEvent;
-import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMechanicLoadEvent;
-import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicReloadedEvent;
-import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicTargeterLoadEvent;
-import io.lumine.xikage.mythicmobs.skills.placeholders.PlaceholderManager;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.SkillManager;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.bukkit.events.MythicConditionLoadEvent;
+import io.lumine.mythic.bukkit.events.MythicMechanicLoadEvent;
+import io.lumine.mythic.bukkit.events.MythicReloadedEvent;
+import io.lumine.mythic.bukkit.events.MythicTargeterLoadEvent;
+import io.lumine.mythic.core.skills.SkillExecutor;
 import net.azisaba.lifemoremythicmobs.condition.*;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.placeholder.*;
@@ -20,108 +23,110 @@ public class Register implements Listener {
     public void onMythicMechanicLoad(@NotNull MythicMechanicLoadEvent e)	{
 
         String mechanic = e.getMechanicName();
+        MythicLineConfig config = e.getConfig();
+        SkillExecutor executor = e.getContainer().getManager();
 
         if ( mechanic.equalsIgnoreCase("takeinv") ) {
-            e.register(new TakeItemMechanic(e.getConfig()));
+            e.register(new TakeItemMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("particleverticalring") || mechanic.equalsIgnoreCase("pvr") || mechanic.equalsIgnoreCase("pvring") ) {
-            e.register(new ParticleVerticalRingMechanic(e.getConfig()));
+            e.register(new ParticleVerticalRingMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("bossbar") ) {
-            e.register(new BossBarMechanic(e.getConfig()));
+            e.register(new BossBarMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("removebossbar") || mechanic.equalsIgnoreCase("bossbarremove") ) {
-            e.register(new RemoveBossBarMechanic(e.getConfig()));
+            e.register(new RemoveBossBarMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("modifybossbar") || mechanic.equalsIgnoreCase("bossbarmodify")) {
-            e.register(new ModifyBossBarMechanic(e.getConfig()));
+            e.register(new ModifyBossBarMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("SetVarDisplayName") || mechanic.equalsIgnoreCase("SetDisplayNameVar") ) {
-            e.register(new SetDisplayNameVarMechanic(e.getConfig()));
+            e.register(new SetDisplayNameVarMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("SetVarLoreLine") || mechanic.equalsIgnoreCase("SetLoreLineVar") ) {
-            e.register(new SetLoreLineVarMechanic(e.getConfig()));
+            e.register(new SetLoreLineVarMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("VarSubstring") ) {
-            e.register(new VarSubstringMechanic(e.getConfig()));
+            e.register(new VarSubstringMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("VarExtractNumber") ) {
-            e.register(new VarExtractNumberMechanic(e.getConfig()));
+            e.register(new VarExtractNumberMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("VarReplaceRegex") ) {
-            e.register(new VarReplaceRegexMechanic(e.getConfig()));
+            e.register(new VarReplaceRegexMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("nullrecovery") ) {
-            e.register(new NullRecoveryMechanic(e.getConfig()));
+            e.register(new NullRecoveryMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("slotjam") ) {
-            e.register(new SlotJamMechanic(e.getConfig()));
+            e.register(new SlotJamMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("fakesounddistortion") || mechanic.equalsIgnoreCase("fakesound") ) {
-            e.register(new FakeSoundDistortionMechanic(e.getConfig()));
+            e.register(new FakeSoundDistortionMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("setFirstPersonView") || mechanic.equalsIgnoreCase("sfpv") ) {
-            e.register(new SetFirstPersonViewMechanic(e.getConfig()));
+            e.register(new SetFirstPersonViewMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("fakeWorldBorder") || mechanic.equalsIgnoreCase("fakeborder")  ) {
-            e.register(new FakeWorldBorderMechanic(e.getConfig()));
+            e.register(new FakeWorldBorderMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("skyRotation") || mechanic.equalsIgnoreCase("skyrotate") ) {
-            e.register(new SkyRotationMechanic(e.getConfig()));
+            e.register(new SkyRotationMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("fakeblock") ) {
-            e.register(new FakeBlockMechanic(e.getConfig()));
+            e.register(new FakeBlockMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("onDeath") || mechanic.equalsIgnoreCase("onDeathAura") ) {
-            e.register(new OnDeathAuraMechanic(e.getConfig()));
+            e.register(new OnDeathAuraMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("onKill") || mechanic.equalsIgnoreCase("onKillAura") ) {
-            e.register(new OnKillAuraMechanic(e.getConfig()));
+            e.register(new OnKillAuraMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("removeCustomAura") || mechanic.equalsIgnoreCase("removeCAura") ) {
-            e.register(new RemoveCustomAuraMechanic(e.getConfig()));
+            e.register(new RemoveCustomAuraMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("modifyPlayerAttribute") || mechanic.equalsIgnoreCase("modPAttribute") ) {
-            e.register(new ModifyAttributeMechanic(e.getConfig()));
+            e.register(new ModifyAttributeMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("MMLuckEval") ) {
-            e.register(new MMLuckEvalMechanic(e.getConfig()));
+            e.register(new MMLuckEvalMechanic(executor, config));
         }
         if (mechanic.equalsIgnoreCase("varOnSwing") || mechanic.equalsIgnoreCase("vOnSwing") ) {
-            e.register(new VarOnInteractAuraMechanic(e.getConfig(), true));
+            e.register(new VarOnInteractAuraMechanic(executor, config, true));
         }
         if (mechanic.equalsIgnoreCase("varOnUse") || mechanic.equalsIgnoreCase("vOnUse") ) {
-            e.register(new VarOnInteractAuraMechanic(e.getConfig(), false));
+            e.register(new VarOnInteractAuraMechanic(executor, config, false));
         }
         if (mechanic.equalsIgnoreCase("LockInventory") || mechanic.equalsIgnoreCase("LockInv") ) {
-            e.register(new LockInventoryMechanic(e.getConfig()));
+            e.register(new LockInventoryMechanic(executor, config));
         }
         if (mechanic.equalsIgnoreCase("newRandomSkill") || mechanic.equalsIgnoreCase("nRandomSkill") ) {
-            e.register(new NewRandomSkillMechanic(e.getConfig()));
+            e.register(new NewRandomSkillMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("changeItemNBT") ) {
-            e.register(new ChangeItemNBTMechanic(e.getConfig()));
+            e.register(new ChangeItemNBTMechanic(executor, config));
         }
-        if ( mechanic.equalsIgnoreCase("getItemNBT") ) {
-            e.register(new GetItemNBTMechanic(e.getConfig()));
+        if (mechanic.equalsIgnoreCase("getItemNBT")) {
+            e.register(new GetItemNBTMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("CastVariable") || mechanic.equalsIgnoreCase("castVar") ) {
-            e.register(new VariableCastMechanic(e.getConfig()));
+            e.register(new VariableCastMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("DispatchVariableSkill") || mechanic.equalsIgnoreCase("disVarSkill") ) {
-            e.register(new DispatchVariableSkillMechanic(e.getConfig()));
+            e.register(new DispatchVariableSkillMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("CallWithArgs") || mechanic.equalsIgnoreCase("CallArgs") ) {
-            e.register(new CallWithArgsMechanic(e.getConfig()));
+            e.register(new CallWithArgsMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("PersistentZone") || mechanic.equalsIgnoreCase("PerZone") ) {
-            e.register(new PersistentZoneMechanic(e.getConfig()));
+            e.register(new PersistentZoneMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("BouncingRaytrace") || mechanic.equalsIgnoreCase("bRaytrace") ) {
-            e.register(new BouncingRaytraceMechanic(e.getConfig()));
+            e.register(new BouncingRaytraceMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("ShapeRenderer") || mechanic.equalsIgnoreCase("lShape") ) {
-            e.register(new ShapeRendererMechanic(e.getConfig()));
+            e.register(new ShapeRendererMechanic(executor, config));
         }
     }
 
@@ -129,49 +134,50 @@ public class Register implements Listener {
     public void onMythicConditionLoad(@NotNull MythicConditionLoadEvent e) {
 
         String condition = e.getConditionName();
+        MythicLineConfig config = e.getConfig();
 
         if ( condition.equalsIgnoreCase("realtime") ) {
-            e.register(new RealTimeConditions(e.getConfig()));
+            e.register(new RealTimeConditions(config));
         }
         if ( condition.equalsIgnoreCase("varNotEquals") ) {
-            e.register(new VarNotEqualsCondition(e.getConfig()));
+            e.register(new VarNotEqualsCondition(config));
         }
         if ( condition.equalsIgnoreCase("serverEquals") ) {
-            e.register(new ServerEqualsCondition(e.getConfig()));
+            e.register(new ServerEqualsCondition(config));
         }
         if ( condition.equalsIgnoreCase("HasEmptyInventorySlot") ) {
-            e.register(new HasEmptyInventorySlotCondition(e.getConfig()));
+            e.register(new HasEmptyInventorySlotCondition(config));
         }
         if ( condition.equalsIgnoreCase("HasItem") ) {
-            e.register(new HasItemCondition(e.getConfig()));
+            e.register(new HasItemCondition(config));
         }
         if ( condition.equalsIgnoreCase("BowTension") ) {
-            e.register(new BowTensionCondition(e.getConfig()));
+            e.register(new BowTensionCondition(config));
         }
         if ( condition.equalsIgnoreCase("PlayersInRadius") ) {
-            e.register(new PlayersInRadiusCondition(e.getConfig()));
+            e.register(new PlayersInRadiusCondition(config));
         }
         if ( condition.equalsIgnoreCase("DayOfWeek") ) {
-            e.register(new DayOfWeekCondition(e.getConfig()));
+            e.register(new DayOfWeekCondition(config));
         }
         if ( condition.equalsIgnoreCase("isPet") ) {
-            e.register(new IsPetCondition(e.getConfig()));
+            e.register(new IsPetCondition(config));
         }
         if ( condition.equalsIgnoreCase("mmidStartsWith") ) {
-            e.register(new ItemMMIDStartsWithCondition(e.getConfig()));
+            e.register(new ItemMMIDStartsWithCondition(config));
         }
         if ( condition.equalsIgnoreCase("mmidContains") ) {
-            e.register(new ItemMMIDContainsCondition(e.getConfig()));
+            e.register(new ItemMMIDContainsCondition(config));
         }
         if ( condition.equalsIgnoreCase("valCompare") ||
                 condition.equalsIgnoreCase("valCompares") ||
                 condition.equalsIgnoreCase("compareValues") ||
                 condition.equalsIgnoreCase("compareValue")
         ) {
-            e.register(new ValCompareCondition(e.getConfig()));
+            e.register(new ValCompareCondition(config));
         }
         if ( condition.equalsIgnoreCase("itemInSlot") ) {
-            e.register(new ItemInSlotCondition(e.getConfig()));
+            e.register(new ItemInSlotCondition(config));
         }
     }
 
@@ -181,7 +187,7 @@ public class Register implements Listener {
     }
 
     public static void reloadPlaceholders() {
-        PlaceholderManager manager = MythicMobs.inst().getPlaceholderManager();
+        PlaceholderManager manager = MythicBukkit.inst().getPlaceholderManager();
         MMIDPlaceholder.register(manager);
         ItemTagPlaceholder.register(manager);
         ServerNamePlaceholder.register(manager);
@@ -194,10 +200,8 @@ public class Register implements Listener {
     @EventHandler
     public void onMythicTargeterLoad(@NotNull MythicTargeterLoadEvent e) {
         String targeter = e.getTargeterName();
-
         if ( targeter.equalsIgnoreCase("Sphere") ) {
-            e.register(new SphereTargeter(e.getConfig()));
+            e.register(new SphereTargeter(e.getContainer().getManager(), e.getConfig()));
         }
     }
-
 }

@@ -1,11 +1,13 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.AbstractLocation;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.*;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.adapters.AbstractLocation;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.*;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -26,8 +28,8 @@ public class PersistentZoneMechanic extends SkillMechanic implements ITargetedLo
     private final int duration;
     private final int interval;
 
-    public PersistentZoneMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public PersistentZoneMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
         this.onEnterSkill = config.getString(new String[]{"onEnter", "oe"});
         this.onStaySkill = config.getString(new String[]{"onStay", "os"});
         this.onLeaveSkill = config.getString(new String[]{"onLeave", "ol"});
@@ -37,17 +39,17 @@ public class PersistentZoneMechanic extends SkillMechanic implements ITargetedLo
     }
 
     @Override
-    public boolean castAtLocation(SkillMetadata data, AbstractLocation target) {
+    public SkillResult castAtLocation(SkillMetadata data, AbstractLocation target) {
         Plugin plugin = Bukkit.getPluginManager().getPlugin("LifeMoreMythicMobs");
         if (plugin instanceof LifeMoreMythicMobs) {
             new ZoneTask((LifeMoreMythicMobs) plugin, data, target);
-            return true;
+            return SkillResult.SUCCESS;
         }
-        return false;
+        return SkillResult.CONDITION_FAILED;
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
+    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
         return castAtLocation(data, target.getLocation());
     }
 
@@ -103,7 +105,7 @@ public class PersistentZoneMechanic extends SkillMechanic implements ITargetedLo
             Entity bukkitEntity = Bukkit.getEntity(targetUUID);
             if (bukkitEntity == null) return;
 
-            Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(skillName);
+            Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
             maybeSkill.ifPresent(skill -> {
                 SkillMetadata newData = data.deepClone();
                 newData.setTrigger(BukkitAdapter.adapt(bukkitEntity));

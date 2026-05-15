@@ -1,12 +1,17 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.*;
-import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderInt;
-import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderString;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.api.skills.Skill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderInt;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,8 +35,8 @@ public class VarOnInteractAuraMechanic extends SkillMechanic implements ITargete
     protected final PlaceholderInt duration;
     protected final boolean isSwing;
 
-    public VarOnInteractAuraMechanic(MythicLineConfig config, boolean isSwing) {
-        super(config.getLine(), config);
+    public VarOnInteractAuraMechanic(SkillExecutor executor, MythicLineConfig config, boolean isSwing) {
+        super(executor, config.getLine(), config);
         this.isSwing = isSwing;
         this.auraName = PlaceholderString.of(config.getString(new String[]{"auraName", "n"}, isSwing ? "swing_aura" : "use_aura"));
         this.onInteractSkill = PlaceholderString.of(config.getString(new String[]{"onInteract", "oi", "skill", "s"}, ""));
@@ -39,8 +44,8 @@ public class VarOnInteractAuraMechanic extends SkillMechanic implements ITargete
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
-        if (!(BukkitAdapter.adapt(target) instanceof Player)) return false;
+    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
+        if (!(BukkitAdapter.adapt(target) instanceof Player)) return SkillResult.CONDITION_FAILED;
 
         String resolvedAuraName = this.auraName.get(data, target);
         String resolvedSkill = this.onInteractSkill.get(data, target);
@@ -53,7 +58,7 @@ public class VarOnInteractAuraMechanic extends SkillMechanic implements ITargete
         } else {
             new InteractAura((Player) BukkitAdapter.adapt(target), data, id, resolvedSkill, resolvedDuration);
         }
-        return true;
+        return SkillResult.SUCCESS;
     }
 
     private class InteractAura implements Listener, Runnable {
@@ -119,7 +124,7 @@ public class VarOnInteractAuraMechanic extends SkillMechanic implements ITargete
 
         private void executeSkill(String skillName) {
             if (skillName == null || skillName.isEmpty()) return;
-            Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(skillName);
+            Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
             maybeSkill.ifPresent(skill -> {
                 SkillMetadata clone = data.deepClone();
                 clone.setTrigger(BukkitAdapter.adapt(player));

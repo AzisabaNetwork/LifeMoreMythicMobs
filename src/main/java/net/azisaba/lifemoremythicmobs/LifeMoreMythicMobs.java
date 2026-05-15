@@ -21,7 +21,7 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
     @Override
     public void onEnable() {
 
-        getLogger().info("はい。。。。。。");
+        getLogger().info("LifeMoreMythicMobs has been enabled.");
 
         if (!Objects.requireNonNull(getConfig().getString("server-override", "")).isEmpty()) {
             server = getConfig().getString("server-override", "");
@@ -53,8 +53,7 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
-        getLogger().info("うへぇ。。。。。");
+        getLogger().info("LifeMoreMythicMobs has been disabled.");
     }
 
     public void fetchServer(Player player) {

@@ -30,7 +30,7 @@ public class CircleUtil {
 
         ParticleBuilder builder = particle.builder().count(amount).extra(speed);
         switch(particle) {
-            case REDSTONE: builder.color(Color.fromRGB(Integer.parseInt(color, 16)));
+            case DUST: builder.color(Color.fromRGB(Integer.parseInt(color, 16)));
             break;
         }
         Vector v = ignoreEntityRotation ?new Vector(rotx, roty, rotz).normalize(): loc.getDirection().

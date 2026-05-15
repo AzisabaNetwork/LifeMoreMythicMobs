@@ -1,9 +1,9 @@
 package net.azisaba.lifemoremythicmobs.condition;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.SkillCondition;
-import io.lumine.xikage.mythicmobs.skills.conditions.IEntityCondition;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.conditions.IEntityCondition;
+import io.lumine.mythic.core.skills.SkillCondition;
 
 import java.time.LocalDateTime;
 
@@ -25,10 +25,8 @@ public class RealTimeConditions extends SkillCondition implements IEntityConditi
     protected final boolean invert;
 
     public boolean timeCheck(int max, int min, int value) {
-
         if (value > max) return false;
         return value >= min;
-
     }
 
     @Override

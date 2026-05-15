@@ -1,16 +1,16 @@
 package net.azisaba.lifemoremythicmobs.condition;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.AbstractPlayer;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.SkillCondition;
-import io.lumine.xikage.mythicmobs.skills.conditions.IEntityCondition;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.adapters.AbstractPlayer;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.conditions.IEntityCondition;
+import io.lumine.mythic.core.skills.SkillCondition;
 
 public class ItemLoreCondition extends SkillCondition implements IEntityCondition {
 
     protected final boolean hotBar;
-    protected final boolean allLore; // 全てのLoreLineを参照するか (falseだとloreLineで指定したlineを参照)
-    protected final boolean sentenceMatch; // Loreの文章が完全一致するか(falseだと一部分に指定されたものが入っていたらtrue)
+    protected final boolean allLore;
+    protected final boolean sentenceMatch;
     protected final int hotBarNum;
     protected final int loreLine;
     protected final String lore;

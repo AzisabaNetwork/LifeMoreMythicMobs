@@ -1,12 +1,13 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.AbstractLocation;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.*;
-import org.bukkit.Bukkit;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.adapters.AbstractLocation;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.*;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
@@ -25,8 +26,8 @@ public class BouncingRaytraceMechanic extends SkillMechanic implements ITargeted
     private final int maxBounces;
     private final double step;
 
-    public BouncingRaytraceMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public BouncingRaytraceMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
         this.onHitSkill = config.getString(new String[]{"onHit", "oh", "oH"}, null);
         this.onLineSkill = config.getString(new String[]{"onLine", "ol", "oL"}, null);
         this.damage = config.getDouble(new String[]{"damage", "a"}, 5.0);
@@ -36,12 +37,12 @@ public class BouncingRaytraceMechanic extends SkillMechanic implements ITargeted
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
+    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
         return castAtLocation(data, target.getLocation());
     }
 
     @Override
-    public boolean castAtLocation(SkillMetadata data, AbstractLocation target) {
+    public SkillResult castAtLocation(SkillMetadata data, AbstractLocation target) {
         Location currentPos = BukkitAdapter.adapt(data.getCaster().getLocation()).add(0, 1.5, 0);
         Vector direction = currentPos.getDirection().normalize();
         double remainingDist = maxRange;
@@ -57,8 +58,6 @@ public class BouncingRaytraceMechanic extends SkillMechanic implements ITargeted
                     true,
                     0.5,
                     (entity) -> {
-                        // 最初の発射時(bounceCount == 0)のみ、自分自身を無視する
-                        // これにより自爆を防ぎつつ、反射して戻ってきたら自分に当たるようになる
                         if (bounceCount == 0 && entity.getUniqueId().equals(casterUUID)) {
                             return false;
                         }
@@ -91,15 +90,14 @@ public class BouncingRaytraceMechanic extends SkillMechanic implements ITargeted
 
             if (remainingDist <= 0) break;
         }
-        return true;
+        return SkillResult.SUCCESS;
     }
 
     private void executeLine(SkillMetadata data, Location start, Vector dir, double dist) {
         if (onLineSkill == null || onLineSkill.isEmpty()) return;
 
-        Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(onLineSkill);
+        Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(onLineSkill);
         maybeSkill.ifPresent(skill -> {
-            // クローンはループの外で1回だけ行う（負荷軽減）
             SkillMetadata newData = data.deepClone();
             for (double d = 0; d < dist; d += step) {
                 Location loc = start.clone().add(dir.clone().multiply(d));
@@ -121,7 +119,7 @@ public class BouncingRaytraceMechanic extends SkillMechanic implements ITargeted
         target.damage(damage, BukkitAdapter.adapt(data.getCaster().getEntity()));
 
         if (onHitSkill != null && !onHitSkill.isEmpty()) {
-            Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(onHitSkill);
+            Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(onHitSkill);
             maybeSkill.ifPresent(skill -> {
                 SkillMetadata newData = data.deepClone();
                 newData.setTrigger(BukkitAdapter.adapt(target));

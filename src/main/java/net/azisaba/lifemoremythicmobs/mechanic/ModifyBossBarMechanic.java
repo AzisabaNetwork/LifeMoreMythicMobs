@@ -1,10 +1,12 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
-import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -17,8 +19,8 @@ public class ModifyBossBarMechanic extends SkillMechanic implements ITargetedEnt
     protected final String style;
     protected final String title;
 
-    public ModifyBossBarMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public ModifyBossBarMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
 
         this.progress = config.getDouble(new String[]{"progress", "pro", "p"}, -1);
         this.id = config.getString(new String[]{"id", "i"}, "def");
@@ -33,7 +35,7 @@ public class ModifyBossBarMechanic extends SkillMechanic implements ITargetedEnt
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata skillMetadata, AbstractEntity target) {
+    public SkillResult castAtEntity(SkillMetadata skillMetadata, AbstractEntity target) {
 
         BossBar bar = BossBarMechanic.bars.get(id);
 
@@ -50,6 +52,6 @@ public class ModifyBossBarMechanic extends SkillMechanic implements ITargetedEnt
             bar.setTitle(title);
         }
 
-        return true;
+        return SkillResult.SUCCESS;
     }
 }

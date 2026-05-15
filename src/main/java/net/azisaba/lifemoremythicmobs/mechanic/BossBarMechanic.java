@@ -1,11 +1,13 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
-import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
@@ -27,8 +29,8 @@ public class BossBarMechanic extends SkillMechanic implements ITargetedEntitySki
 
     public static HashMap<String, BossBar> bars = new HashMap<>();
 
-    public BossBarMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public BossBarMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
 
         this.always = config.getBoolean(new String[]{"always", "a", "al"}, false);
         this.duration = config.getInteger(new String[]{"duration", "d"}, 100);
@@ -41,12 +43,12 @@ public class BossBarMechanic extends SkillMechanic implements ITargetedEntitySki
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata skillMetadata, AbstractEntity target) {
+    public SkillResult castAtEntity(SkillMetadata skillMetadata, AbstractEntity target) {
         Player bukkitTarget = (Player) BukkitAdapter.adapt(target);
 
         bossBar(title, style, color, bukkitTarget, progress, duration, always, id);
 
-        return true;
+        return SkillResult.SUCCESS;
     }
 
     public void bossBar(String title, String style, String color, Player p, double progress, long duration, boolean always, String id) {

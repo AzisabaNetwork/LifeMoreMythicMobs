@@ -1,13 +1,10 @@
 package net.azisaba.lifemoremythicmobs.condition;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.SkillCondition;
-import io.lumine.xikage.mythicmobs.skills.conditions.IEntityCondition;
-
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
-
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.conditions.IEntityCondition;
+import io.lumine.mythic.core.skills.SkillCondition;
+import net.azisaba.lifemoremythicmobs.util.ItemUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -85,7 +82,7 @@ public class ItemInSlotCondition extends SkillCondition implements IEntityCondit
             ItemStack item = player.getInventory().getItem(slot);
 
             if (item != null && item.getAmount() > 0) {
-                String itemMMID = getMMIDFromNBT(item);
+                String itemMMID = ItemUtil.getMythicType(item);
 
                 if (this.mmid.equalsIgnoreCase(itemMMID)) {
                     foundCount += item.getAmount();
@@ -106,19 +103,6 @@ public class ItemInSlotCondition extends SkillCondition implements IEntityCondit
             case "==": return found == this.requiredCount;
             case "!=": return found != this.requiredCount;
             default:   return found >= this.requiredCount;
-        }
-    }
-
-    private String getMMIDFromNBT(ItemStack item) {
-        try {
-            net.minecraft.server.v1_15_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
-            if (!nmsItem.hasTag()) return null;
-            NBTTagCompound tag = nmsItem.getTag();
-            if (tag == null || !tag.hasKey("MYTHIC_TYPE")) return null;
-
-            return tag.getString("MYTHIC_TYPE");
-        } catch (Exception e) {
-            return null;
         }
     }
 

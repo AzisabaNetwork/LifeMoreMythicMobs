@@ -1,12 +1,14 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
-import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
-import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderInt;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderInt;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import io.lumine.mythic.api.skills.SkillMetadata;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,8 +34,8 @@ public class SlotJamMechanic extends SkillMechanic implements ITargetedEntitySki
     protected final int targetSlot;
     protected final boolean blockSwap;
 
-    public SlotJamMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public SlotJamMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
         this.duration = PlaceholderInt.of(config.getString(new String[]{"duration", "d"}, "100"));
         this.lockToCurrent = config.getBoolean(new String[]{"lockCurrent", "lc"}, true);
         this.targetSlot = config.getInteger(new String[]{"slot", "s"}, 0);
@@ -41,8 +43,8 @@ public class SlotJamMechanic extends SkillMechanic implements ITargetedEntitySki
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
-        if (!target.isPlayer()) return false;
+    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
+        if (!target.isPlayer()) return SkillResult.CONDITION_FAILED;
 
         Player player = (Player) BukkitAdapter.adapt(target);
         int dur = this.duration.get(data, target);
@@ -53,7 +55,7 @@ public class SlotJamMechanic extends SkillMechanic implements ITargetedEntitySki
         } else {
             new SlotJamTask(player, dur, slotToLock, blockSwap);
         }
-        return true;
+        return SkillResult.SUCCESS;
     }
 
     private static class SlotJamTask implements Listener, Runnable {

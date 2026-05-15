@@ -1,11 +1,13 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractLocation;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
-import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
-import io.lumine.xikage.mythicmobs.skills.ITargetedLocationSkill;
+import io.lumine.mythic.api.adapters.AbstractLocation;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedLocationSkill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -17,8 +19,8 @@ public class FakeBlockMechanic extends SkillMechanic implements ITargetedLocatio
     protected BlockData blockData;
     protected long duration;
 
-    public FakeBlockMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public FakeBlockMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
 
         String materialName = config.getString(new String[]{"material", "m"}, "STONE");
         try {
@@ -31,7 +33,7 @@ public class FakeBlockMechanic extends SkillMechanic implements ITargetedLocatio
     }
 
     @Override
-    public boolean castAtLocation(SkillMetadata data, AbstractLocation target) {
+    public SkillResult castAtLocation(SkillMetadata data, AbstractLocation target) {
         final org.bukkit.Location loc = BukkitAdapter.adapt(target);
 
         if (data.getCaster().getEntity().isPlayer()) {
@@ -47,6 +49,6 @@ public class FakeBlockMechanic extends SkillMechanic implements ITargetedLocatio
                 }
             }, duration);
         }
-        return true;
+        return SkillResult.SUCCESS;
     }
 }

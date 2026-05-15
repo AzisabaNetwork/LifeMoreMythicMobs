@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "net.azisaba.lifemoremythicmobs"
-version = "2.4.8+1.15.2"
+version = "2.4.8+1.21.11"
 
 repositories {
     mavenCentral()
@@ -17,6 +17,7 @@ repositories {
         url = uri("https://oss.sonatype.org/content/groups/public/")
     }
     maven {
+        name = "Lumine Releases"
         url = uri("https://mvn.lumine.io/repository/maven-public/")
     }
     maven {
@@ -34,15 +35,14 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
-    compileOnly("org.jetbrains:annotations:24.0.1")
-    compileOnly("io.lumine.xikage:MythicMobs:4.12.0")
-    compileOnly("org.spigotmc:spigot:1.15.2-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    compileOnly("io.lumine:Mythic-Dist:5.12.0")
     compileOnly("com.github.MyPetORG.MyPet:mypet-api:5c8ceeac6a")
     compileOnly("net.azisaba:lifepvelevel:2.0.9+1.15.2")
+    compileOnly("org.jetbrains:annotations:24.0.1")
 }
 
-java.toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 
 tasks {
     compileJava {

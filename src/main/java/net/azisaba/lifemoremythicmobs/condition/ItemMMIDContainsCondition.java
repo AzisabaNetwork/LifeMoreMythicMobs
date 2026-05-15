@@ -1,14 +1,12 @@
 package net.azisaba.lifemoremythicmobs.condition;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.items.ItemManager;
-import io.lumine.xikage.mythicmobs.skills.SkillCondition;
-import io.lumine.xikage.mythicmobs.skills.conditions.IEntityCondition;
-
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.items.ItemManager;
+import io.lumine.mythic.api.skills.conditions.IEntityCondition;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.bukkit.utils.shadows.nbt.NBTTagCompound;
+import io.lumine.mythic.core.skills.SkillCondition;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -26,7 +24,7 @@ public class ItemMMIDContainsCondition extends SkillCondition implements IEntity
     public ItemMMIDContainsCondition(MythicLineConfig config) {
         super(config.getLine());
 
-        this.itemManager = MythicMobs.inst().getItemManager();
+        this.itemManager = MythicBukkit.inst().getItemManager();
 
         this.contains = config.getString(new String[]{"mmid", "id"}, "");
         this.ignoreCase = config.getBoolean(new String[]{"ignorecase", "ic"}, false);
@@ -60,15 +58,10 @@ public class ItemMMIDContainsCondition extends SkillCondition implements IEntity
             item = inv.getItemInMainHand();
         }
 
-        if (item == null || item.getAmount() == 0) {
+        if (item == null || item.getAmount() == 0 || item.getType().isAir()) {
             return false;
         }
-
-        net.minecraft.server.v1_15_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
-        if (!nmsItem.hasTag()) return false;
-        NBTTagCompound tag = nmsItem.getTag();
-        if (tag == null || !tag.hasKey("MYTHIC_TYPE")) return false;
-        String mmid = tag.getString("MYTHIC_TYPE");
+        String mmid = MythicBukkit.inst().getItemManager().getMythicTypeFromItem(item);
         if (mmid.isEmpty()) return false;
 
         String checkID = this.ignoreCase ? mmid.toLowerCase() : mmid;

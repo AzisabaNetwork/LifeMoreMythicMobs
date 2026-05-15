@@ -1,13 +1,15 @@
 package net.azisaba.lifemoremythicmobs.targetter;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractLocation;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
-import io.lumine.xikage.mythicmobs.skills.targeters.ILocationSelector;
+import io.lumine.mythic.api.adapters.AbstractLocation;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.targeters.ILocationSelector;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -16,17 +18,16 @@ public class SphereTargeter extends ILocationSelector {
     protected int points;
     protected boolean random;
 
-    public SphereTargeter(MythicLineConfig config) {
-        super(config);
+    public SphereTargeter(SkillExecutor manager, MythicLineConfig config) {
+        super(manager, config);
         this.radius = config.getDouble(new String[]{"radius", "r"}, 5.0D);
         this.points = config.getInteger(new String[]{"points", "pts", "p"}, 32);
         this.random = config.getBoolean(new String[]{"random", "rng"}, false);
     }
 
     @Override
-    public HashSet<AbstractLocation> getLocations(SkillMetadata data) {
+    public Collection<AbstractLocation> getLocations(SkillMetadata data) {
         HashSet<AbstractLocation> targets = new HashSet<>();
-
         AbstractLocation absOrigin = data.getOrigin();
         if (absOrigin == null) return targets;
 

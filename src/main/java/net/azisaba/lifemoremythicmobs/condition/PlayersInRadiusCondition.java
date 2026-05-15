@@ -1,10 +1,10 @@
 package net.azisaba.lifemoremythicmobs.condition;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractLocation;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.SkillCondition;
-import io.lumine.xikage.mythicmobs.skills.conditions.ILocationCondition;
+import io.lumine.mythic.api.adapters.AbstractLocation;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.conditions.ILocationCondition;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillCondition;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -96,20 +96,13 @@ public class PlayersInRadiusCondition extends SkillCondition implements ILocatio
     }
 
     private boolean compareAmount(int actual, int required, String operator) {
-        switch (operator) {
-            case OP_GREATER_THAN:
-                return actual > required;
-            case OP_LESS_THAN:
-                return actual < required;
-            case OP_GREATER_THAN_EQUAL:
-                return actual >= required;
-            case OP_LESS_THAN_EQUAL:
-                return actual <= required;
-            case OP_NOT_EQUAL:
-                return actual != required;
-            case OP_EQUAL:
-            default:
-                return actual == required;
-        }
+        return switch (operator) {
+            case OP_GREATER_THAN -> actual > required;
+            case OP_LESS_THAN -> actual < required;
+            case OP_GREATER_THAN_EQUAL -> actual >= required;
+            case OP_LESS_THAN_EQUAL -> actual <= required;
+            case OP_NOT_EQUAL -> actual != required;
+            default -> actual == required;
+        };
     }
 }

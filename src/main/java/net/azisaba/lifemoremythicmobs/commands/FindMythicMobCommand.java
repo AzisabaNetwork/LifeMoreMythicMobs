@@ -1,7 +1,7 @@
 package net.azisaba.lifemoremythicmobs.commands;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.mobs.MythicMob;
+import io.lumine.mythic.api.mobs.MythicMob;
+import io.lumine.mythic.bukkit.MythicBukkit;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -34,7 +34,7 @@ public class FindMythicMobCommand extends SubCommand {
     }
 
     @Override
-    public void execute(@NotNull Player player, @NotNull String @NotNull [] args) {
+    public void execute(@NotNull Player player, @NotNull String[] args) {
         if (args.length == 0) {
             player.sendMessage(ChatColor.RED + "使用法: /lmmm findMythicMob <表示名 | name=表示名 | type=モブタイプ | health=HP>");
             return;
@@ -42,7 +42,7 @@ public class FindMythicMobCommand extends SubCommand {
         player.sendMessage(ChatColor.YELLOW + "Mobを検索しています...");
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             List<MythicMob> matchedMobs = new ArrayList<>();
-            Collection<MythicMob> mobTypes = MythicMobs.inst().getMobManager().getMobTypes();
+            Collection<MythicMob> mobTypes = MythicBukkit.inst().getMobManager().getMobTypes();
             for (MythicMob mob : mobTypes) {
                 boolean isMatch = true;
                 for (String arg : args) {
@@ -52,12 +52,12 @@ public class FindMythicMobCommand extends SubCommand {
                         if (!checkNameMatch(mob, val)) isMatch = false;
                     } else if (lowerArg.startsWith("type=")) {
                         String queryType = lowerArg.substring(5).toUpperCase();
-                        String mobType = mob.getEntityType() != null ? mob.getEntityType().toUpperCase() : "UNKNOWN";
+                        String mobType = mob.getEntityType() != null ? mob.getEntityType().toString().toUpperCase() : "UNKNOWN";
                         if (!mobType.contains(queryType)) isMatch = false;
                     } else if (lowerArg.startsWith("health=")) {
                         try {
-                            double val = Double.parseDouble(lowerArg.substring(7));
-                            if (mob.getHealth() != null && mob.getHealth().get() != val) isMatch = false;
+                            double queryHealth = Double.parseDouble(lowerArg.substring(7));
+                            if (mob.getHealth() != null && mob.getHealth().get() != queryHealth) isMatch = false;
                         } catch (Exception e) {
                             isMatch = false;
                         }
@@ -66,43 +66,38 @@ public class FindMythicMobCommand extends SubCommand {
                     }
                     if (!isMatch) break;
                 }
-                if (isMatch) {
-                    matchedMobs.add(mob);
-                }
+                if (isMatch) matchedMobs.add(mob);
             }
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                sendResult(player, matchedMobs);
-            });
+            Bukkit.getScheduler().runTask(plugin, () -> sendResult(player, matchedMobs));
         });
     }
 
     private void sendResult(Player player, List<MythicMob> mobs) {
         if (mobs.isEmpty()) {
             player.sendMessage(ChatColor.YELLOW + "該当するMobが見つかりませんでした。");
-        } else {
-            player.sendMessage(ChatColor.GREEN + "=== Mob検索結果 (" + mobs.size() + "件) ===");
-            int count = 0;
-            for (MythicMob mob : mobs) {
-                String internalName = mob.getInternalName();
-                String displayName = "No DisplayName";
-                if (mob.getDisplayName() != null) {
-                    displayName = mob.getDisplayName().get();
-                }
-                double hp = (mob.getHealth() != null) ? mob.getHealth().get() : 0;
-                String entityType = (mob.getEntityType() != null) ? mob.getEntityType() : "UNKNOWN";
-                TextComponent mainComponent = new TextComponent(ChatColor.GOLD + internalName);
-                TextComponent infoComponent = new TextComponent(ChatColor.GRAY + " (" + entityType + " / " + hp + "HP)");
-                TextComponent nameComponent = new TextComponent(ChatColor.WHITE + " -> " + ChatColor.translateAlternateColorCodes('&', displayName));
-                ComponentBuilder hover = new ComponentBuilder(ChatColor.YELLOW + "ID: " + internalName + "\n");
-                hover.append(ChatColor.GREEN + "クリックでスポーンエッグを入手");
-                mainComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover.create()));
-                String command = "/mm eggs give " + player.getName() + " " + internalName;
-                mainComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
-                mainComponent.addExtra(infoComponent);
-                mainComponent.addExtra(nameComponent);
-                player.spigot().sendMessage(mainComponent);
-                count++;
-            }
+            return;
+        }
+        player.sendMessage(ChatColor.GREEN + "=== Mob検索結果 (" + mobs.size() + "件) ===");
+        for (MythicMob mob : mobs) {
+            String internalName = mob.getInternalName();
+            String displayName = mob.getDisplayName() != null ? mob.getDisplayName().get() : "No DisplayName";
+            double hp = mob.getHealth().get();
+            String entityType = mob.getEntityType() != null ? mob.getEntityType().toString() : "UNKNOWN";
+
+            TextComponent mainComponent = new TextComponent(ChatColor.GOLD + internalName);
+            TextComponent infoComponent = new TextComponent(ChatColor.GRAY + " (" + entityType + " / " + hp + "HP)");
+            TextComponent nameComponent = new TextComponent(ChatColor.WHITE + " -> " + ChatColor.translateAlternateColorCodes('&', displayName));
+
+            ComponentBuilder hover = new ComponentBuilder(ChatColor.YELLOW + "ID: " + internalName + "\n");
+            hover.append(ChatColor.GREEN + "クリックでスポーンエッグを入手");
+            mainComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover.create()));
+
+            String command = "/mm eggs give " + player.getName() + " " + internalName;
+            mainComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
+
+            mainComponent.addExtra(infoComponent);
+            mainComponent.addExtra(nameComponent);
+            player.spigot().sendMessage(mainComponent);
         }
     }
 
@@ -111,11 +106,11 @@ public class FindMythicMobCommand extends SubCommand {
         String displayName = mob.getDisplayName().get();
         if (displayName == null) return false;
         String stripped = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', displayName)).toLowerCase();
-        return stripped.contains(query);
+        return stripped.contains(query.toLowerCase());
     }
 
     @Override
-    public @NotNull List<@NotNull String> suggest(@NotNull Player player, @NotNull String @NotNull [] args) {
+    public @NotNull List<String> suggest(@NotNull Player player, @NotNull String[] args) {
         String currentArg = args[args.length - 1].toLowerCase();
         List<String> suggestions = new ArrayList<>();
         for (String key : KEYS) {

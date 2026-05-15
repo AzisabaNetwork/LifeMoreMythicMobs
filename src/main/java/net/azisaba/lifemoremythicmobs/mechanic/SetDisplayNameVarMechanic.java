@@ -1,10 +1,12 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
-import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import io.lumine.mythic.api.skills.SkillMetadata;
 import net.azisaba.lifemoremythicmobs.util.ItemUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
@@ -18,16 +20,15 @@ public class SetDisplayNameVarMechanic extends SkillMechanic implements ITargete
     protected final boolean stripColor;
     protected final boolean offhand;
 
-    public SetDisplayNameVarMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
-
+    public SetDisplayNameVarMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
         this.varName = config.getString(new String[] {"variable", "var", "v", "変数"});
         this.stripColor = config.getBoolean(new String[] {"stripcolor", "sc", "色削除"}, false);
         this.offhand = config.getBoolean(new String[] {"offhand", "o", "オフハンド"}, false);
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata skillMetadata, AbstractEntity abstractEntity) {
+    public SkillResult castAtEntity(SkillMetadata skillMetadata, AbstractEntity abstractEntity) {
         String name = "";
         Entity entity = abstractEntity.getBukkitEntity();
         if (entity instanceof LivingEntity) {
@@ -39,6 +40,6 @@ public class SetDisplayNameVarMechanic extends SkillMechanic implements ITargete
         }
         if (stripColor) name = ChatColor.stripColor(name);
         ItemUtil.setVariable(skillMetadata, varName, name);
-        return true;
+        return SkillResult.SUCCESS;
     }
 }

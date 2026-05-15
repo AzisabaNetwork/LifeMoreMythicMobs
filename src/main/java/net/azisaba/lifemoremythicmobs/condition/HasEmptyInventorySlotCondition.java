@@ -1,9 +1,9 @@
 package net.azisaba.lifemoremythicmobs.condition;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.SkillCondition;
-import io.lumine.xikage.mythicmobs.skills.conditions.IEntityCondition;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.conditions.IEntityCondition;
+import io.lumine.mythic.core.skills.SkillCondition;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -19,10 +19,9 @@ public class HasEmptyInventorySlotCondition extends SkillCondition implements IE
     @Override
     public boolean check(AbstractEntity abstractEntity) {
         Entity entity = abstractEntity.getBukkitEntity();
-        if (!(entity instanceof Player)) {
+        if (!(entity instanceof Player player)) {
             return false;
         }
-        Player player = (Player) entity;
         return invert == (player.getInventory().firstEmpty() == -1);
     }
 }

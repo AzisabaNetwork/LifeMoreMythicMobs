@@ -1,21 +1,17 @@
 package net.azisaba.lifemoremythicmobs.commands;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.items.MythicItem;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.items.MythicItem;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -31,12 +27,12 @@ public class FindMythicItemCommand extends SubCommand {
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return "findMythicItem";
     }
 
     @Override
-    public void execute(Player player, String[] args) {
+    public void execute(@NotNull Player player, @NotNull String[] args) {
         if (args.length == 0) {
             player.sendMessage(ChatColor.RED + "使用法: /lmmm findMythicItem <name=アイテム名 | model=モデル番号 | material=アイテムID | enchant=エンチャント名>");
             return;
@@ -44,7 +40,7 @@ public class FindMythicItemCommand extends SubCommand {
         player.sendMessage(ChatColor.YELLOW + "アイテムを検索しています...");
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             List<MythicItem> matchedItems = new ArrayList<>();
-            Collection<MythicItem> allItems = MythicMobs.inst().getItemManager().getItems();
+            Collection<MythicItem> allItems = MythicBukkit.inst().getItemManager().getItems();
             for (MythicItem mmItem : allItems) {
                 ItemStack stack = null;
                 try {
@@ -94,7 +90,7 @@ public class FindMythicItemCommand extends SubCommand {
                         String query = lowerArg.substring(8);
                         boolean enchantHit = false;
                         for (Enchantment ench : stack.getEnchantments().keySet()) {
-                            if (ench.getName().toLowerCase().contains(query)) {
+                            if (ench.getKey().getKey().toLowerCase().contains(query)) {
                                 enchantHit = true;
                                 break;
                             }
@@ -123,7 +119,6 @@ public class FindMythicItemCommand extends SubCommand {
             player.sendMessage(ChatColor.YELLOW + "条件に一致するアイテムは見つかりませんでした");
         } else {
             player.sendMessage(ChatColor.GREEN + "=== 検索結果 (" + items.size() + "件) ===");
-            int count = 0;
             for (MythicItem item : items) {
                 String mmid = item.getInternalName();
                 String displayName = item.getDisplayName();
@@ -134,13 +129,12 @@ public class FindMythicItemCommand extends SubCommand {
                 message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText.create()));
                 message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/mm items give " + player.getName() + " " + mmid));
                 player.spigot().sendMessage(message);
-                count++;
             }
         }
     }
 
     @Override
-    public @NotNull List<String> suggest(Player player, String[] args) {
+    public @NotNull List<String> suggest(@NotNull Player player, @NotNull String[] args) {
         String currentArg = args[args.length - 1].toLowerCase();
         List<String> suggestions = new ArrayList<>();
         for (String key : KEYS) {
@@ -159,7 +153,7 @@ public class FindMythicItemCommand extends SubCommand {
         } else if (currentArg.startsWith("enchant=")) {
             String val = currentArg.substring(8);
             return Arrays.stream(Enchantment.values())
-                    .map(ench -> "enchant=" + ench.getName().toLowerCase())
+                    .map(ench -> "enchant=" + ench.getKey().getKey().toLowerCase())
                     .filter(s -> s.startsWith("enchant=" + val))
                     .collect(Collectors.toList());
         }

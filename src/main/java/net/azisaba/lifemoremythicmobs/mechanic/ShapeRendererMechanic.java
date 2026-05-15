@@ -1,13 +1,15 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.AbstractLocation;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
-import io.lumine.xikage.mythicmobs.skills.ITargetedLocationSkill;
-import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.adapters.AbstractLocation;
+import io.lumine.mythic.api.skills.ITargetedLocationSkill;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import io.lumine.mythic.api.skills.SkillMetadata;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import org.bukkit.Bukkit;
@@ -31,8 +33,8 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
     private final double tMin;
     private final double tMax;
 
-    public ShapeRendererMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public ShapeRendererMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
         this.shape = config.getString(new String[]{"shape", "s"}, "circle").toLowerCase();
         this.particle = Particle.valueOf(config.getString(new String[]{"particle", "p"}, "REDSTONE").toUpperCase());
         this.radius = config.getDouble(new String[]{"radius", "r"}, 2.0);
@@ -55,16 +57,14 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
+    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
         return castAtLocation(data, target.getLocation());
     }
 
     @Override
-    public boolean castAtLocation(SkillMetadata data, AbstractLocation target) {
+    public SkillResult castAtLocation(SkillMetadata data, AbstractLocation target) {
         Location center = BukkitAdapter.adapt(target);
-        // マイナスを外して正しい Yaw を取得
         double casterYaw = Math.toRadians(data.getCaster().getLocation().getYaw());
-
         switch (shape) {
             case "circle":
                 drawCircle(center, casterYaw);
@@ -79,11 +79,11 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
                 drawCustom(center, casterYaw);
                 break;
         }
-        return true;
+        return SkillResult.SUCCESS;
     }
 
     private void spawn(Location loc) {
-        if (particle == Particle.REDSTONE) {
+        if (particle == Particle.DUST) {
             loc.getWorld().spawnParticle(particle, loc, 1, new Particle.DustOptions(color, 1.0f));
         } else {
             loc.getWorld().spawnParticle(particle, loc, 1, 0, 0, 0, 0);
@@ -136,7 +136,6 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
                 double lx = eX.setVariable("t", t + rotation).evaluate();
                 double ly = eY.setVariable("t", t + rotation).evaluate();
                 double lz = eZ.setVariable("t", t + rotation).evaluate();
-                // 回転計算を通す
                 spawn(center.clone().add(rotate(lx, ly, lz, yaw)));
             }
         } catch (Exception e) {
@@ -144,11 +143,9 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
         }
     }
 
-    // Minecraft の Yaw に合わせた回転行列
     private Vector rotate(double x, double y, double z, double yaw) {
         double cos = Math.cos(yaw);
         double sin = Math.sin(yaw);
-        // 標準的な回転行列を使用。Minecraftの座標系ではこれで方位が一致する
         double nx = x * cos - z * sin;
         double nz = x * sin + z * cos;
         return new Vector(nx, y, nz);

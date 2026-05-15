@@ -1,7 +1,7 @@
 package net.azisaba.lifemoremythicmobs.placeholder;
 
-import io.lumine.xikage.mythicmobs.skills.placeholders.Placeholder;
-import io.lumine.xikage.mythicmobs.skills.placeholders.PlaceholderManager;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
+import io.lumine.mythic.core.skills.placeholders.Placeholder;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 
 public class ServerNamePlaceholder {

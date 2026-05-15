@@ -1,14 +1,13 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.AbstractLocation;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
-import io.lumine.xikage.mythicmobs.skills.ITargetedLocationSkill;
-import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
-import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderFloat;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.adapters.AbstractLocation;
+import io.lumine.mythic.api.skills.*;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderFloat;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -30,8 +29,8 @@ public class SetFirstPersonViewMechanic extends SkillMechanic implements ITarget
     protected final boolean useTargetRotation;
     protected final double yOffset;
 
-    public SetFirstPersonViewMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public SetFirstPersonViewMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
         this.duration = config.getInteger(new String[]{"duration", "d"}, 100);
         this.yaw = PlaceholderFloat.of(config.getString(new String[]{"yaw", "y"}, "0"));
         this.pitch = PlaceholderFloat.of(config.getString(new String[]{"pitch", "p"}, "0"));
@@ -40,8 +39,8 @@ public class SetFirstPersonViewMechanic extends SkillMechanic implements ITarget
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
-        if (!data.getCaster().getEntity().isPlayer()) return false;
+    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
+        if (!data.getCaster().getEntity().isPlayer()) return SkillResult.CONDITION_FAILED;
         Player player = (Player) BukkitAdapter.adapt(data.getCaster().getEntity());
 
         Location loc = BukkitAdapter.adapt(target.getLocation()).add(0, yOffset, 0);
@@ -51,8 +50,8 @@ public class SetFirstPersonViewMechanic extends SkillMechanic implements ITarget
     }
 
     @Override
-    public boolean castAtLocation(SkillMetadata data, AbstractLocation target) {
-        if (!data.getCaster().getEntity().isPlayer()) return false;
+    public SkillResult castAtLocation(SkillMetadata data, AbstractLocation target) {
+        if (!data.getCaster().getEntity().isPlayer()) return SkillResult.CONDITION_FAILED;
         Player player = (Player) BukkitAdapter.adapt(data.getCaster().getEntity());
 
         Location loc = BukkitAdapter.adapt(target).add(0, yOffset, 0);
@@ -68,12 +67,12 @@ public class SetFirstPersonViewMechanic extends SkillMechanic implements ITarget
         }
     }
 
-    private boolean startSession(Player player, Location cameraLocation) {
+    private SkillResult startSession(Player player, Location cameraLocation) {
         if (activeCameras.containsKey(player.getUniqueId())) {
             activeCameras.get(player.getUniqueId()).stop();
         }
         new CameraSession(player, cameraLocation, duration);
-        return true;
+        return SkillResult.SUCCESS;
     }
 
     private static class CameraSession implements Runnable {

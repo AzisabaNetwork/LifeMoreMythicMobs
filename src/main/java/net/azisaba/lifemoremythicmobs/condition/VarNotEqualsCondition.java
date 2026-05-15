@@ -1,9 +1,9 @@
 package net.azisaba.lifemoremythicmobs.condition;
 
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.SkillCondition;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
-import io.lumine.xikage.mythicmobs.skills.conditions.ISkillMetaCondition;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.conditions.ISkillMetaCondition;
+import io.lumine.mythic.core.skills.SkillCondition;
 import net.azisaba.lifemoremythicmobs.util.ItemUtil;
 
 import java.util.Objects;

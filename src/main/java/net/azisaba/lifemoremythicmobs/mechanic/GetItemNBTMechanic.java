@@ -1,48 +1,51 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.ITargetedEntitySkill;
-import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
-import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import net.azisaba.lifemoremythicmobs.util.ItemUtil;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 
 public class GetItemNBTMechanic extends SkillMechanic implements ITargetedEntitySkill {
 
     protected final String tag;
     protected final String varName;
 
-    public GetItemNBTMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public GetItemNBTMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
         this.tag = config.getString(new String[] {"tag", "t"}, "DefaultTag");
-        this.varName = config.getString(new String[] {"variable", "var", "v", "変数"});
+        this.varName = config.getString(new String[] {"variable", "var", "v"}, "変数");
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
-        if (!target.isPlayer()) return false;
+    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
+        if (!target.isPlayer()) return SkillResult.CONDITION_FAILED;
 
         Player player = (Player) BukkitAdapter.adapt(target);
         ItemStack item = player.getInventory().getItemInMainHand();
 
-        if (item == null || item.getType() == Material.AIR) return false;
+        if (item == null || item.getType() == Material.AIR) return SkillResult.CONDITION_FAILED;
 
-        net.minecraft.server.v1_15_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
-        if (!nmsItem.hasTag()) return false;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return SkillResult.CONDITION_FAILED;
 
-        NBTTagCompound compound = nmsItem.getTag();
-        if (compound != null && compound.hasKey(tag)) {
-            String value = compound.get(tag).asString();
+        NamespacedKey key = new NamespacedKey("lifemoremythicmobs", tag.toLowerCase());
+        String value = meta.getPersistentDataContainer().get(key, PersistentDataType.STRING);
 
+        if (value != null) {
             ItemUtil.setVariable(data, varName, value);
-            return true;
+            return SkillResult.SUCCESS;
         }
-        return false;
+        return SkillResult.CONDITION_FAILED;
     }
 }

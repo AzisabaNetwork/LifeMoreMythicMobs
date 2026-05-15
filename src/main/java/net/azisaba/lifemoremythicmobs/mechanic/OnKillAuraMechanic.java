@@ -1,10 +1,15 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
-import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
-import io.lumine.xikage.mythicmobs.skills.*;
+import io.lumine.mythic.api.adapters.AbstractEntity;
+import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.api.skills.Skill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -29,8 +34,8 @@ public class OnKillAuraMechanic extends SkillMechanic implements ITargetedEntity
     protected final int duration;
     protected final int tickInterval;
 
-    public OnKillAuraMechanic(MythicLineConfig config) {
-        super(config.getLine(), config);
+    public OnKillAuraMechanic(SkillExecutor executor, MythicLineConfig config) {
+        super(executor, config.getLine(), config);
         this.auraName = config.getString(new String[]{"auraName", "aura", "n"}, "kill_aura");
         this.onKillSkill = config.getString(new String[]{"onKill", "ok"}, null);
         this.onTickSkill = config.getString(new String[]{"onTick", "ot"}, null);
@@ -47,16 +52,16 @@ public class OnKillAuraMechanic extends SkillMechanic implements ITargetedEntity
     }
 
     @Override
-    public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
+    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
         String id = target.getUniqueId().toString() + ":" + this.auraName;
 
         if (activeAuras.containsKey(id)) {
             activeAuras.get(id).refresh(this.duration);
-            return true;
+            return SkillResult.SUCCESS;
         }
 
         new KillAura(target, data, id);
-        return true;
+        return SkillResult.SUCCESS;
     }
 
     private class KillAura implements Listener, Runnable {
@@ -117,7 +122,7 @@ public class OnKillAuraMechanic extends SkillMechanic implements ITargetedEntity
 
         private void executeSkill(String skillName, AbstractEntity trigger) {
             if (skillName == null || skillName.isEmpty()) return;
-            Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(skillName);
+            Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
             maybeSkill.ifPresent(skill -> {
                 SkillMetadata clone = data.deepClone();
                 if (trigger != null) {
