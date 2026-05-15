@@ -108,6 +108,21 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("CastVariable") || mechanic.equalsIgnoreCase("castVar") ) {
             e.register(new VariableCastMechanic(e.getConfig()));
         }
+        if ( mechanic.equalsIgnoreCase("DispatchVariableSkill") || mechanic.equalsIgnoreCase("disVarSkill") ) {
+            e.register(new DispatchVariableSkillMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("CallWithArgs") || mechanic.equalsIgnoreCase("CallArgs") ) {
+            e.register(new CallWithArgsMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("PersistentZone") || mechanic.equalsIgnoreCase("PerZone") ) {
+            e.register(new PersistentZoneMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("BouncingRaytrace") || mechanic.equalsIgnoreCase("bRaytrace") ) {
+            e.register(new BouncingRaytraceMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("ShapeRenderer") || mechanic.equalsIgnoreCase("lShape") ) {
+            e.register(new ShapeRendererMechanic(e.getConfig()));
+        }
     }
 
     @EventHandler
