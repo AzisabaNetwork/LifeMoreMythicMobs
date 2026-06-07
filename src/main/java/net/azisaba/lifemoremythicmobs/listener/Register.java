@@ -10,11 +10,28 @@ import net.azisaba.lifemoremythicmobs.condition.*;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.placeholder.*;
 import net.azisaba.lifemoremythicmobs.targetter.SphereTargeter;
+import net.azisaba.lifemoremythicmobs.trigger.TriggerEvents;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
 public class Register implements Listener {
+
+    private final TriggerEvents triggerEvents = new TriggerEvents();
+    private boolean isTriggerRegistered = false;
+
+    @EventHandler
+    public void onMythicReloaded(@NotNull MythicReloadedEvent e) {
+        registerTriggerListener();
+        reloadPlaceholders();
+    }
+
+    private void registerTriggerListener() {
+        if (!isTriggerRegistered) {
+            MythicMobs.inst().getServer().getPluginManager().registerEvents(triggerEvents, MythicMobs.inst());
+            isTriggerRegistered = true;
+        }
+    }
 
     @EventHandler
     public void onMythicMechanicLoad(@NotNull MythicMechanicLoadEvent e)	{
@@ -123,6 +140,7 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("ShapeRenderer") || mechanic.equalsIgnoreCase("lShape") ) {
             e.register(new ShapeRendererMechanic(e.getConfig()));
         }
+        registerTriggerListener();
     }
 
     @EventHandler

@@ -5,6 +5,9 @@ import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
 import io.lumine.xikage.mythicmobs.skills.variables.VariableRegistry;
 import io.lumine.xikage.mythicmobs.skills.variables.VariableScope;
+import io.lumine.xikage.mythicmobs.util.jnbt.CompoundTag;
+import io.lumine.xikage.mythicmobs.util.jnbt.StringTag;
+import io.lumine.xikage.mythicmobs.util.jnbt.Tag;
 import net.minecraft.server.v1_15_R1.NBTBase;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
@@ -20,44 +23,36 @@ import java.util.List;
 
 public class ItemUtil {
 
+    private static CompoundTag getCompoundTag(ItemStack stack) {
+        if (stack == null || stack.getType().isAir()) return null;
+        return MythicMobs.inst().getVolatileCodeHandler().getItemHandler().getNBTData(stack);
+    }
+
     @Contract("null -> null")
     public static @Nullable String getMythicType(@Nullable ItemStack stack) {
-        String type = getStringTag(stack, "MYTHIC_TYPE");
-        if (type == null || type.isEmpty()) return null;
-        return type;
+        return getStringTag(stack, "MYTHIC_TYPE");
     }
 
     @Contract("null, _ -> null")
     public static @Nullable String getStringTag(@Nullable ItemStack stack, @NotNull String key) {
-        if (stack == null || stack.getType().isAir()) return null;
-        NBTTagCompound tag = CraftItemStack.asNMSCopy(stack).getTag();
-        if (tag == null) return null;
-        return tag.getString(key);
-    }
-
-    @Contract("null, _ -> null")
-    public static @Nullable String getTagAsString(@Nullable ItemStack stack, @NotNull String key) {
-        if (stack == null || stack.getType().isAir()) return null;
-        NBTTagCompound tag = CraftItemStack.asNMSCopy(stack).getTag();
-        if (tag == null) return null;
-        NBTBase base = tag.get(key);
-        if (base == null) return null;
-        return base.asString();
+        CompoundTag tag = getCompoundTag(stack);
+        if (tag == null || !tag.getValue().containsKey(key)) return null;
+        return ((StringTag) tag.getValue().get(key)).getValue();
     }
 
     @Contract("null, _ -> null")
     public static @Nullable String resolveTagAsString(@Nullable ItemStack stack, @NotNull String keySeparatedByDot) {
-        if (stack == null || stack.getType().isAir()) return null;
-        NBTTagCompound tag = CraftItemStack.asNMSCopy(stack).getTag();
+        CompoundTag tag = getCompoundTag(stack);
         if (tag == null) return null;
-        List<String> keys = new ArrayList<>(Arrays.asList(keySeparatedByDot.split("\\.")));
-        keys.remove(keys.size() - 1);
-        for (String key : keys) {
-            tag = tag.getCompound(key);
+        String[] keys = keySeparatedByDot.split("\\.");
+        CompoundTag current = tag;
+        for (int i = 0; i < keys.length - 1; i++) {
+            Tag t = current.getValue().get(keys[i]);
+            if (!(t instanceof CompoundTag)) return null;
+            current = (CompoundTag) t;
         }
-        NBTBase base = tag.get(keySeparatedByDot.split("\\.")[keys.size()]);
-        if (base == null) return null;
-        return base.asString();
+        Tag target = current.getValue().get(keys[keys.length - 1]);
+        return (target != null) ? target.toString() : null;
     }
 
     public static String resolveVariable(SkillMetadata skillMetadata, String varName) {

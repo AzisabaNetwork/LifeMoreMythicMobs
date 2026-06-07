@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "net.azisaba.lifemoremythicmobs"
-version = "2.4.8+1.15.2"
+version = "2.4.9+1.15.2"
 
 repositories {
     mavenCentral()
@@ -37,7 +37,7 @@ dependencies {
     compileOnly("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:24.0.1")
     compileOnly("io.lumine.xikage:MythicMobs:4.12.0")
-    compileOnly("org.spigotmc:spigot:1.15.2-R0.1-SNAPSHOT")
+    // compileOnly("org.spigotmc:spigot:1.15.2-R0.1-SNAPSHOT")
     compileOnly("com.github.MyPetORG.MyPet:mypet-api:5c8ceeac6a")
     compileOnly("net.azisaba:lifepvelevel:2.0.9+1.15.2")
 }
