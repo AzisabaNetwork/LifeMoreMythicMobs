@@ -7,6 +7,7 @@ import net.azisaba.lifemoremythicmobs.commands.RootCommand;
 import net.azisaba.lifemoremythicmobs.listener.BowForceListener;
 import net.azisaba.lifemoremythicmobs.listener.JoinListener;
 import net.azisaba.lifemoremythicmobs.listener.Register;
+import net.azisaba.lifemoremythicmobs.mechanic.ModifyAttributeMechanic;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -53,6 +54,7 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
 
     @Override
     public void onDisable() {
+        ModifyAttributeMechanic.shutdown();
         getLogger().info("LifeMoreMythicMobs has been disabled.");
     }
 
