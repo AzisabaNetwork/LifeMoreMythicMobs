@@ -3,205 +3,272 @@ package net.azisaba.lifemoremythicmobs.mechanic;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.api.skills.Skill;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
-import io.lumine.mythic.bukkit.BukkitAdapter;
-import io.lumine.mythic.bukkit.MythicBukkit;
-import io.lumine.mythic.bukkit.utils.Schedulers;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
-import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.plugin.Plugin;
-
-import java.util.Map;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedEntitySkill {
+   private final PlaceholderString slot;
+   private final PlaceholderString attributeSlot;
+   private final Attribute attribute;
+   private final PlaceholderString mode;
+   private final PlaceholderString rawValue;
 
-    private static final Map<String, AttributeModTask> activeMods = new ConcurrentHashMap<>();
+   public ModifyAttributeMechanic(SkillExecutor executor, MythicLineConfig config) {
+      super(executor, config.getLine(), config);
+      this.slot = PlaceholderString.of(config.getString(new String[]{"slot", "s"}, "HEAD").toUpperCase());
+      this.attributeSlot = PlaceholderString.of(config.getString(new String[]{"attributeSlot", "as"}, "HEAD").toUpperCase());
+      this.attribute = Attribute.valueOf(config.getString(new String[]{"attribute", "a"}, "GENERIC_ARMOR").toUpperCase());
+      this.rawValue = PlaceholderString.of(config.getString(new String[]{"value", "v"}, "0.0"));
+      this.mode = PlaceholderString.of(config.getString(new String[]{"mode", "m"}, "overwrite").toLowerCase());
+   }
 
-    protected final PlaceholderString amountStr;
-    protected final int duration;
-    protected final String auraName;
-    protected final String attributeName;
-    protected final boolean fixed;
-    protected final boolean capAtZero;
+   @Override
+   public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
+      String slot = this.slot.get(data);
+      String attrSlot = this.attributeSlot.get(data);
+      String mode = this.mode.get(data);
+      if (!(target.getBukkitEntity() instanceof Player)) {
+         return SkillResult.FAILURE;
+      }
 
-    protected final String onTickSkill;
-    protected final String onEndSkill;
-    protected final int tickInterval;
+      Player player = (Player)target.getBukkitEntity();
+      ItemStack item = this.getItemFromSlot(player, slot);
+      if (item != null && item.getType() != Material.AIR) {
+         ItemMeta meta = item.getItemMeta();
+         if (meta == null) {
+            return SkillResult.FAILURE;
+         }
 
-    public ModifyAttributeMechanic(SkillExecutor executor, MythicLineConfig config) {
-        super(executor, config.getLine(), config);
-        this.amountStr = PlaceholderString.of(config.getString(new String[]{"amount", "a"}, "0.0"));
-        this.duration = config.getInteger(new String[]{"duration", "d"}, 100);
-        this.auraName = config.getString(new String[]{"auraName", "aura", "n"}, "attr_mod");
-        this.fixed = config.getBoolean(new String[]{"fixed", "fix", "f"}, false);
-        this.capAtZero = config.getBoolean(new String[]{"capAtZero", "cap", "c"}, true);
-        this.attributeName = config.getString(new String[]{"type", "t", "attribute"}, "GENERIC_ARMOR").toUpperCase();
-        this.onTickSkill = config.getString(new String[]{"onTick", "ot"}, null);
-        this.onEndSkill = config.getString(new String[]{"onEnd", "oe"}, null);
-        this.tickInterval = config.getInteger(new String[]{"tickInterval", "ti"}, 1);
-    }
-
-    public static void remove(AbstractEntity target, String auraName) {
-        String uuidStr = target.getUniqueId().toString();
-        activeMods.forEach((id, task) -> {
-            if (id.startsWith(uuidStr) && id.endsWith(":" + auraName)) {
-                task.stop();
+         EquipmentSlot equipmentSlot = this.getEquipmentSlot(attrSlot);
+         Collection<AttributeModifier> mods = meta.getAttributeModifiers(this.attribute);
+         AttributeModifier matched = null;
+         Operation baseOp = Operation.ADD_NUMBER;
+         double baseAmount = 0.0;
+         if (mods != null) {
+            for (AttributeModifier mod : mods) {
+               if (mod.getSlot() == equipmentSlot) {
+                  matched = mod;
+                  baseAmount = mod.getAmount();
+                  baseOp = mod.getOperation();
+                  break;
+               }
             }
-        });
-    }
+         }
 
-    @Override
-    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
-        String resolvedAmount = this.amountStr.get(data, target);
-
-        Schedulers.sync().run(() -> {
-            if (!(BukkitAdapter.adapt(target) instanceof LivingEntity)) return;
-            LivingEntity entity = (LivingEntity) BukkitAdapter.adapt(target);
-
-            Attribute targetAttr = parseAttribute(attributeName);
-            if (targetAttr == null) return;
-
-            AttributeInstance attrInstance = entity.getAttribute(targetAttr);
-            if (attrInstance == null) return;
-
-            String id = entity.getUniqueId() + ":" + targetAttr.getKey().getKey().toUpperCase() + ":" + auraName;
-
-            if (activeMods.containsKey(id)) {
-                activeMods.get(id).stop();
-            }
-
-            new AttributeModTask(entity, targetAttr, id, resolvedAmount, duration, data);
-        });
-        return SkillResult.SUCCESS;
-    }
-
-    private Attribute parseAttribute(String name) {
-        String formatted = name.toLowerCase();
-        if (!formatted.startsWith("generic_") && !formatted.contains(":")) {
-            formatted = "generic_" + formatted;
-        }
-        return Registry.ATTRIBUTE.get(NamespacedKey.minecraft(formatted.replace("generic_generic_", "generic_")));
-    }
-
-    private class AttributeModTask implements Runnable {
-        private final LivingEntity entity;
-        private final Attribute attribute;
-        private final String id;
-        private final AttributeModifier modifier;
-        private final SkillMetadata data;
-        private int ticksRemaining;
-        private int taskId = -1;
-
-        public AttributeModTask(LivingEntity entity, Attribute attribute, String id, String amountInput, int duration, SkillMetadata data) {
-            this.entity = entity;
-            this.attribute = attribute;
-            this.id = id;
-            this.ticksRemaining = duration;
-            this.data = data;
-
-            AttributeInstance attrInstance = entity.getAttribute(attribute);
-            if (attrInstance == null) {
-                this.modifier = null;
-                return;
-            }
-
-            double baseValue = attrInstance.getBaseValue();
-            double currentValue = attrInstance.getValue();
-
-            double parsedVal;
-            try {
-                parsedVal = Double.parseDouble(amountInput.replaceAll("[^0-9.\\-]", ""));
-            } catch (Exception e) { parsedVal = 0; }
-
-            double targetTotal;
-            boolean isPercent = amountInput.endsWith("%");
-
-            if (amountInput.startsWith("+")) {
-                double add = isPercent ? (currentValue * (parsedVal / 100.0)) : parsedVal;
-                targetTotal = currentValue + add;
-            } else if (amountInput.startsWith("-")) {
-                double sub = isPercent ? (currentValue * (Math.abs(parsedVal) / 100.0)) : Math.abs(parsedVal);
-                targetTotal = currentValue - sub;
-            } else if (isPercent) {
-                targetTotal = baseValue * (parsedVal / 100.0);
-            } else if (fixed) {
-                targetTotal = parsedVal;
+         String evaluated = this.rawValue.get(data).trim();
+         boolean isPercent = evaluated.endsWith("%");
+         double parsedValue = isPercent ? this.parsePercent(evaluated) : this.parseRawDouble(evaluated);
+         double finalAmount;
+         Operation newOp;
+         if (mode.equals("add")) {
+            if (matched == null) {
+               finalAmount = parsedValue;
+               newOp = isPercent ? Operation.ADD_SCALAR : Operation.ADD_NUMBER;
             } else {
-                targetTotal = baseValue + parsedVal;
+               finalAmount = baseAmount + parsedValue;
+               newOp = baseOp;
+            }
+         } else if (mode.equals("multiply")) {
+            if (matched == null) {
+               return SkillResult.FAILURE;
             }
 
-            if (capAtZero && targetTotal < 0) targetTotal = 0;
+            finalAmount = baseAmount * parsedValue;
+            newOp = baseOp;
+         } else {
+            newOp = isPercent ? Operation.ADD_SCALAR : Operation.ADD_NUMBER;
+            finalAmount = parsedValue;
+         }
 
-            double finalModAmount = targetTotal - baseValue;
+         if (matched != null) {
+            meta.removeAttributeModifier(this.attribute, matched);
+         }
 
-            NamespacedKey mKey = new NamespacedKey("lifemore", auraName.toLowerCase().replaceAll("[^a-z0-9/._-]", ""));
-            this.modifier = new AttributeModifier(mKey, finalModAmount, AttributeModifier.Operation.ADD_NUMBER);
+         if (mode.equals("overwrite") || mode.equals("add") || matched != null) {
+            meta.addAttributeModifier(
+               this.attribute, new AttributeModifier(UUID.randomUUID(), "mm-" + this.attribute.name(), finalAmount, newOp, equipmentSlot)
+            );
+            this.updateLore(meta, this.attribute, finalAmount, newOp, equipmentSlot);
+         }
 
-            for (AttributeModifier m : attrInstance.getModifiers()) {
-                if (m.getName().equals(auraName)) {
-                    attrInstance.removeModifier(m);
-                }
+         item.setItemMeta(meta);
+         this.setItemToSlot(player, slot, item);
+         return SkillResult.SUCCESS;
+      } else {
+         return SkillResult.FAILURE;
+      }
+   }
+
+   private void updateLore(ItemMeta meta, Attribute attribute, double value, Operation op, EquipmentSlot slot) {
+      String displayName = this.getAttributeDisplayName(attribute);
+      String sectionTitle = "§7" + this.getSlotDescription(slot);
+      String entry = (value >= 0.0 ? "§9" : "§c") + displayName + " " + this.formatAmount(value, op);
+      List<String> lore = meta.hasLore() ? new ArrayList<>(meta.getLore()) : new ArrayList<>();
+      boolean sectionFound = false;
+      boolean entryUpdated = false;
+
+      for (int i = 0; i < lore.size(); i++) {
+         if (lore.get(i).equals(sectionTitle)) {
+            sectionFound = true;
+
+            for (int j = i + 1; j < lore.size(); j++) {
+               String line = lore.get(j);
+               if (!line.startsWith("§9") && !line.startsWith("§c")) {
+                  break;
+               }
+
+               if (line.contains(displayName)) {
+                  lore.set(j, entry);
+                  entryUpdated = true;
+                  break;
+               }
             }
 
-            attrInstance.addModifier(modifier);
+            if (!entryUpdated) {
+               lore.add(i + 1, entry);
+            }
+            break;
+         }
+      }
 
-            Plugin plugin = Bukkit.getPluginManager().getPlugin("LifeMoreMythicMobs");
-            if (plugin == null) plugin = Bukkit.getPluginManager().getPlugin("MythicMobs");
+      if (!sectionFound) {
+         lore.add(sectionTitle);
+         lore.add(entry);
+      }
 
-            if (plugin != null) {
-                activeMods.put(id, this);
-                this.taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this, 1L, 1L);
-            }
-        }
+      meta.setLore(lore);
+   }
 
-        @Override
-        public void run() {
-            if (!entity.isValid() || entity.isDead() || ticksRemaining <= 0) {
-                stop();
-                return;
-            }
-            if (onTickSkill != null && ticksRemaining % tickInterval == 0) {
-                executeSkill(onTickSkill);
-            }
-            ticksRemaining--;
-        }
+   private String getSlotDescription(EquipmentSlot slot) {
+      if (slot == EquipmentSlot.HAND) {
+         return "メインハンドに";
+      } else if (slot == EquipmentSlot.OFF_HAND) {
+         return "オフハンドに";
+      } else if (slot == EquipmentSlot.HEAD) {
+         return "頭に装備したとき:";
+      } else if (slot == EquipmentSlot.CHEST) {
+         return "胴体に装備したとき:";
+      } else if (slot == EquipmentSlot.LEGS) {
+         return "脚に装備したとき:";
+      } else {
+         return slot == EquipmentSlot.FEET ? "足に装備したとき:" : "装備したとき:";
+      }
+   }
 
-        public void stop() {
-            if (taskId != -1) {
-                Bukkit.getScheduler().cancelTask(taskId);
-                taskId = -1;
-            }
-            AttributeInstance attr = entity.getAttribute(attribute);
-            if (attr != null && modifier != null) {
-                attr.removeModifier(modifier);
-            }
-            if (ticksRemaining <= 0) {
-                executeSkill(onEndSkill);
-            }
-            activeMods.remove(id);
-        }
+   private String getAttributeDisplayName(Attribute attr) {
+      if (attr == Attribute.GENERIC_ARMOR) {
+         return "防具";
+      } else if (attr == Attribute.GENERIC_ARMOR_TOUGHNESS) {
+         return "防具強度";
+      } else if (attr == Attribute.GENERIC_ATTACK_DAMAGE) {
+         return "攻撃力";
+      } else if (attr == Attribute.GENERIC_ATTACK_SPEED) {
+         return "攻撃速度";
+      } else if (attr == Attribute.GENERIC_KNOCKBACK_RESISTANCE) {
+         return "ノックバック耐性";
+      } else if (attr == Attribute.GENERIC_LUCK) {
+         return "幸運";
+      } else if (attr == Attribute.GENERIC_MAX_HEALTH) {
+         return "最大体力";
+      } else {
+         return attr == Attribute.GENERIC_MOVEMENT_SPEED ? "移動速度" : attr.name().replace("GENERIC_", "").replace("_", "").toLowerCase();
+      }
+   }
 
-        private void executeSkill(String skillName) {
-            if (skillName == null || skillName.isEmpty()) return;
-            Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
-            maybeSkill.ifPresent(skill -> {
-                SkillMetadata clone = data.deepClone();
-                clone.setTrigger(BukkitAdapter.adapt(entity));
-                skill.execute(clone);
-            });
-        }
-    }
+   private String formatAmount(double amount, Operation op) {
+      return op == Operation.ADD_SCALAR ? String.format("+%.0f%%", amount * 100.0) : String.format("+%.1f", amount);
+   }
+
+   private double parsePercent(String val) {
+      try {
+         val = val.trim().replace("%", "");
+         return Double.parseDouble(val) / 100.0;
+      } catch (Exception e) {
+         return 0.0;
+      }
+   }
+
+   private double parseRawDouble(String input) {
+      try {
+         return input.endsWith("%") ? this.parsePercent(input) : Double.parseDouble(input);
+      } catch (Exception e) {
+         return 0.0;
+      }
+   }
+
+   private ItemStack getItemFromSlot(Player player, String slot) {
+      switch (slot) {
+         case "OFFHAND":
+            return player.getInventory().getItemInOffHand();
+         case "FEET":
+            return player.getInventory().getBoots();
+         case "HEAD":
+            return player.getInventory().getHelmet();
+         case "LEGS":
+            return player.getInventory().getLeggings();
+         case "CHEST":
+            return player.getInventory().getChestplate();
+         case "MAINHAND":
+            return player.getInventory().getItemInMainHand();
+         default:
+            return null;
+      }
+   }
+
+   private void setItemToSlot(Player player, String slot, ItemStack item) {
+      switch (slot) {
+         case "OFFHAND":
+            player.getInventory().setItemInOffHand(item);
+            break;
+         case "FEET":
+            player.getInventory().setBoots(item);
+            break;
+         case "HEAD":
+            player.getInventory().setHelmet(item);
+            break;
+         case "LEGS":
+            player.getInventory().setLeggings(item);
+            break;
+         case "CHEST":
+            player.getInventory().setChestplate(item);
+            break;
+         case "MAINHAND":
+            player.getInventory().setItemInMainHand(item);
+            break;
+      }
+   }
+
+   private EquipmentSlot getEquipmentSlot(String slot) {
+      switch (slot) {
+         case "OFFHAND":
+            return EquipmentSlot.OFF_HAND;
+         case "FEET":
+            return EquipmentSlot.FEET;
+         case "HEAD":
+            return EquipmentSlot.HEAD;
+         case "LEGS":
+            return EquipmentSlot.LEGS;
+         case "CHEST":
+            return EquipmentSlot.CHEST;
+         case "MAINHAND":
+            return EquipmentSlot.HAND;
+         default:
+            return EquipmentSlot.HAND;
+      }
+   }
 }
