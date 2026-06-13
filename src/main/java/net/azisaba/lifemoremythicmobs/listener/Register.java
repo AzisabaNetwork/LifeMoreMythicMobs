@@ -353,7 +353,6 @@ public class Register implements Listener {
         // Add alias: customProjectile -> CustomProjectileMechanic
         if ( mechanic.equalsIgnoreCase("customProjectile") ) {
             e.register(new CustomProjectileMechanic(executor, config));
-}
         }
     }
 
