@@ -2,9 +2,9 @@ name: Build & Artifact Upload
 
 on:
   push:
-    branches: ["*"]
+    branches: ["**"]
   pull_request:
-    branches: ["*"]
+    branches: ["**"]
   workflow_dispatch:
 
 permissions: {}
