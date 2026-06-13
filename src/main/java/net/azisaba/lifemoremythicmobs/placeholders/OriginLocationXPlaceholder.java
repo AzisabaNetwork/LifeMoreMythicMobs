@@ -1,5 +1,7 @@
-package net.azisaba.lifemoremythicmobs.placeholder;
+package net.azisaba.lifemoremythicmobs.placeholders;
+
 import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
-public class PvELevelPlaceholder {
+
+public class OriginLocationXPlaceholder {
     public static void register(PlaceholderManager manager) {}
 }

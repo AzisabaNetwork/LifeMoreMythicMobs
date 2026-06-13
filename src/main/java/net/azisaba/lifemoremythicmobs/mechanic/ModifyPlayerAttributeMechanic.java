@@ -49,7 +49,7 @@ public class ModifyPlayerAttributeMechanic extends SkillMechanic implements ITar
     protected final String onEndSkill;
     protected final int tickInterval;
 
-    public ModifyAttributeMechanic(SkillExecutor executor, MythicLineConfig config) {
+    public ModifyPlayerAttributeMechanic(SkillExecutor executor, MythicLineConfig config) {
         super(executor, config.getLine(), config);
         this.amountStr = PlaceholderString.of(config.getString(new String[]{"amount", "a"}, "0.0"));
         this.duration = config.getInteger(new String[]{"duration", "d"}, 100);
