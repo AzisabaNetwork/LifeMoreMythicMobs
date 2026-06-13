@@ -17,11 +17,12 @@ import java.util.List;
 import java.util.Objects;
 
 public final class LifeMoreMythicMobs extends JavaPlugin{
+    private static LifeMoreMythicMobs instance;
     public String server = "";
 
     @Override
     public void onEnable() {
-
+        instance = this;
         getLogger().info("はい。。。。。。");
 
         if (!Objects.requireNonNull(getConfig().getString("server-override", "")).isEmpty()) {
@@ -29,6 +30,8 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
         }
         Objects.requireNonNull(getCommand("lmmm")).setExecutor(new RootCommand(this));
         getServer().getPluginManager().registerEvents(new Register(), this);
+        getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.listener.SpawnerToolListener(this), this);
+        getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.listener.SpawnerManagerListener(this), this);
         getServer().getPluginManager().registerEvents(new BowForceListener(), this);
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
         Bukkit.getScheduler().runTask(this, Register::reloadPlaceholders);
@@ -55,7 +58,6 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
     @Override
     public void onDisable() {
         ModifyAttributeMechanic.shutdown();
-        // Plugin shutdown logic
         getLogger().info("うへぇ。。。。。");
     }
 
@@ -66,5 +68,9 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("GetServer");
         player.sendPluginMessage(this, "BungeeCord", out.toByteArray());
+    }
+
+    public static LifeMoreMythicMobs inst() {
+        return instance;
     }
 }

@@ -21,7 +21,7 @@ public class FakeWorldBorderMechanic extends SkillMechanic implements ITargetedE
     protected final double size;
     protected final int duration;
     protected final int warningTime;
-    protected final Double forceX; // null を許容
+    protected final Double forceX;
     protected final Double forceY;
     protected final Double forceZ;
 
@@ -31,7 +31,6 @@ public class FakeWorldBorderMechanic extends SkillMechanic implements ITargetedE
         this.duration = config.getInteger(new String[]{"duration", "d"}, 100);
         this.warningTime = config.getInteger(new String[]{"warning", "w"}, 5);
 
-        // getPlaceholderString を使って、指定がなければ null、あれば Double に変換
         this.forceX = config.getPlaceholderString(new String[]{"x"}, null) != null ? config.getDouble("x") : null;
         this.forceY = config.getPlaceholderString(new String[]{"y"}, null) != null ? config.getDouble("y") : null;
         this.forceZ = config.getPlaceholderString(new String[]{"z"}, null) != null ? config.getDouble("z") : null;

@@ -34,7 +34,6 @@ public class ChangeItemNBTMechanic extends SkillMechanic implements ITargetedEnt
 
         if (item.getType() == Material.AIR) return false;
 
-        // 変数・プレースホルダーを解決
         String resolvedValue = this.value.get(data, target);
 
         net.minecraft.server.v1_15_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);

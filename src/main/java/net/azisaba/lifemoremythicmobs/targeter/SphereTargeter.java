@@ -1,4 +1,4 @@
-package net.azisaba.lifemoremythicmobs.targetter;
+package net.azisaba.lifemoremythicmobs.targeter;
 
 import io.lumine.xikage.mythicmobs.adapters.AbstractLocation;
 import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;

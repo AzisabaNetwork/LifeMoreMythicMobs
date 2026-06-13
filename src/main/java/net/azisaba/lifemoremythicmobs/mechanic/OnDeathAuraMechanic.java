@@ -1,24 +1,15 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
 import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
 import io.lumine.xikage.mythicmobs.skills.*;
-import org.bukkit.Bukkit;
+import net.azisaba.lifemoremythicmobs.util.CustomAura;
+import net.azisaba.lifemoremythicmobs.util.SkillUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.plugin.Plugin;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntitySkill {
-
-    private static final Map<String, DeathAura> activeAuras = new ConcurrentHashMap<>();
 
     protected final String auraName;
     protected final String onDeathSkill;
@@ -38,89 +29,46 @@ public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntit
     }
 
     public static void remove(AbstractEntity target, String auraName) {
-        String id = target.getUniqueId().toString() + ":" + auraName;
-        if (activeAuras.containsKey(id)) {
-            activeAuras.get(id).stop(false);
-        }
+        CustomAura.remove(target, auraName);
     }
 
     @Override
     public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
         String id = target.getUniqueId().toString() + ":" + this.auraName;
 
-        if (activeAuras.containsKey(id)) {
-            activeAuras.get(id).refresh(this.duration);
+        CustomAura existing = CustomAura.getActive(id);
+        if (existing instanceof DeathAura) {
+            existing.refresh(this.duration);
             return true;
         }
-
-        new DeathAura(target, data, id);
+        
+        new DeathAura(target, data, auraName, duration, tickInterval);
         return true;
     }
 
-    private class DeathAura implements Listener, Runnable {
-        private final AbstractEntity target;
-        private final SkillMetadata data;
-        private final String id;
-        private int ticksRemaining;
-        private final int taskId;
-
-        public DeathAura(AbstractEntity target, SkillMetadata data, String id) {
-            this.target = target;
-            this.data = data;
-            this.id = id;
-            this.ticksRemaining = duration;
-
-            Plugin plugin = Bukkit.getPluginManager().getPlugin("MythicMobs");
-            activeAuras.put(id, this);
-            Bukkit.getPluginManager().registerEvents(this, plugin);
-            this.taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this, 0L, 1L);
-        }
-
-        public void refresh(int newDuration) {
-            this.ticksRemaining = newDuration;
+    private class DeathAura extends CustomAura {
+        public DeathAura(AbstractEntity target, SkillMetadata data, String auraName, int duration, int tickInterval) {
+            super(target, data, auraName, duration, tickInterval);
         }
 
         @Override
-        public void run() {
-            if (target.isDead()) {
-                stop(false);
-                return;
-            }
-            if (ticksRemaining <= 0) {
-                stop(true);
-                return;
-            }
-
+        protected void onTick() {
             if (onTickSkill != null && ticksRemaining % tickInterval == 0) {
-                executeSkill(onTickSkill);
+                SkillUtil.executeSkill(onTickSkill, data, target);
             }
+        }
 
-            ticksRemaining--;
+        @Override
+        protected void onEnd(boolean timeOut) {
+            if (timeOut) SkillUtil.executeSkill(onEndSkill, data, target);
         }
 
         @EventHandler(priority = EventPriority.MONITOR)
         public void onDeath(EntityDeathEvent event) {
             if (event.getEntity().getUniqueId().equals(target.getUniqueId())) {
-                executeSkill(onDeathSkill);
+                SkillUtil.executeSkill(onDeathSkill, data, target);
                 stop(false);
             }
-        }
-
-        private void stop(boolean timeOut) {
-            Bukkit.getScheduler().cancelTask(taskId);
-            HandlerList.unregisterAll(this);
-            activeAuras.remove(id);
-            if (timeOut) executeSkill(onEndSkill);
-        }
-
-        private void executeSkill(String skillName) {
-            if (skillName == null || skillName.isEmpty()) return;
-            Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(skillName);
-            maybeSkill.ifPresent(skill -> {
-                SkillMetadata clone = data.deepClone();
-                clone.setTrigger(target);
-                skill.execute(clone);
-            });
         }
     }
 }

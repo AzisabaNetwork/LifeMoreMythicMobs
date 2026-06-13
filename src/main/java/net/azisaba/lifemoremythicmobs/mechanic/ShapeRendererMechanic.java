@@ -31,6 +31,10 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
     private final double tMin;
     private final double tMax;
 
+    private final Expression eX;
+    private final Expression eY;
+    private final Expression eZ;
+
     public ShapeRendererMechanic(MythicLineConfig config) {
         super(config.getLine(), config);
         this.shape = config.getString(new String[]{"shape", "s"}, "circle").toLowerCase();
@@ -40,9 +44,9 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
         this.density = config.getDouble(new String[]{"density", "d"}, 0.2);
         this.rotation = Math.toRadians(config.getDouble(new String[]{"rotation", "rot"}, 0));
 
-        this.expX = config.getString(new String[]{"expX", "ex"}, "r*cos(t)");
-        this.expY = config.getString(new String[]{"expY", "ey"}, "0");
-        this.expZ = config.getString(new String[]{"expZ", "ez"}, "r*sin(t)");
+        this.expX = config.getString(new String[]{"expX", "ex"}, "r*cos(t)").replace("\"", "").replace("<&fs>", "/").replace("<&as>", "*").replace("<&sp>", " ");
+        this.expY = config.getString(new String[]{"expY", "ey"}, "0").replace("\"", "").replace("<&fs>", "/").replace("<&as>", "*").replace("<&sp>", " ");
+        this.expZ = config.getString(new String[]{"expZ", "ez"}, "r*sin(t)").replace("\"", "").replace("<&fs>", "/").replace("<&as>", "*").replace("<&sp>", " ");
         this.tMin = config.getDouble(new String[]{"tMin", "tmin"}, 0);
         this.tMax = config.getDouble(new String[]{"tMax", "tmax"}, Math.PI * 2);
 
@@ -52,6 +56,16 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
                 Integer.valueOf(colorStr.substring(3, 5), 16),
                 Integer.valueOf(colorStr.substring(5, 7), 16)
         );
+
+        if (this.shape.equals("custom")) {
+            this.eX = new ExpressionBuilder(expX).variables("t", "r", "pi").build();
+            this.eY = new ExpressionBuilder(expY).variables("t", "r", "pi").build();
+            this.eZ = new ExpressionBuilder(expZ).variables("t", "r", "pi").build();
+        } else {
+            this.eX = null;
+            this.eY = null;
+            this.eZ = null;
+        }
     }
 
     @Override
@@ -62,7 +76,6 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
     @Override
     public boolean castAtLocation(SkillMetadata data, AbstractLocation target) {
         Location center = BukkitAdapter.adapt(target);
-        // マイナスを外して正しい Yaw を取得
         double casterYaw = Math.toRadians(data.getCaster().getLocation().getYaw());
 
         switch (shape) {
@@ -119,15 +132,8 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
     }
 
     private void drawCustom(Location center, double yaw) {
+        if (eX == null || eY == null || eZ == null) return;
         try {
-            String px = expX.replace("\"", "").replace("<&fs>", "/").replace("<&as>", "*").replace("<&sp>", " ");
-            String py = expY.replace("\"", "").replace("<&fs>", "/").replace("<&as>", "*").replace("<&sp>", " ");
-            String pz = expZ.replace("\"", "").replace("<&fs>", "/").replace("<&as>", "*").replace("<&sp>", " ");
-
-            Expression eX = new ExpressionBuilder(px).variables("t", "r", "pi").build();
-            Expression eY = new ExpressionBuilder(py).variables("t", "r", "pi").build();
-            Expression eZ = new ExpressionBuilder(pz).variables("t", "r", "pi").build();
-
             eX.setVariable("r", radius).setVariable("pi", Math.PI);
             eY.setVariable("r", radius).setVariable("pi", Math.PI);
             eZ.setVariable("r", radius).setVariable("pi", Math.PI);
@@ -136,7 +142,6 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
                 double lx = eX.setVariable("t", t + rotation).evaluate();
                 double ly = eY.setVariable("t", t + rotation).evaluate();
                 double lz = eZ.setVariable("t", t + rotation).evaluate();
-                // 回転計算を通す
                 spawn(center.clone().add(rotate(lx, ly, lz, yaw)));
             }
         } catch (Exception e) {
@@ -144,11 +149,9 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
         }
     }
 
-    // Minecraft の Yaw に合わせた回転行列
     private Vector rotate(double x, double y, double z, double yaw) {
         double cos = Math.cos(yaw);
         double sin = Math.sin(yaw);
-        // 標準的な回転行列を使用。Minecraftの座標系ではこれで方位が一致する
         double nx = x * cos - z * sin;
         double nz = x * sin + z * cos;
         return new Vector(nx, y, nz);
