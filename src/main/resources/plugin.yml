@@ -9,5 +9,18 @@ load: STARTUP
 commands:
   lmmm:
     aliases: [lmm]
-    permission: lifemoremythicmobs.lmmm
     description: Main command of LifeMoreMythicMobs
+
+permissions:
+  lifemoremythicmobs.admin:
+    description: Allows use of all LifeMoreMythicMobs commands
+    default: op
+  lifemoremythicmobs.command.spawner:
+    description: Allows use of /lmmm spawner command
+    default: op
+  lifemoremythicmobs.command.findmythicitem:
+    description: Allows use of /lmmm findMythicItem command
+    default: op
+  lifemoremythicmobs.command.findmythicmob:
+    description: Allows use of /lmmm findMythicMob command
+    default: op

@@ -10,6 +10,8 @@ import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.SkillUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -25,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySkill {
 
-    private static final ConcurrentHashMap<String, List<TypeBuffAura>> REGISTRY = new ConcurrentHashMap<>();
+    private static final Map<UUID, Map<String, List<TypeBuffAura>>> ENTITY_AURA_MAP = new ConcurrentHashMap<>();
 
     protected final String auraName;
     protected final Map<String, Double> mods;
@@ -81,20 +83,18 @@ public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySk
     }
 
     private static Plugin resolvePlugin() {
-        Plugin plugin = Bukkit.getPluginManager().getPlugin("LifeMoreMythicMobs");
-        if (plugin == null) plugin = Bukkit.getPluginManager().getPlugin("MythicMobs");
-        return plugin;
+        return LifeMoreMythicMobs.inst();
     }
 
     private static Optional<Skill> resolveSkill(String name) {
-        if (name == null || name.isEmpty()) return Optional.empty();
-        return MythicBukkit.inst().getSkillManager().getSkill(name);
+        return SkillUtil.resolveSkill(name);
     }
 
     @Override
     public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
-        String registryKey = target.getUniqueId().toString() + ":" + auraName;
-        List<TypeBuffAura> stacks = REGISTRY.computeIfAbsent(registryKey, k -> new ArrayList<>());
+        UUID uuid = target.getUniqueId();
+        Map<String, List<TypeBuffAura>> auraMap = ENTITY_AURA_MAP.computeIfAbsent(uuid, k -> new ConcurrentHashMap<>());
+        List<TypeBuffAura> stacks = auraMap.computeIfAbsent(auraName, k -> new ArrayList<>());
 
         synchronized (stacks) {
             int active = countActive(stacks);
@@ -108,12 +108,12 @@ public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySk
             if (active >= maxStacks) return SkillResult.SUCCESS;
 
             new TypeBuffAura(
-                    target.getUniqueId(), registryKey, auraName, mods, duration,
+                    uuid, auraName, mods, duration,
                     maxStacks, stackTimer, interval,
                     resolveSkill(onStartSkillName),
                     resolveSkill(onTickSkillName),
                     resolveSkill(onEndSkillName),
-                    data, stacks
+                    data, auraMap, stacks
             );
         }
         return SkillResult.SUCCESS;
@@ -128,18 +128,31 @@ public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySk
     }
 
     public static void remove(AbstractEntity target, String auraName) {
-        String registryKey = target.getUniqueId().toString() + ":" + auraName;
-        List<TypeBuffAura> stacks = REGISTRY.get(registryKey);
+        UUID uuid = target.getUniqueId();
+        Map<String, List<TypeBuffAura>> auraMap = ENTITY_AURA_MAP.get(uuid);
+        if (auraMap == null) return;
+        List<TypeBuffAura> stacks = auraMap.get(auraName);
         if (stacks == null) return;
         synchronized (stacks) {
             new ArrayList<>(stacks).forEach(aura -> aura.terminate(false));
         }
     }
 
+    public static void removeAll(UUID uuid) {
+        Map<String, List<TypeBuffAura>> auraMap = ENTITY_AURA_MAP.remove(uuid);
+        if (auraMap == null) return;
+        for (List<TypeBuffAura> stacks : auraMap.values()) {
+            synchronized (stacks) {
+                new ArrayList<>(stacks).forEach(aura -> aura.terminate(false));
+            }
+        }
+    }
+
     public static Map<String, Double> getCombinedMods(UUID uuid) {
         Map<String, Double> deltaAccum = new HashMap<>();
-        REGISTRY.forEach((key, stacks) -> {
-            if (!key.startsWith(uuid.toString())) return;
+        Map<String, List<TypeBuffAura>> auraMap = ENTITY_AURA_MAP.get(uuid);
+        if (auraMap == null) return Collections.emptyMap();
+        for (List<TypeBuffAura> stacks : auraMap.values()) {
             synchronized (stacks) {
                 for (TypeBuffAura aura : stacks) {
                     if (!aura.ended) {
@@ -149,7 +162,7 @@ public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySk
                     }
                 }
             }
-        });
+        }
         Map<String, Double> combined = new HashMap<>();
         deltaAccum.forEach((element, totalDelta) ->
                 combined.put(element, 1.0 + totalDelta)
@@ -158,8 +171,9 @@ public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySk
     }
 
     public static boolean hasAura(UUID uuid, String auraName) {
-        String registryKey = uuid.toString() + ":" + auraName;
-        List<TypeBuffAura> stacks = REGISTRY.get(registryKey);
+        Map<String, List<TypeBuffAura>> auraMap = ENTITY_AURA_MAP.get(uuid);
+        if (auraMap == null) return false;
+        List<TypeBuffAura> stacks = auraMap.get(auraName);
         if (stacks == null) return false;
         synchronized (stacks) {
             return countActive(stacks) > 0;
@@ -167,8 +181,9 @@ public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySk
     }
 
     public static int getStacks(UUID uuid, String auraName) {
-        String registryKey = uuid.toString() + ":" + auraName;
-        List<TypeBuffAura> stacks = REGISTRY.get(registryKey);
+        Map<String, List<TypeBuffAura>> auraMap = ENTITY_AURA_MAP.get(uuid);
+        if (auraMap == null) return 0;
+        List<TypeBuffAura> stacks = auraMap.get(auraName);
         if (stacks == null) return 0;
         synchronized (stacks) {
             return countActive(stacks);
@@ -177,7 +192,6 @@ public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySk
 
     static class TypeBuffAura implements Runnable {
         private final UUID targetUUID;
-        private final String registryKey;
         final String auraName;
         final Map<String, Double> mods;
         final int maxStacks;
@@ -187,19 +201,19 @@ public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySk
         final Optional<Skill> onTickSkill;
         final Optional<Skill> onEndSkill;
         final SkillMetadata originMeta;
+        final Map<String, List<TypeBuffAura>> auraMap;
         final List<TypeBuffAura> stackList;
         volatile boolean ended = false;
         volatile int ticksRemaining;
         private int ticksSinceLastTick = 0;
         private int taskId = -1;
 
-        TypeBuffAura(UUID targetUUID, String registryKey, String auraName,
+        TypeBuffAura(UUID targetUUID, String auraName,
                      Map<String, Double> mods, int duration, int maxStacks, boolean stackTimer,
                      int interval,
                      Optional<Skill> onStartSkill, Optional<Skill> onTickSkill, Optional<Skill> onEndSkill,
-                     SkillMetadata originMeta, List<TypeBuffAura> stackList) {
+                     SkillMetadata originMeta, Map<String, List<TypeBuffAura>> auraMap, List<TypeBuffAura> stackList) {
             this.targetUUID = targetUUID;
-            this.registryKey = registryKey;
             this.auraName = auraName;
             this.mods = mods;
             this.ticksRemaining = duration;
@@ -210,6 +224,7 @@ public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySk
             this.onTickSkill = onTickSkill;
             this.onEndSkill = onEndSkill;
             this.originMeta = originMeta;
+            this.auraMap = auraMap;
             this.stackList = stackList;
 
             Plugin plugin = resolvePlugin();
@@ -284,7 +299,10 @@ public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySk
                 synchronized (stackList) {
                     stackList.remove(this);
                     if (stackList.isEmpty()) {
-                        REGISTRY.remove(registryKey);
+                        auraMap.remove(auraName);
+                        if (auraMap.isEmpty()) {
+                            ENTITY_AURA_MAP.remove(targetUUID);
+                        }
                     }
                 }
             }
@@ -297,7 +315,10 @@ public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySk
                     a.terminate(true);
                 }
                 stackList.clear();
-                REGISTRY.remove(registryKey);
+                auraMap.remove(auraName);
+                if (auraMap.isEmpty()) {
+                    ENTITY_AURA_MAP.remove(targetUUID);
+                }
             }
         }
 

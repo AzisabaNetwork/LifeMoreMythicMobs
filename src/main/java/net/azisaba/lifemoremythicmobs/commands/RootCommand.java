@@ -23,7 +23,8 @@ public class RootCommand implements TabExecutor {
         this.plugin = plugin;
         this.commands = Arrays.asList(
                 new FindMythicItemCommand(plugin),
-                new FindMythicMobCommand(plugin)
+                new FindMythicMobCommand(plugin),
+                new SpawnerToolCommand(plugin)
         );
     }
 
@@ -45,6 +46,12 @@ public class RootCommand implements TabExecutor {
             sendHelp(sender);
             return true;
         }
+
+        if (!sender.hasPermission("lifemoremythicmobs.admin") && !sender.hasPermission("lifemoremythicmobs.command." + subCommand.getName().toLowerCase())) {
+            sender.sendMessage(ChatColor.RED + "このコマンドを実行する権限がありません。");
+            return true;
+        }
+
         subCommand.execute((Player) sender, Arrays.copyOfRange(args, 1, args.length));
         return true;
     }

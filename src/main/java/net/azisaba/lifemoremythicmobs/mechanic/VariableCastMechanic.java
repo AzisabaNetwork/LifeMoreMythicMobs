@@ -25,6 +25,7 @@ public class VariableCastMechanic extends SkillMechanic implements ITargetedEnti
     public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
         VariableRegistry registry = data.getVariables();
         if (!registry.has(varName)) return SkillResult.CONDITION_FAILED;
+
         String rawValue = registry.get(varName).toString().replace("\"", "");
         try {
             Variable newVar;
@@ -35,6 +36,7 @@ public class VariableCastMechanic extends SkillMechanic implements ITargetedEnti
                 int i = (int) Float.parseFloat(rawValue);
                 newVar = Variable.ofType(VariableType.INTEGER, i);
             }
+
             registry.put(varName, newVar);
             return SkillResult.SUCCESS;
         } catch (NumberFormatException e) {

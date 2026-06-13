@@ -6,16 +6,23 @@ import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.events.MythicConditionLoadEvent;
 import io.lumine.mythic.bukkit.events.MythicMechanicLoadEvent;
+import io.lumine.mythic.bukkit.events.MythicMobDeathEvent;
+import io.lumine.mythic.bukkit.events.MythicMobDespawnEvent;
 import io.lumine.mythic.bukkit.events.MythicReloadedEvent;
 import io.lumine.mythic.bukkit.events.MythicTargeterLoadEvent;
 import io.lumine.mythic.core.skills.SkillExecutor;
+import org.bukkit.event.entity.EntityDeathEvent;
 import net.azisaba.lifemoremythicmobs.condition.*;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.placeholder.*;
-import net.azisaba.lifemoremythicmobs.targetter.SphereTargeter;
+import net.azisaba.lifemoremythicmobs.targeter.SphereTargeter;
+import net.azisaba.lifemoremythicmobs.util.CustomAura;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public class Register implements Listener {
 
@@ -82,6 +89,9 @@ public class Register implements Listener {
         }
         if ( mechanic.equalsIgnoreCase("onKill") || mechanic.equalsIgnoreCase("onKillAura") ) {
             e.register(new OnKillAuraMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("onConsume") || mechanic.equalsIgnoreCase("onConsumeAura") ) {
+            e.register(new OnConsumeAuraMechanic(e.getConfig()));
         }
         if ( mechanic.equalsIgnoreCase("removeCustomAura") || mechanic.equalsIgnoreCase("removeCAura") ) {
             e.register(new RemoveCustomAuraMechanic(executor, config));
@@ -215,5 +225,26 @@ public class Register implements Listener {
         if ( targeter.equalsIgnoreCase("Sphere") ) {
             e.register(new SphereTargeter(e.getContainer().getManager(), e.getConfig()));
         }
+    }
+
+    @EventHandler
+    public void onMythicMobDeath(MythicMobDeathEvent e) {
+        UUID uuid = e.getEntity().getUniqueId();
+        TypeBuffMechanic.removeAll(uuid);
+        CustomAura.removeAll(uuid);
+    }
+
+    @EventHandler
+    public void onMythicMobDespawn(MythicMobDespawnEvent e) {
+        UUID uuid = e.getEntity().getUniqueId();
+        TypeBuffMechanic.removeAll(uuid);
+        CustomAura.removeAll(uuid);
+    }
+
+    @EventHandler
+    public void onEntityDeath(EntityDeathEvent e) {
+        UUID uuid = e.getEntity().getUniqueId();
+        TypeBuffMechanic.removeAll(uuid);
+        CustomAura.removeAll(uuid);
     }
 }
