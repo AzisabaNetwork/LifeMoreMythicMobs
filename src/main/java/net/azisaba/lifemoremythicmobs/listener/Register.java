@@ -123,6 +123,12 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("ShapeRenderer") || mechanic.equalsIgnoreCase("lShape") ) {
             e.register(new ShapeRendererMechanic(e.getConfig()));
         }
+        if ( mechanic.equalsIgnoreCase("typeBuff") || mechanic.equalsIgnoreCase("tBuff") ) {
+            e.register(new TypeBuffMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("typeDamage") || mechanic.equalsIgnoreCase("tDamage") ) {
+            e.register(new TypedDamageMechanic(e.getConfig()));
+        }
     }
 
     @EventHandler
@@ -172,6 +178,12 @@ public class Register implements Listener {
         }
         if ( condition.equalsIgnoreCase("itemInSlot") ) {
             e.register(new ItemInSlotCondition(e.getConfig()));
+        }
+        if ( condition.equalsIgnoreCase("typeBuffStacks") || condition.equalsIgnoreCase("tBuffStacks") ) {
+            e.register(new TypeBuffStacksCondition(e.getConfig()));
+        }
+        if ( condition.equalsIgnoreCase("hasTypeBuff") || condition.equalsIgnoreCase("hastBuff") ) {
+            e.register(new HasTypeBuffCondition(e.getConfig()));
         }
     }
 
