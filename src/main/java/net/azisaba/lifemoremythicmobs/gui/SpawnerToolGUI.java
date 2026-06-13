@@ -108,7 +108,7 @@ public class SpawnerToolGUI {
             ));
 
             if (isSet && allowEnchant) {
-                meta.addEnchant(org.bukkit.enchantments.Enchantment.DURABILITY, 1, true);
+                meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, true);
                 meta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
             }
 
