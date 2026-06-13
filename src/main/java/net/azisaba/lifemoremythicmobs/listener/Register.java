@@ -209,9 +209,7 @@ public class Register implements Listener {
             e.register(new ExtendAttackReachMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("ExtendReachBuff") ) {
-            ExtendReachBuffMechanic extInst = new ExtendReachBuffMechanic(executor, config);
-            e.register(extInst);
-            Bukkit.getPluginManager().registerEvents(extInst, JavaPlugin.getPlugin(LifeMoreMythicMobs.class));
+            e.register(new ExtendReachBuffMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("Slach") ) {
             e.register(new SlachMechanic(executor, config));
@@ -444,49 +442,7 @@ public class Register implements Listener {
             e.register(new ItemInSlotCondition(config));
         }
 
-        // === IgaCustom conditions ===
-        if ( condition.equalsIgnoreCase("cuboidCustom") ) {
-            e.register(new CuboidCustomCondition(config.getLine(), config));
-        }
-        if ( condition.equalsIgnoreCase("notHasAura") ) {
-            e.register(new NotHasAuraCondition(config));
-        }
-        if ( condition.equalsIgnoreCase("HasAttribute") ) {
-            e.register(new HasAttributeCondition(config));
-        }
-        if ( condition.equalsIgnoreCase("NearbyEntity") ) {
-            e.register(new NearbyEntityCondition(config));
-        }
-        if ( condition.equalsIgnoreCase("ChinChiroMenashi") ) {
-            e.register(new ChinChiroMenashiCondition(config.getLine(), config));
-        }
-        if ( condition.equalsIgnoreCase("HutagoAngelNearby") ) {
-            e.register(new HutagoAngelNearbyCondition(config));
-        }
-        if ( condition.equalsIgnoreCase("Gamemode") ) {
-            e.register(new GamemodeCondition(config));
-        }
-        if ( condition.equalsIgnoreCase("Not") ) {
-            e.register(new NotCondition(config.getLine(), config));
-        }
-        if ( condition.equalsIgnoreCase("And") ) {
-            e.register(new AndCondition(config.getLine(), config));
-        }
-        if ( condition.equalsIgnoreCase("Or") ) {
-            e.register(new OrCondition(config.getLine(), config));
-        }
-        if ( condition.equalsIgnoreCase("WorldNotInConfig") ) {
-            e.register(new WorldNotInConfigCondition(config.getLine(), config));
-        }
-        if ( condition.equalsIgnoreCase("ChinChiro456") ) {
-            e.register(new ChinChiro456Condition(config.getLine(), config));
-        }
-        if ( condition.equalsIgnoreCase("HealthCompare") ) {
-            e.register(new HealthCompareCondition(config.getLine(), config));
-        }
-        if ( condition.equalsIgnoreCase("WearingSlot") ) {
-            e.register(new WearingSlotCondition(config.getLine(), config));
-        }
+        // TODO: IgaCustom conditions - need MM 5.12 API adaptation
     }
 
     @EventHandler
@@ -504,10 +460,7 @@ public class Register implements Listener {
         CasterAttackPlaceholder.register(manager);
         CasterLuckPlaceholder.register(manager);
         PvELevelPlaceholder.register(manager);
-        // IgaCustom placeholders
-        OriginLocationXPlaceholder.register(manager);
-        OriginLocationYPlaceholder.register(manager);
-        OriginLocationZPlaceholder.register(manager);
+        // TODO: IgaCustom placeholders
     }
 
     @EventHandler
@@ -517,36 +470,6 @@ public class Register implements Listener {
         if ( targeter.equalsIgnoreCase("Sphere") ) {
             e.register(new SphereTargeter(e.getContainer().getManager(), e.getConfig()));
         }
-        // IgaCustom targeters
-        if ( targeter.equalsIgnoreCase("ringAroundOrigin") ) {
-            e.register(new RingAroundOriginTargeter(e.getConfig()));
-        }
-        if ( targeter.equalsIgnoreCase("SummonsOfCaster") ) {
-            e.register(new SummonsOfCasterTargeter(e.getConfig()));
-        }
-        if ( targeter.equalsIgnoreCase("DirectionalOffset") ) {
-            e.register(new DirectionalOffsetTargeter(e.getConfig()));
-        }
-        if ( targeter.equalsIgnoreCase("PlayersInRadiusLimitVariable") ) {
-            e.register(new PlayersInRadiusLimitVariableTargeter(e.getConfig()));
-        }
-        if ( targeter.equalsIgnoreCase("PlayersFacingCaster") ) {
-            e.register(new PlayersFacingCasterTargeter(e.getConfig()));
-        }
-        if ( targeter.equalsIgnoreCase("AngleOffsetLocation") ) {
-            e.register(new AngleOffsetLocationTargeter(e.getConfig()));
-        }
-        if ( targeter.equalsIgnoreCase("EntitiesNearOriginCustom") ) {
-            e.register(new EntitiesNearOriginCustomTargeter(e.getConfig()));
-        }
-        if ( targeter.equalsIgnoreCase("RandomAroundCasterLocation") ) {
-            e.register(new RandomAroundCasterLocationTargeter(e.getConfig()));
-        }
-        if ( targeter.equalsIgnoreCase("RandomOriginPoints") ) {
-            e.register(new RandomOriginPointsTargeter(e.getConfig()));
-        }
-        if ( targeter.equalsIgnoreCase("LivingInRadiusCustom") ) {
-            e.register(new LivingInRadiusCustomTargeter(e.getConfig()));
-        }
+        // TODO: IgaCustom targeters
     }
 }
