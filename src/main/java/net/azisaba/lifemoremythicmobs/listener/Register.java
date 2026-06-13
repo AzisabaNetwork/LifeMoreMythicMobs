@@ -84,9 +84,6 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("onKill") || mechanic.equalsIgnoreCase("onKillAura") ) {
             e.register(new OnKillAuraMechanic(e.getConfig()));
         }
-        if ( mechanic.equalsIgnoreCase("onConsume") || mechanic.equalsIgnoreCase("onConsumeAura") ) {
-            e.register(new OnConsumeAuraMechanic(e.getConfig()));
-        }
         if ( mechanic.equalsIgnoreCase("removeCustomAura") || mechanic.equalsIgnoreCase("removeCAura") ) {
             e.register(new RemoveCustomAuraMechanic(e.getConfig()));
         }
@@ -135,11 +132,11 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("typeBuff") || mechanic.equalsIgnoreCase("tBuff") ) {
             e.register(new TypeBuffMechanic(e.getConfig()));
         }
-        if ( mechanic.equalsIgnoreCase("typeOffensiveBuff") || mechanic.equalsIgnoreCase("tOffensiveBuff") ) {
-            e.register(new TypeOffensiveBuffMechanic(e.getConfig()));
-        }
         if ( mechanic.equalsIgnoreCase("typeDamage") || mechanic.equalsIgnoreCase("tDamage") ) {
             e.register(new TypedDamageMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("onConsume") || mechanic.equalsIgnoreCase("onConsumeAura") ) {
+            e.register(new OnConsumeAuraMechanic(e.getConfig()));
         }
     }
 
@@ -196,12 +193,6 @@ public class Register implements Listener {
         }
         if ( condition.equalsIgnoreCase("hasTypeBuff") || condition.equalsIgnoreCase("hastBuff") ) {
             e.register(new HasTypeBuffCondition(e.getConfig()));
-        }
-        if ( condition.equalsIgnoreCase("hasTypeOffensiveBuff") || condition.equalsIgnoreCase("hastOffensiveBuff") ) {
-            e.register(new HasTypeOffensiveBuffCondition(e.getConfig()));
-        }
-        if ( condition.equalsIgnoreCase("typeOffensiveBuffStacks") || condition.equalsIgnoreCase("tOffensiveBuffStacks") ) {
-            e.register(new TypeOffensiveBuffStacksCondition(e.getConfig()));
         }
     }
 

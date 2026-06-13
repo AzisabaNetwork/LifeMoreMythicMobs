@@ -34,6 +34,7 @@ public class MMLuckEvalMechanic extends SkillMechanic implements ITargetedEntity
             LifeMoreMythicMobs.getPlugin(LifeMoreMythicMobs.class).getSLF4JLogger().info("Evaluating script: " + script);
             Method method = Class.forName("com.github.mori01231.mmluck.utils.Expr")
                     .getMethod("eval", Player.class, String.class);
+            //noinspection JavaReflectionInvocation
             Object value = method.invoke(null, abstractEntity.getBukkitEntity(), script);
             ItemUtil.setVariable(skillMetadata, to, String.valueOf(value));
         } catch (Exception e) {

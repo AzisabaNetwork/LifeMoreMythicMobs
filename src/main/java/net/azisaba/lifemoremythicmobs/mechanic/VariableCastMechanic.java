@@ -24,6 +24,7 @@ public class VariableCastMechanic extends SkillMechanic implements ITargetedEnti
         VariableRegistry registry = data.getVariables();
         if (!registry.has(varName)) return false;
 
+        // 現在の値を文字列として取得し、ダブルクォーテーションを徹底的に除去
         String rawValue = registry.get(varName).toString().replace("\"", "");
 
         try {
@@ -32,13 +33,16 @@ public class VariableCastMechanic extends SkillMechanic implements ITargetedEnti
                 float f = Float.parseFloat(rawValue);
                 newVar = Variable.ofType(VariableType.FLOAT, f);
             } else {
-                int i = (int) Float.parseFloat(rawValue);
+                // デフォルトは整数
+                int i = (int) Float.parseFloat(rawValue); // 小数点が含まれていても整数化
                 newVar = Variable.ofType(VariableType.INTEGER, i);
             }
 
+            // 変換した「純粋な数字型」の変数で上書き保存
             registry.put(varName, newVar);
             return true;
         } catch (NumberFormatException e) {
+            // 数字に変換できなかった場合は何もしない
             return false;
         }
     }

@@ -57,6 +57,8 @@ public class BouncingRaytraceMechanic extends SkillMechanic implements ITargeted
                     true,
                     0.5,
                     (entity) -> {
+                        // 最初の発射時(bounceCount == 0)のみ、自分自身を無視する
+                        // これにより自爆を防ぎつつ、反射して戻ってきたら自分に当たるようになる
                         if (bounceCount == 0 && entity.getUniqueId().equals(casterUUID)) {
                             return false;
                         }
@@ -97,6 +99,7 @@ public class BouncingRaytraceMechanic extends SkillMechanic implements ITargeted
 
         Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(onLineSkill);
         maybeSkill.ifPresent(skill -> {
+            // クローンはループの外で1回だけ行う（負荷軽減）
             SkillMetadata newData = data.deepClone();
             for (double d = 0; d < dist; d += step) {
                 Location loc = start.clone().add(dir.clone().multiply(d));

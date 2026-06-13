@@ -21,6 +21,8 @@ public class SpawnerManagerGUI {
     public static final String GROUP_LIST_TITLE = "スポナー管理 - グループ別";
     public static final String SPAWNER_LIST_TITLE_PREFIX = "一覧: ";
     public static final String DETAIL_TITLE_PREFIX = "詳細: ";
+    public static final String GROUP_EDIT_TITLE_PREFIX = "一括編集: ";
+    public static final String INDIVIDUAL_EDIT_TITLE_PREFIX = "個別編集: ";
 
     public static void openMain(Player player) {
         Inventory inv = Bukkit.createInventory(null, 9, MAIN_TITLE);
@@ -129,7 +131,138 @@ public class SpawnerManagerGUI {
         if (spawners.size() > start + 45) {
             inv.setItem(53, createItem(Material.ARROW, ChatColor.YELLOW + "次のページ"));
         }
+        
+        if (filterType.equals("group")) {
+            inv.setItem(47, createItem(Material.WRITABLE_BOOK, ChatColor.YELLOW + "グループ一括編集", ChatColor.GRAY + "このグループの全スポナーを編集します"));
+        }
+        
         inv.setItem(49, createItem(Material.BARRIER, ChatColor.RED + "戻る"));
+
+        player.openInventory(inv);
+    }
+
+    public static void openGroupEdit(Player player, String groupName) {
+        List<MythicSpawner> spawners = MythicMobs.inst().getSpawnerManager().getSpawners().stream()
+                .filter(s -> groupName.equalsIgnoreCase(s.getGroup()))
+                .collect(Collectors.toList());
+
+        MythicSpawner representative = spawners.isEmpty() ? null : spawners.get(0);
+
+        Inventory inv = Bukkit.createInventory(null, 27, GROUP_EDIT_TITLE_PREFIX + groupName);
+
+        String currentMob = representative != null ? representative.getTypeName() : "???";
+        inv.setItem(0, createItem(Material.ZOMBIE_SPAWN_EGG, ChatColor.YELLOW + "モブ名の変更", 
+                ChatColor.GRAY + "代表値: " + ChatColor.WHITE + currentMob,
+                ChatColor.GRAY + "全スポナーの出現モブ(MobType)を変更します"));
+        
+        // Row 2: Basic options
+        String maxMobs = representative != null ? String.valueOf(representative.getMaxMobs()) : "???";
+        inv.setItem(9, createItem(Material.IRON_INGOT, ChatColor.YELLOW + "MaxMobs の変更", 
+                ChatColor.GRAY + "代表値: " + ChatColor.WHITE + maxMobs,
+                ChatColor.GRAY + "一括で変更します"));
+
+        String mobLevel = representative != null ? String.valueOf(representative.getMobLevel()) : "???";
+        inv.setItem(10, createItem(Material.EXPERIENCE_BOTTLE, ChatColor.YELLOW + "MobLevel の変更", 
+                ChatColor.GRAY + "代表値: " + ChatColor.WHITE + mobLevel,
+                ChatColor.GRAY + "一括で変更します"));
+
+        String radius = representative != null ? String.valueOf(representative.getSpawnRadius()) : "???";
+        inv.setItem(11, createItem(Material.COMPASS, ChatColor.YELLOW + "Radius の変更", 
+                ChatColor.GRAY + "代表値: " + ChatColor.WHITE + radius,
+                ChatColor.GRAY + "一括で変更します"));
+
+        String activationRange = representative != null ? String.valueOf(representative.getActivationRange()) : "???";
+        inv.setItem(12, createItem(Material.BEACON, ChatColor.YELLOW + "ActivationRange の変更", 
+                ChatColor.GRAY + "代表値: " + ChatColor.WHITE + activationRange,
+                ChatColor.GRAY + "一括で変更します"));
+
+        String leashRange = representative != null ? String.valueOf(representative.getLeashRange()) : "???";
+        inv.setItem(13, createItem(Material.LEAD, ChatColor.YELLOW + "LeashRange の変更", 
+                ChatColor.GRAY + "代表値: " + ChatColor.WHITE + leashRange,
+                ChatColor.GRAY + "一括で変更します"));
+
+        String cooldown = representative != null ? String.valueOf(representative.getCooldownSeconds()) : "???";
+        inv.setItem(14, createItem(Material.CLOCK, ChatColor.YELLOW + "Cooldown の変更", 
+                ChatColor.GRAY + "代表値: " + ChatColor.WHITE + cooldown,
+                ChatColor.GRAY + "一括で変更します"));
+
+        String warmup = representative != null ? String.valueOf(representative.getWarmupSeconds()) : "???";
+        inv.setItem(15, createItem(Material.CAMPFIRE, ChatColor.YELLOW + "Warmup の変更", 
+                ChatColor.GRAY + "代表値: " + ChatColor.WHITE + warmup,
+                ChatColor.GRAY + "一括で変更します"));
+
+        String amountValue = "???";
+        if (representative != null) {
+            try {
+                java.lang.reflect.Method m = representative.getClass().getMethod("getMobsPerSpawn");
+                amountValue = String.valueOf(m.invoke(representative));
+            } catch (Exception ignored) {}
+        }
+        inv.setItem(16, createItem(Material.SLIME_BALL, ChatColor.YELLOW + "Amount の変更", 
+                ChatColor.GRAY + "代表値: " + ChatColor.WHITE + amountValue,
+                ChatColor.GRAY + "一括で変更します"));
+
+        inv.setItem(22, createItem(Material.IRON_DOOR, ChatColor.GRAY + "戻る"));
+        
+        player.openInventory(inv);
+    }
+
+    public static void openIndividualEdit(Player player, String spawnerName) {
+        MythicSpawner s = MythicMobs.inst().getSpawnerManager().getSpawnerByName(spawnerName);
+        if (s == null) {
+            player.sendMessage(ChatColor.RED + "スポナーが見つかりませんでした。");
+            return;
+        }
+
+        Inventory inv = Bukkit.createInventory(null, 27, INDIVIDUAL_EDIT_TITLE_PREFIX + spawnerName);
+
+        inv.setItem(0, createItem(Material.ZOMBIE_SPAWN_EGG, ChatColor.YELLOW + "モブ名の変更", 
+                ChatColor.GRAY + "現在の値: " + ChatColor.WHITE + s.getTypeName(),
+                ChatColor.GRAY + "このスポナーの出現モブ(MobType)を変更します",
+                "", ChatColor.AQUA + "右クリックで元に戻す"));
+
+        // Row 2: Basic options
+        inv.setItem(9, createItem(Material.IRON_INGOT, ChatColor.YELLOW + "MaxMobs の変更", 
+                ChatColor.GRAY + "現在の値: " + ChatColor.WHITE + s.getMaxMobs(),
+                ChatColor.GRAY + "設定値を変更します",
+                "", ChatColor.AQUA + "右クリックで元に戻す"));
+        inv.setItem(10, createItem(Material.EXPERIENCE_BOTTLE, ChatColor.YELLOW + "MobLevel の変更", 
+                ChatColor.GRAY + "現在の値: " + ChatColor.WHITE + s.getMobLevel(),
+                ChatColor.GRAY + "設定値を変更します",
+                "", ChatColor.AQUA + "右クリックで元に戻す"));
+        inv.setItem(11, createItem(Material.COMPASS, ChatColor.YELLOW + "Radius の変更", 
+                ChatColor.GRAY + "現在の値: " + ChatColor.WHITE + s.getSpawnRadius(),
+                ChatColor.GRAY + "設定値を変更します",
+                "", ChatColor.AQUA + "右クリックで元に戻す"));
+        inv.setItem(12, createItem(Material.BEACON, ChatColor.YELLOW + "ActivationRange の変更", 
+                ChatColor.GRAY + "現在の値: " + ChatColor.WHITE + s.getActivationRange(),
+                ChatColor.GRAY + "設定値を変更します",
+                "", ChatColor.AQUA + "右クリックで元に戻す"));
+        inv.setItem(13, createItem(Material.LEAD, ChatColor.YELLOW + "LeashRange の変更", 
+                ChatColor.GRAY + "現在の値: " + ChatColor.WHITE + s.getLeashRange(),
+                ChatColor.GRAY + "設定値を変更します",
+                "", ChatColor.AQUA + "右クリックで元に戻す"));
+        inv.setItem(14, createItem(Material.CLOCK, ChatColor.YELLOW + "Cooldown の変更", 
+                ChatColor.GRAY + "現在の値: " + ChatColor.WHITE + s.getCooldownSeconds(),
+                ChatColor.GRAY + "設定値を変更します",
+                "", ChatColor.AQUA + "右クリックで元に戻す"));
+        inv.setItem(15, createItem(Material.CAMPFIRE, ChatColor.YELLOW + "Warmup の変更", 
+                ChatColor.GRAY + "現在の値: " + ChatColor.WHITE + s.getWarmupSeconds(),
+                ChatColor.GRAY + "設定値を変更します",
+                "", ChatColor.AQUA + "右クリックで元に戻す"));
+        
+        String amount = "???";
+        try {
+            java.lang.reflect.Method m = s.getClass().getMethod("getMobsPerSpawn");
+            amount = String.valueOf(m.invoke(s));
+        } catch (Exception ignored) {}
+
+        inv.setItem(16, createItem(Material.SLIME_BALL, ChatColor.YELLOW + "Amount の変更", 
+                ChatColor.GRAY + "現在の値: " + ChatColor.WHITE + amount,
+                ChatColor.GRAY + "設定値を変更します",
+                "", ChatColor.AQUA + "右クリックで元に戻す"));
+
+        inv.setItem(22, createItem(Material.IRON_DOOR, ChatColor.GRAY + "戻る"));
 
         player.openInventory(inv);
     }
@@ -144,9 +277,10 @@ public class SpawnerManagerGUI {
         Inventory inv = Bukkit.createInventory(null, 27, DETAIL_TITLE_PREFIX + spawnerName);
 
         inv.setItem(4, createSpawnerItem(s));
-        inv.setItem(11, createItem(Material.ENDER_PEARL, ChatColor.AQUA + "テレポート", ChatColor.GRAY + "スポナーの座標にテレポートします"));
-        inv.setItem(13, createItem(Material.BEACON, ChatColor.YELLOW + "位置を可視化", ChatColor.GRAY + "パーティクルで場所を表示します"));
-        inv.setItem(15, createItem(Material.BARRIER, ChatColor.RED + "削除", ChatColor.GRAY + "このスポナーを削除します"));
+        inv.setItem(10, createItem(Material.WRITABLE_BOOK, ChatColor.YELLOW + "編集", ChatColor.GRAY + "このスポナーの設定を変更します"));
+        inv.setItem(12, createItem(Material.ENDER_PEARL, ChatColor.AQUA + "テレポート", ChatColor.GRAY + "スポナーの座標にテレポートします"));
+        inv.setItem(14, createItem(Material.BEACON, ChatColor.YELLOW + "位置を可視化", ChatColor.GRAY + "パーティクルで場所を表示します"));
+        inv.setItem(16, createItem(Material.BARRIER, ChatColor.RED + "削除", ChatColor.GRAY + "このスポナーを削除します"));
         inv.setItem(22, createItem(Material.IRON_DOOR, ChatColor.GRAY + "戻る"));
 
         player.openInventory(inv);
@@ -166,9 +300,22 @@ public class SpawnerManagerGUI {
         lore.add(ChatColor.GRAY + "MaxMobs: " + s.getMaxMobs());
         lore.add(ChatColor.GRAY + "MobLevel: " + s.getMobLevel());
         lore.add(ChatColor.GRAY + "Cooldown: " + s.getCooldownSeconds());
+        lore.add(ChatColor.GRAY + "Warmup: " + s.getWarmupSeconds());
+        lore.add(ChatColor.GRAY + "Radius: " + s.getSpawnRadius());
         lore.add(ChatColor.GRAY + "ActivationRange: " + s.getActivationRange());
+        lore.add(ChatColor.GRAY + "LeashRange: " + s.getLeashRange());
+
+        String amount = "???";
+        try {
+            java.lang.reflect.Method m = s.getClass().getMethod("getMobsPerSpawn");
+            amount = String.valueOf(m.invoke(s));
+        } catch (Exception ignored) {}
+        lore.add(ChatColor.GRAY + "Amount: " + amount);
+
+        lore.add(ChatColor.GRAY + "CheckForPlayers: " + s.isCheckForPlayers());
         lore.add("");
         lore.add(ChatColor.WHITE + "左クリック: 詳細表示");
+        lore.add(ChatColor.WHITE + "シフト左クリック: 編集");
         lore.add(ChatColor.WHITE + "右クリック: 位置を可視化");
         meta.setLore(lore);
         item.setItemMeta(meta);

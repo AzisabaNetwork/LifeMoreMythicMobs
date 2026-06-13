@@ -26,10 +26,8 @@ public class SphereTargeter extends ILocationSelector {
     @Override
     public HashSet<AbstractLocation> getLocations(SkillMetadata data) {
         HashSet<AbstractLocation> targets = new HashSet<>();
-
         AbstractLocation absOrigin = data.getOrigin();
         if (absOrigin == null) return targets;
-
         Location origin = BukkitAdapter.adapt(absOrigin);
 
         if (random) {
@@ -38,30 +36,23 @@ public class SphereTargeter extends ILocationSelector {
                 double z = rng.nextDouble(-1.0, 1.0);
                 double phi = rng.nextDouble(0, 2 * Math.PI);
                 double rAtZ = Math.sqrt(1 - z * z);
-
                 double x = rAtZ * Math.cos(phi);
                 double y = rAtZ * Math.sin(phi);
-
                 Vector v = new Vector(x, y, z).multiply(radius);
                 targets.add(BukkitAdapter.adapt(origin.clone().add(v)));
             }
         } else {
             double phiAngle = Math.PI * (3.0 - Math.sqrt(5.0));
-
             for (int i = 0; i < points; i++) {
                 double y = 1 - (i / (double) (points - 1)) * 2;
                 double rAtY = Math.sqrt(1 - y * y);
-
                 double theta = phiAngle * i;
-
                 double x = Math.cos(theta) * rAtY;
                 double z = Math.sin(theta) * rAtY;
-
                 Vector v = new Vector(x, y, z).multiply(radius);
                 targets.add(BukkitAdapter.adapt(origin.clone().add(v)));
             }
         }
-
         return targets;
     }
 }

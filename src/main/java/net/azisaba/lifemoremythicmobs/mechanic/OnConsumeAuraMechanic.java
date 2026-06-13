@@ -12,7 +12,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 
 public class OnConsumeAuraMechanic extends SkillMechanic implements ITargetedEntitySkill {
-
     protected final String auraName;
     protected final String onConsumeSkill;
     protected final String onTickSkill;
@@ -37,7 +36,6 @@ public class OnConsumeAuraMechanic extends SkillMechanic implements ITargetedEnt
     @Override
     public boolean castAtEntity(SkillMetadata data, AbstractEntity target) {
         String id = target.getUniqueId().toString() + ":" + this.auraName;
-
         CustomAura existing = CustomAura.getActive(id);
         if (existing instanceof ConsumeAura) {
             existing.refresh(this.duration);

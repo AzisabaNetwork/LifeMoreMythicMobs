@@ -9,8 +9,8 @@ import io.lumine.xikage.mythicmobs.skills.conditions.IEntityCondition;
 public class ItemLoreCondition extends SkillCondition implements IEntityCondition {
 
     protected final boolean hotBar;
-    protected final boolean allLore;
-    protected final boolean sentenceMatch;
+    protected final boolean allLore; // 全てのLoreLineを参照するか (falseだとloreLineで指定したlineを参照)
+    protected final boolean sentenceMatch; // Loreの文章が完全一致するか(falseだと一部分に指定されたものが入っていたらtrue)
     protected final int hotBarNum;
     protected final int loreLine;
     protected final String lore;

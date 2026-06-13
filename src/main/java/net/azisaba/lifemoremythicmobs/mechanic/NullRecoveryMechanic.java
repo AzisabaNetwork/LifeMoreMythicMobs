@@ -1,15 +1,25 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
+import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
+import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
 import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
 import io.lumine.xikage.mythicmobs.skills.*;
-import net.azisaba.lifemoremythicmobs.util.CustomAura;
-import net.azisaba.lifemoremythicmobs.util.SkillUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.plugin.Plugin;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEntitySkill {
+
+    private static final Map<String, NullRecoveryAura> activeAuras = new ConcurrentHashMap<>();
 
     protected final String auraName;
     protected final String onStart;
@@ -33,36 +43,62 @@ public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEnti
     }
 
     public static void remove(AbstractEntity target, String auraName) {
-        CustomAura.remove(target, auraName);
+        String identifier = target.getUniqueId().toString() + ":" + auraName;
+        if (activeAuras.containsKey(identifier)) {
+            activeAuras.get(identifier).stop();
+        }
     }
 
     @Override
     public boolean castAtEntity(SkillMetadata skillMetadata, AbstractEntity abstractEntity) {
         String identifier = abstractEntity.getUniqueId().toString() + ":" + this.auraName;
 
-        CustomAura existing = CustomAura.getActive(identifier);
-        if (existing instanceof NullRecoveryAura) {
-            existing.refresh(this.duration);
+        if (activeAuras.containsKey(identifier)) {
+            activeAuras.get(identifier).refresh(this.duration);
             return true;
         }
 
-        new NullRecoveryAura(abstractEntity, skillMetadata, auraName, duration, tickInterval);
+        new NullRecoveryAura(abstractEntity, skillMetadata, identifier);
         return true;
     }
 
-    private class NullRecoveryAura extends CustomAura {
+    private class NullRecoveryAura implements Listener, Runnable {
+        private final AbstractEntity target;
+        private final SkillMetadata data;
+        private final String identifier;
+        private int ticksRemaining;
+        private int taskId = -1;
         private double lastHealth;
 
-        public NullRecoveryAura(AbstractEntity target, SkillMetadata data, String auraName, int duration, int tickInterval) {
-            super(target, data, auraName, duration, tickInterval);
+        public NullRecoveryAura(AbstractEntity target, SkillMetadata data, String identifier) {
+            this.target = target;
+            this.data = data;
+            this.identifier = identifier;
+            this.ticksRemaining = duration;
             this.lastHealth = target.getHealth();
-            SkillUtil.executeSkill(onStart, data, target);
+
+            Plugin plugin = Bukkit.getPluginManager().getPlugin("MythicMobs");
+            if (plugin != null) {
+                activeAuras.put(identifier, this);
+                Bukkit.getPluginManager().registerEvents(this, plugin);
+                this.taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this, 0L, 1L);
+                executeSkill(onStart);
+            }
+        }
+
+        public void refresh(int newDuration) {
+            this.ticksRemaining = newDuration;
         }
 
         @Override
-        protected void onTick() {
+        public void run() {
+            if (target.isDead() || ticksRemaining <= 0) {
+                stop();
+                return;
+            }
+
             if (onTickSkill != null && ticksRemaining % tickInterval == 0) {
-                SkillUtil.executeSkill(onTickSkill, data, target);
+                executeSkill(onTickSkill);
             }
 
             double currentHealth = target.getHealth();
@@ -79,16 +115,19 @@ public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEnti
 
                 double finalHealth = Math.max(lastHealth, currentHealth - reduce);
                 target.setHealth(finalHealth);
-                if (reduce > 0) SkillUtil.executeSkill(onHeal, data, target);
+                if (reduce > 0) executeSkill(onHeal);
                 this.lastHealth = finalHealth;
             } else {
                 this.lastHealth = currentHealth;
             }
+            ticksRemaining--;
         }
 
-        @Override
-        protected void onEnd(boolean timeOut) {
-            SkillUtil.executeSkill(onEnd, data, target);
+        public void stop() {
+            if (this.taskId != -1) Bukkit.getScheduler().cancelTask(this.taskId);
+            HandlerList.unregisterAll(this);
+            activeAuras.remove(identifier);
+            executeSkill(onEnd);
         }
 
         @EventHandler(priority = EventPriority.LOWEST)
@@ -96,6 +135,16 @@ public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEnti
             if (event.getEntity().getUniqueId().equals(target.getUniqueId())) {
                 this.lastHealth = target.getHealth();
             }
+        }
+
+        private void executeSkill(String skillName) {
+            if (skillName == null || skillName.isEmpty()) return;
+            Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(skillName);
+            maybeSkill.ifPresent(skill -> {
+                SkillMetadata clone = data.deepClone();
+                clone.setTrigger(target);
+                skill.execute(clone);
+            });
         }
     }
 }

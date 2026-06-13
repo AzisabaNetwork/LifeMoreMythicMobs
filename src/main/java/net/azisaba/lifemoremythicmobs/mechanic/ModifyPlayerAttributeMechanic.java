@@ -251,6 +251,7 @@ public class ModifyPlayerAttributeMechanic extends SkillMechanic implements ITar
             AttributeInstance attrInstance = entity.getAttribute(attribute);
             if (attrInstance == null) return;
 
+            // 一時的に古い自分のModifierの値を記録して、あとでパース計算に使用する
             double prevModAmount = (currentModifier != null) ? currentModifier.getAmount() : 0.0;
 
             AttributeModifier oldModifier = currentModifier;
@@ -298,12 +299,18 @@ public class ModifyPlayerAttributeMechanic extends SkillMechanic implements ITar
             }
 
             if (fixed) {
+                // 現在の実際の最終合計値（自分のModifierが付いたままの状態の値）
+                // ただし、updateModifierValue 内で直前に取り除かれているため、
+                // 取り除いた後の値（attrInstance.getValue()）に、直前までの自分の値を擬似的に足して「現在のズレ前の値」とする
                 double currentActualTotal = currentValueWithoutThisModifier + prevModAmount;
 
+                // もし現在の最終値が目標値とズレている場合、その差分を今のModifier値にフィードバックする
                 double deviation = targetTotal - currentActualTotal;
 
+                // 新しいModifier値 = 前回のModifier値 + ズレの修正値
                 double result = prevModAmount + deviation;
 
+                // 外部要因でModifierが完全に消し飛んだ時などのセーフティ
                 if (!hadModifier) {
                     double otherPluginModsSum = 0;
                     for (AttributeModifier m : attrInstance.getModifiers()) {
