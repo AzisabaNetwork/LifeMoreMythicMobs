@@ -64,12 +64,12 @@ public class UpgradeGUI {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(ChatColor.GOLD + type.displayName + (isMax ? ChatColor.RED + " [MAX]" : ""));
-        
+
         List<String> lore = new ArrayList<>();
         lore.add(ChatColor.YELLOW + "現在のレベル: " + ChatColor.WHITE + level + (isMax ? ChatColor.RED + " (最大)" : ""));
-        
+
         String effectValue = "+" + (int)(level * type.perLevel * 100) + "%";
-        
+
         lore.add(ChatColor.YELLOW + "効果: " + ChatColor.WHITE + effectValue);
         lore.add("");
         if (!isMax) {
@@ -78,7 +78,7 @@ public class UpgradeGUI {
         }
         lore.add(ChatColor.WHITE + "左クリックして強化");
         lore.add(ChatColor.WHITE + "右クリックして強化を取り消し");
-        
+
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;

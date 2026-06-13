@@ -21,11 +21,11 @@ public class RemoveCustomAuraMechanic extends SkillMechanic implements ITargeted
     public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
         OnDeathAuraMechanic.remove(target, auraName);
         OnKillAuraMechanic.remove(target, auraName);
-        OnConsumeAuraMechanic.remove(target, auraName);
         NullRecoveryMechanic.remove(target, auraName);
         ModifyPlayerAttributeMechanic.remove(target, auraName);
         TypeBuffMechanic.remove(target, auraName);
         TypeOffensiveBuffMechanic.remove(target, auraName);
+        OnConsumeAuraMechanic.remove(target, auraName);
         return SkillResult.SUCCESS;
     }
 }

@@ -22,6 +22,7 @@ public class SkyRotationMechanic extends SkillMechanic implements ITargetedEntit
     protected final int duration;
     protected final long speed;
 
+    // プレイヤーごとの実行中タスクを保持するマップ
     private static final Map<UUID, BukkitRunnable> runningTasks = new HashMap<>();
 
     public SkyRotationMechanic(SkillExecutor executor, MythicLineConfig config) {
@@ -39,6 +40,7 @@ public class SkyRotationMechanic extends SkillMechanic implements ITargetedEntit
         Plugin plugin = Bukkit.getPluginManager().getPlugin("MythicMobs");
         if (plugin == null) return SkillResult.ERROR;
 
+        // すでに実行中のタスクがあればキャンセルして延長（上書き）
         if (runningTasks.containsKey(uuid)) {
             runningTasks.get(uuid).cancel();
         }
@@ -61,6 +63,7 @@ public class SkyRotationMechanic extends SkillMechanic implements ITargetedEntit
             }
         };
 
+        // マップに登録して実行
         runningTasks.put(uuid, task);
         task.runTaskTimer(plugin, 0L, 1L);
 

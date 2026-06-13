@@ -38,6 +38,7 @@ public class BowTensionCondition extends SkillCondition implements ISkillMetaCon
             return false;
         }
         double actualForce = Float.parseFloat(actualForceString);
+        //noinspection EqualsBetweenInconvertibleTypes
         boolean value = (new RangedDouble(this.force.get(data, data.getCaster().getEntity()))).equals(actualForce);
         return this.invert != value;
     }

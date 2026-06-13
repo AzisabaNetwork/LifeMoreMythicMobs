@@ -41,6 +41,7 @@ public class ChangeItemNBTMechanic extends SkillMechanic implements ITargetedEnt
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return SkillResult.CONDITION_FAILED;
 
+        // 変数・プレースホルダーを解決
         String resolvedValue = this.value.get(data, target);
 
         NamespacedKey key = new NamespacedKey("lifemoremythicmobs", tag.toLowerCase().replaceAll("[^a-z0-9/._-]", ""));
