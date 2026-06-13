@@ -37,15 +37,15 @@ public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEn
     public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
 
         if (target.isDead()) {
-            return SkillResult.INVALID;
+            return SkillResult.CONDITION_FAILED;
         }
 
         if (data.getCaster().isUsingDamageSkill()) {
-            return SkillResult.INVALID;
+            return SkillResult.CONDITION_FAILED;
         }
 
         if (target.isLiving() && target.getHealth() <= 0.0D) {
-            return SkillResult.INVALID;
+            return SkillResult.CONDITION_FAILED;
         }
 
         double base = amount.get(data.getCaster()) * data.getPower();

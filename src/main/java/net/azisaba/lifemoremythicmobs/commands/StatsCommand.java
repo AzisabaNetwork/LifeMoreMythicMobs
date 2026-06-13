@@ -4,6 +4,8 @@ import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.azisaba.lifemoremythicmobs.upgrade.UpgradeStatManager;
 import net.azisaba.lifemoremythicmobs.upgrade.UpgradeStatManager.StatType;
 import org.bukkit.ChatColor;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
@@ -30,7 +32,7 @@ public class StatsCommand extends SubCommand {
         player.sendMessage(ChatColor.GOLD + "========== [ ステータス ] ==========");
 
         // 全てのバニラ属性の表示
-        for (Attribute attribute : Attribute.values()) {
+        for (Attribute attribute : Registry.ATTRIBUTE) {
             AttributeInstance instance = player.getAttribute(attribute);
             if (instance != null) {
                 String label = getAttributeLabel(attribute);
@@ -61,20 +63,20 @@ public class StatsCommand extends SubCommand {
     }
 
     private String getAttributeLabel(Attribute attribute) {
-        switch (attribute) {
-            case GENERIC_MAX_HEALTH: return "最大体力";
-            case GENERIC_FOLLOW_RANGE: return "追跡範囲";
-            case GENERIC_KNOCKBACK_RESISTANCE: return "ノックバック耐性";
-            case GENERIC_MOVEMENT_SPEED: return "移動速度";
-            case GENERIC_ATTACK_DAMAGE: return "攻撃力";
-            case GENERIC_ATTACK_SPEED: return "攻撃速度";
-            case GENERIC_ARMOR: return "防御力";
-            case GENERIC_ARMOR_TOUGHNESS: return "防具強度";
-            case GENERIC_LUCK: return "幸運";
+        String key = attribute.getKey().getKey(); // e.g. "max_health"
+        switch (key) {
+            case "max_health": return "最大体力";
+            case "follow_range": return "追跡範囲";
+            case "knockback_resistance": return "ノックバック耐性";
+            case "movement_speed": return "移動速度";
+            case "attack_damage": return "攻撃力";
+            case "attack_speed": return "攻撃速度";
+            case "armor": return "防御力";
+            case "armor_toughness": return "防具強度";
+            case "luck": return "幸運";
             default:
-                // 内部名を見やすく整形 (例: GENERIC_FLYING_SPEED -> Flying Speed)
-                String name = attribute.name().replace("GENERIC_", "");
-                name = name.replace("_", " ").toLowerCase();
+                // 内部名を見やすく整形 (例: flying_speed -> Flying Speed)
+                String name = key.replace("_", " ").toLowerCase();
                 if (name.length() > 0) {
                     name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
                 }
