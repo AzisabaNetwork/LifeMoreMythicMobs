@@ -12,7 +12,7 @@ commands:
     description: Main command of LifeMoreMythicMobs
 
 permissions:
-  lifemoremythicmobs.admin:
+  lifemoremythicmobs.lmmm:
     description: Allows use of all LifeMoreMythicMobs commands
     default: op
   lifemoremythicmobs.command.spawner:

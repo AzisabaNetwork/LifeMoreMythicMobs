@@ -47,7 +47,7 @@ public class RootCommand implements TabExecutor {
             return true;
         }
 
-        if (!sender.hasPermission("lifemoremythicmobs.admin") && !sender.hasPermission("lifemoremythicmobs.command." + subCommand.getName().toLowerCase())) {
+        if (!sender.hasPermission("lifemoremythicmobs.lmmm") && !sender.hasPermission("lifemoremythicmobs.command." + subCommand.getName().toLowerCase())) {
             sender.sendMessage(ChatColor.RED + "このコマンドを実行する権限がありません。");
             return true;
         }
