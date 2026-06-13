@@ -11,7 +11,6 @@ import io.lumine.mythic.bukkit.events.MythicMobDespawnEvent;
 import io.lumine.mythic.bukkit.events.MythicReloadedEvent;
 import io.lumine.mythic.bukkit.events.MythicTargeterLoadEvent;
 import io.lumine.mythic.core.skills.SkillExecutor;
-import org.bukkit.event.entity.EntityDeathEvent;
 import net.azisaba.lifemoremythicmobs.condition.*;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.placeholder.*;
@@ -91,13 +90,13 @@ public class Register implements Listener {
             e.register(new OnKillAuraMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("onConsume") || mechanic.equalsIgnoreCase("onConsumeAura") ) {
-            e.register(new OnConsumeAuraMechanic(e.getConfig()));
+            e.register(new OnConsumeAuraMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("removeCustomAura") || mechanic.equalsIgnoreCase("removeCAura") ) {
             e.register(new RemoveCustomAuraMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("modifyPlayerAttribute") || mechanic.equalsIgnoreCase("modPAttribute") ) {
-            e.register(new ModifyAttributeMechanic(executor, config));
+            e.register(new ModifyPlayerAttributeMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("MMLuckEval") ) {
             e.register(new MMLuckEvalMechanic(executor, config));
@@ -140,6 +139,9 @@ public class Register implements Listener {
         }
         if ( mechanic.equalsIgnoreCase("typeBuff") || mechanic.equalsIgnoreCase("tBuff") ) {
             e.register(new TypeBuffMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("typeOffensiveBuff") || mechanic.equalsIgnoreCase("tOffensiveBuff") ) {
+            e.register(new TypeOffensiveBuffMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("typeDamage") || mechanic.equalsIgnoreCase("tDamage") ) {
             e.register(new TypedDamageMechanic(executor, config));
@@ -201,6 +203,12 @@ public class Register implements Listener {
         if ( condition.equalsIgnoreCase("hasTypeBuff") || condition.equalsIgnoreCase("hastBuff") ) {
             e.register(new HasTypeBuffCondition(config));
         }
+        if ( condition.equalsIgnoreCase("hasTypeOffensiveBuff") || condition.equalsIgnoreCase("hastOffensiveBuff") ) {
+            e.register(new HasTypeOffensiveBuffCondition(config));
+        }
+        if ( condition.equalsIgnoreCase("typeOffensiveBuffStacks") || condition.equalsIgnoreCase("tOffensiveBuffStacks") ) {
+            e.register(new TypeOffensiveBuffStacksCondition(config));
+        }
     }
 
     @EventHandler
@@ -231,6 +239,7 @@ public class Register implements Listener {
     public void onMythicMobDeath(MythicMobDeathEvent e) {
         UUID uuid = e.getEntity().getUniqueId();
         TypeBuffMechanic.removeAll(uuid);
+        TypeOffensiveBuffMechanic.removeAll(uuid);
         CustomAura.removeAll(uuid);
     }
 
@@ -238,6 +247,7 @@ public class Register implements Listener {
     public void onMythicMobDespawn(MythicMobDespawnEvent e) {
         UUID uuid = e.getEntity().getUniqueId();
         TypeBuffMechanic.removeAll(uuid);
+        TypeOffensiveBuffMechanic.removeAll(uuid);
         CustomAura.removeAll(uuid);
     }
 
@@ -245,6 +255,7 @@ public class Register implements Listener {
     public void onEntityDeath(EntityDeathEvent e) {
         UUID uuid = e.getEntity().getUniqueId();
         TypeBuffMechanic.removeAll(uuid);
+        TypeOffensiveBuffMechanic.removeAll(uuid);
         CustomAura.removeAll(uuid);
     }
 }

@@ -7,7 +7,7 @@ import net.azisaba.lifemoremythicmobs.commands.RootCommand;
 import net.azisaba.lifemoremythicmobs.listener.BowForceListener;
 import net.azisaba.lifemoremythicmobs.listener.JoinListener;
 import net.azisaba.lifemoremythicmobs.listener.Register;
-import net.azisaba.lifemoremythicmobs.mechanic.ModifyAttributeMechanic;
+import net.azisaba.lifemoremythicmobs.mechanic.ModifyPlayerAttributeMechanic;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,7 +22,6 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
 
     @Override
     public void onEnable() {
-
         instance = this;
         getLogger().info("LifeMoreMythicMobs has been enabled.");
 
@@ -33,6 +32,7 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
         getServer().getPluginManager().registerEvents(new Register(), this);
         getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.listener.SpawnerToolListener(this), this);
         getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.listener.SpawnerManagerListener(this), this);
+        getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.listener.UpgradeListener(this), this);
         getServer().getPluginManager().registerEvents(new BowForceListener(), this);
         getServer().getPluginManager().registerEvents(new JoinListener(this), this);
         Bukkit.getScheduler().runTask(this, Register::reloadPlaceholders);
@@ -58,7 +58,7 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
 
     @Override
     public void onDisable() {
-        ModifyAttributeMechanic.shutdown();
+        ModifyPlayerAttributeMechanic.shutdown();
         getLogger().info("LifeMoreMythicMobs has been disabled.");
     }
 

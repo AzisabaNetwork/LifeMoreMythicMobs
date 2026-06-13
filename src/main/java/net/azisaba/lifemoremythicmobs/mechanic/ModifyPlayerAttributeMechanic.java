@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedEntitySkill, Listener {
+public class ModifyPlayerAttributeMechanic extends SkillMechanic implements ITargetedEntitySkill, Listener {
 
     private static final Map<String, AttributeModTask> activeMods = new ConcurrentHashMap<>();
     private static boolean listenerRegistered = false;
