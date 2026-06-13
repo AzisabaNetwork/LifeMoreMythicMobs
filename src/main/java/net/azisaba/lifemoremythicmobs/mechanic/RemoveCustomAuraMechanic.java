@@ -21,8 +21,9 @@ public class RemoveCustomAuraMechanic extends SkillMechanic implements ITargeted
         OnKillAuraMechanic.remove(target, auraName);
         OnConsumeAuraMechanic.remove(target, auraName);
         NullRecoveryMechanic.remove(target, auraName);
-        ModifyAttributeMechanic.remove(target, auraName);
+        ModifyPlayerAttributeMechanic.remove(target, auraName);
         TypeBuffMechanic.remove(target, auraName);
+        TypeOffensiveBuffMechanic.remove(target, auraName);
         return true;
     }
 }

@@ -127,4 +127,13 @@ public class ItemUtil {
     public static @NotNull VariableRegistry getPlayerVariable(@NotNull Player player) {
         return MythicMobs.inst().getPlayerManager().getPlayerData(BukkitAdapter.adapt(player)).getVariables();
     }
+
+    public static boolean hasUseAnimation(@NotNull org.bukkit.Material material) {
+        return material == org.bukkit.Material.BOW ||
+                material == org.bukkit.Material.CROSSBOW ||
+                material == org.bukkit.Material.SHIELD ||
+                material == org.bukkit.Material.TRIDENT ||
+                material == org.bukkit.Material.POTION ||
+                material.isEdible();
+    }
 }

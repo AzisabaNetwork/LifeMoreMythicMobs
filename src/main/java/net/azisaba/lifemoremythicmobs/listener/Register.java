@@ -91,7 +91,7 @@ public class Register implements Listener {
             e.register(new RemoveCustomAuraMechanic(e.getConfig()));
         }
         if ( mechanic.equalsIgnoreCase("modifyPlayerAttribute") || mechanic.equalsIgnoreCase("modPAttribute") ) {
-            e.register(new ModifyAttributeMechanic(e.getConfig()));
+            e.register(new ModifyPlayerAttributeMechanic(e.getConfig()));
         }
         if ( mechanic.equalsIgnoreCase("MMLuckEval") ) {
             e.register(new MMLuckEvalMechanic(e.getConfig()));
@@ -134,6 +134,9 @@ public class Register implements Listener {
         }
         if ( mechanic.equalsIgnoreCase("typeBuff") || mechanic.equalsIgnoreCase("tBuff") ) {
             e.register(new TypeBuffMechanic(e.getConfig()));
+        }
+        if ( mechanic.equalsIgnoreCase("typeOffensiveBuff") || mechanic.equalsIgnoreCase("tOffensiveBuff") ) {
+            e.register(new TypeOffensiveBuffMechanic(e.getConfig()));
         }
         if ( mechanic.equalsIgnoreCase("typeDamage") || mechanic.equalsIgnoreCase("tDamage") ) {
             e.register(new TypedDamageMechanic(e.getConfig()));
@@ -194,6 +197,12 @@ public class Register implements Listener {
         if ( condition.equalsIgnoreCase("hasTypeBuff") || condition.equalsIgnoreCase("hastBuff") ) {
             e.register(new HasTypeBuffCondition(e.getConfig()));
         }
+        if ( condition.equalsIgnoreCase("hasTypeOffensiveBuff") || condition.equalsIgnoreCase("hastOffensiveBuff") ) {
+            e.register(new HasTypeOffensiveBuffCondition(e.getConfig()));
+        }
+        if ( condition.equalsIgnoreCase("typeOffensiveBuffStacks") || condition.equalsIgnoreCase("tOffensiveBuffStacks") ) {
+            e.register(new TypeOffensiveBuffStacksCondition(e.getConfig()));
+        }
     }
 
     @EventHandler
@@ -225,6 +234,7 @@ public class Register implements Listener {
     public void onMythicMobDeath(MythicMobDeathEvent e) {
         UUID uuid = e.getEntity().getUniqueId();
         TypeBuffMechanic.removeAll(uuid);
+        TypeOffensiveBuffMechanic.removeAll(uuid);
         CustomAura.removeAll(uuid);
     }
 
@@ -232,6 +242,7 @@ public class Register implements Listener {
     public void onMythicMobDespawn(MythicMobDespawnEvent e) {
         UUID uuid = e.getEntity().getUniqueId();
         TypeBuffMechanic.removeAll(uuid);
+        TypeOffensiveBuffMechanic.removeAll(uuid);
         CustomAura.removeAll(uuid);
     }
 
@@ -239,6 +250,7 @@ public class Register implements Listener {
     public void onEntityDeath(EntityDeathEvent e) {
         UUID uuid = e.getEntity().getUniqueId();
         TypeBuffMechanic.removeAll(uuid);
+        TypeOffensiveBuffMechanic.removeAll(uuid);
         CustomAura.removeAll(uuid);
     }
 }

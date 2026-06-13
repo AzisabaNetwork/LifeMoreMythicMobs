@@ -257,9 +257,9 @@ public class SpawnerToolListener implements Listener {
         }
 
         if (group != null && !group.isEmpty()) {
-            player.sendMessage(ChatColor.GREEN + "スポナーを作成し、グループ '" + group + "' に追加しました: " + finalName + " (" + mob + ")");
+            player.sendMessage(ChatColor.YELLOW + "スポナーを作成し、グループ '" + group + "' に追加しました: " + finalName + " (" + mob + ")");
         } else {
-            player.sendMessage(ChatColor.GREEN + "スポナーを作成しました: " + finalName + " (" + mob + ")");
+            player.sendMessage(ChatColor.YELLOW + "スポナーを作成しました: " + finalName + " (" + mob + ")");
         }
     }
 

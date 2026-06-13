@@ -18,6 +18,12 @@ permissions:
   lifemoremythicmobs.command.spawner:
     description: Allows use of /lmmm spawner command
     default: op
+  lifemoremythicmobs.command.upgrade:
+    description: Allows use of /lmmm upgrade command
+    default: true
+  lifemoremythicmobs.command.stats:
+    description: Allows use of /lmmm stats command
+    default: true
   lifemoremythicmobs.command.findmythicitem:
     description: Allows use of /lmmm findMythicItem command
     default: op

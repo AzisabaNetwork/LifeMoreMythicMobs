@@ -8,8 +8,13 @@ import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
 import io.lumine.xikage.mythicmobs.skills.damage.DamageMetadata;
 import io.lumine.xikage.mythicmobs.skills.damage.DamagingMechanic;
 import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderDouble;
+import io.lumine.xikage.mythicmobs.skills.variables.VariableRegistry;
+import io.lumine.xikage.mythicmobs.skills.variables.VariableScope;
+import io.lumine.xikage.mythicmobs.MythicMobs;
+import io.lumine.xikage.mythicmobs.mobs.ActiveMob;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEntitySkill {
 
@@ -49,14 +54,38 @@ public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEn
         double base = amount.get(data, target) * data.getPower();
 
         if (!element.isEmpty()) {
-            Map<String, Double> mods =
-                    TypeBuffMechanic.getCombinedMods(target.getUniqueId());
+            double multiplier = 1.0;
 
-            Double multiplier = mods.get(element);
+            // 被ダメ側の補正 (Aura + Upgrade)
+            Map<String, Double> targetMods = TypeBuffMechanic.getCombinedMods(target.getUniqueId());
+            double targetAuraMod = targetMods.getOrDefault(element, 1.0);
 
-            if (multiplier != null) {
-                base *= multiplier;
+            VariableRegistry targetVars = MythicMobs.inst().getVariableManager().getRegistry(VariableScope.CASTER, data, target);
+            int resLevel = targetVars.getInt("upg_total_" + element.toLowerCase() + "_res");
+            double upgradeRes = resLevel * 0.01;
+
+            multiplier *= Math.max(0, targetAuraMod - upgradeRes);
+
+            // MythicMobs の DamageModifiers を反映
+            Optional<ActiveMob> am = MythicMobs.inst().getMobManager().getActiveMob(target.getUniqueId());
+            if (am.isPresent()) {
+                Map<String, Double> modifiers = am.get().getType().getDamageModifiers();
+                if (modifiers.containsKey(element.toUpperCase())) {
+                    multiplier *= modifiers.get(element.toUpperCase());
+                }
             }
+
+            // 与ダメ側の補正 (Aura + Upgrade)
+            Map<String, Double> casterMods = TypeOffensiveBuffMechanic.getCombinedMods(data.getCaster().getEntity().getUniqueId());
+            double casterAuraMod = casterMods.getOrDefault(element, 1.0);
+
+            VariableRegistry casterVars = MythicMobs.inst().getVariableManager().getRegistry(VariableScope.CASTER, data, data.getCaster().getEntity());
+            int dmgLevel = casterVars.getInt("upg_total_" + element.toLowerCase() + "_dmg");
+            double upgradeDmg = dmgLevel * 0.01;
+
+            multiplier *= Math.max(0, casterAuraMod + upgradeDmg);
+
+            base *= multiplier;
         }
 
         DamageMetadata meta = new DamageMetadata(

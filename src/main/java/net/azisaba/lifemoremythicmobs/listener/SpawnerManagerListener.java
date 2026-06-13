@@ -135,9 +135,9 @@ public class SpawnerManagerListener implements Listener {
             } else if (slot == 13) { // Visualize
                 visualizeSpawner(player, spawnerName);
             } else if (slot == 15) { // Delete
-                player.closeInventory();
                 player.performCommand("mm spawners remove " + spawnerName);
                 player.sendMessage(ChatColor.RED + "スポナーを削除しました: " + spawnerName);
+                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0));
             } else if (slot == 22) { // Back
                 SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0));
             }
@@ -159,7 +159,7 @@ public class SpawnerManagerListener implements Listener {
         if (s == null) return;
 
         AbstractLocation aloc = s.getLocation();
-        Location loc = BukkitAdapter.adapt(aloc).add(0.5, 0, 0.5);
+        Location loc = BukkitAdapter.adapt(aloc).add(0.5, 0.5, 0.5);
         
         player.sendMessage(ChatColor.GREEN + "スポナー '" + spawnerName + "' の位置を可視化しています (10秒間)");
 

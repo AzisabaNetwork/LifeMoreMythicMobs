@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedEntitySkill, Listener {
+public class ModifyPlayerAttributeMechanic extends SkillMechanic implements ITargetedEntitySkill, Listener {
 
     private static final Map<String, AttributeModTask> activeMods = new ConcurrentHashMap<>();
     private static boolean listenerRegistered = false;
@@ -42,7 +42,7 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
     protected final String onEndSkill;
     protected final int tickInterval;
 
-    public ModifyAttributeMechanic(MythicLineConfig config) {
+    public ModifyPlayerAttributeMechanic(MythicLineConfig config) {
         super(config.getLine(), config);
         this.amountStr = PlaceholderString.of(config.getString(new String[]{"amount", "a"}, "0.0"));
         this.duration = config.getInteger(new String[]{"duration", "d"}, 100);
@@ -166,7 +166,7 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
 
                 new AttributeModTask(entity, targetAttr, id, resolvedAmount, duration, data);
             } catch (Exception e) {
-                MythicMobs.inst().getLogger().severe("ModifyAttributeMechanic でエラーが発生しました: " + e.getMessage());
+                MythicMobs.inst().getLogger().severe("ModifyPlayerAttributeMechanic でエラーが発生しました: " + e.getMessage());
                 e.printStackTrace();
             }
         });

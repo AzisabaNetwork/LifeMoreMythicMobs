@@ -24,7 +24,9 @@ public class RootCommand implements TabExecutor {
         this.commands = Arrays.asList(
                 new FindMythicItemCommand(plugin),
                 new FindMythicMobCommand(plugin),
-                new SpawnerToolCommand(plugin)
+                new SpawnerToolCommand(plugin),
+                new UpgradeCommand(plugin),
+                new StatsCommand(plugin)
         );
     }
 
