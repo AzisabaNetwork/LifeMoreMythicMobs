@@ -38,6 +38,10 @@ public class SpawnerManagerListener implements Listener {
     private final Map<UUID, String> pendingIndividualSpawner = new HashMap<>();
     private final Map<UUID, String> pendingIndividualEditSetting = new HashMap<>();
     private final Map<UUID, Map<String, String>> originalIndividualSettings = new HashMap<>();
+    // Multi-select state
+    private final Map<UUID, java.util.Set<String>> selectedSpawners = new HashMap<>();
+    private final Map<UUID, Boolean> selectionMode = new HashMap<>();
+    private final Map<UUID, String> pendingSelectedEditSetting = new HashMap<>();
 
     public SpawnerManagerListener(LifeMoreMythicMobs plugin) {
         this.plugin = plugin;
@@ -50,7 +54,9 @@ public class SpawnerManagerListener implements Listener {
             !title.startsWith(SpawnerManagerGUI.SPAWNER_LIST_TITLE_PREFIX) && 
             !title.startsWith(SpawnerManagerGUI.DETAIL_TITLE_PREFIX) &&
             !title.startsWith(SpawnerManagerGUI.GROUP_EDIT_TITLE_PREFIX) &&
-            !title.startsWith(SpawnerManagerGUI.INDIVIDUAL_EDIT_TITLE_PREFIX)) {
+            !title.startsWith(SpawnerManagerGUI.INDIVIDUAL_EDIT_TITLE_PREFIX) &&
+            !title.equals(SpawnerManagerGUI.SELECT_EDIT_TITLE) &&
+            !title.equals(SpawnerManagerGUI.CONFIRM_DELETE_SELECTED_TITLE)) {
             return;
         }
 
@@ -63,10 +69,12 @@ public class SpawnerManagerListener implements Listener {
 
         if (title.equals(SpawnerManagerGUI.MAIN_TITLE)) {
             if (slot == 2) {
+                clearSelection(player);
                 currentPage.put(player.getUniqueId(), 0);
                 SpawnerManagerGUI.openWorldList(player, 0);
             }
             else if (slot == 6) {
+                clearSelection(player);
                 currentPage.put(player.getUniqueId(), 0);
                 SpawnerManagerGUI.openGroupList(player, 0);
             }
@@ -77,7 +85,8 @@ public class SpawnerManagerListener implements Listener {
                 currentFilterType.put(player.getUniqueId(), "world");
                 currentFilterValue.put(player.getUniqueId(), worldName);
                 currentPage.put(player.getUniqueId(), 0);
-                SpawnerManagerGUI.openSpawnerList(player, "world", worldName, 0);
+                clearSelection(player);
+                SpawnerManagerGUI.openSpawnerList(player, "world", worldName, 0, getSelected(player), isSelectionMode(player));
             } else if (slot == 45) {
                 int page = currentPage.getOrDefault(player.getUniqueId(), 0) - 1;
                 if (page >= 0) {
@@ -89,6 +98,7 @@ public class SpawnerManagerListener implements Listener {
                 currentPage.put(player.getUniqueId(), page);
                 SpawnerManagerGUI.openWorldList(player, page);
             } else if (slot == 49) {
+                clearSelection(player);
                 SpawnerManagerGUI.openMain(player);
             }
         } 
@@ -98,7 +108,8 @@ public class SpawnerManagerListener implements Listener {
                 currentFilterType.put(player.getUniqueId(), "group");
                 currentFilterValue.put(player.getUniqueId(), groupName);
                 currentPage.put(player.getUniqueId(), 0);
-                SpawnerManagerGUI.openSpawnerList(player, "group", groupName, 0);
+                clearSelection(player);
+                SpawnerManagerGUI.openSpawnerList(player, "group", groupName, 0, getSelected(player), isSelectionMode(player));
             } else if (slot == 45) {
                 int page = currentPage.getOrDefault(player.getUniqueId(), 0) - 1;
                 if (page >= 0) {
@@ -110,31 +121,67 @@ public class SpawnerManagerListener implements Listener {
                 currentPage.put(player.getUniqueId(), page);
                 SpawnerManagerGUI.openGroupList(player, page);
             } else if (slot == 49) {
+                clearSelection(player);
                 SpawnerManagerGUI.openMain(player);
             }
         } 
         else if (title.startsWith(SpawnerManagerGUI.SPAWNER_LIST_TITLE_PREFIX)) {
             if (slot < 45) {
                 String spawnerName = ChatColor.stripColor(clicked.getItemMeta().getDisplayName());
-                if (event.getClick() == ClickType.RIGHT) {
-                    visualizeSpawner(player, spawnerName);
-                } else if (event.getClick() == ClickType.SHIFT_LEFT) {
-                    saveOriginalSettings(player, spawnerName);
-                    SpawnerManagerGUI.openIndividualEdit(player, spawnerName);
+                if (spawnerName.startsWith("[選択] ")) {
+                    spawnerName = spawnerName.substring("[選択] ".length());
+                }
+                // 選択モードならトグル
+                if (isSelectionMode(player)) {
+                    java.util.Set<String> set = getSelected(player);
+                    if (set.contains(spawnerName)) {
+                        set.remove(spawnerName);
+                        player.sendMessage(ChatColor.YELLOW + "選択解除: " + spawnerName + ChatColor.GRAY + " (選択数: " + set.size() + ")");
+                    } else {
+                        set.add(spawnerName);
+                        player.sendMessage(ChatColor.GREEN + "選択: " + spawnerName + ChatColor.GRAY + " (選択数: " + set.size() + ")");
+                    }
+                    SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), set, true);
                 } else {
-                    SpawnerManagerGUI.openDetail(player, spawnerName);
+                    if (event.getClick() == ClickType.RIGHT) {
+                        visualizeSpawner(player, spawnerName);
+                    } else if (event.getClick() == ClickType.SHIFT_LEFT) {
+                        saveOriginalSettings(player, spawnerName);
+                        SpawnerManagerGUI.openIndividualEdit(player, spawnerName);
+                    } else {
+                        SpawnerManagerGUI.openDetail(player, spawnerName);
+                    }
                 }
             } else if (slot == 47 && currentFilterType.getOrDefault(player.getUniqueId(), "").equals("group")) {
                 SpawnerManagerGUI.openGroupEdit(player, currentFilterValue.get(player.getUniqueId()));
+            } else if (slot == 46) { // 選択モード切替
+                boolean now = !isSelectionMode(player);
+                selectionMode.put(player.getUniqueId(), now);
+                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), getSelected(player), now);
+            } else if (slot == 48) { // 選択一括編集
+                java.util.Set<String> set = getSelected(player);
+                if (set.isEmpty()) {
+                    player.sendMessage(ChatColor.RED + "選択されていません。");
+                    return;
+                }
+                SpawnerManagerGUI.openSelectedEdit(player, set);
+            } else if (slot == 50) { // 選択一括削除
+                java.util.Set<String> set = getSelected(player);
+                if (set.isEmpty()) {
+                    player.sendMessage(ChatColor.RED + "選択されていません。");
+                    return;
+                }
+                SpawnerManagerGUI.openConfirmBulkDeleteSelected(player, set.size());
             } else if (slot == 45) {
                 int page = currentPage.getOrDefault(player.getUniqueId(), 0) - 1;
                 currentPage.put(player.getUniqueId(), page);
-                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), page);
+                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), page, getSelected(player), isSelectionMode(player));
             } else if (slot == 53) {
                 int page = currentPage.getOrDefault(player.getUniqueId(), 0) + 1;
                 currentPage.put(player.getUniqueId(), page);
-                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), page);
+                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), page, getSelected(player), isSelectionMode(player));
             } else if (slot == 49) {
+                clearSelection(player);
                 SpawnerManagerGUI.openMain(player);
             }
         } 
@@ -154,9 +201,9 @@ public class SpawnerManagerListener implements Listener {
             } else if (slot == 16) { // Delete
                 player.performCommand("mm spawners remove " + spawnerName);
                 player.sendMessage(ChatColor.RED + "スポナーを削除しました: " + spawnerName);
-                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0));
+                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), getSelected(player), isSelectionMode(player));
             } else if (slot == 22) { // Back
-                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0));
+                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), getSelected(player), isSelectionMode(player));
             }
         }
         else if (title.startsWith(SpawnerManagerGUI.INDIVIDUAL_EDIT_TITLE_PREFIX)) {
@@ -202,7 +249,7 @@ public class SpawnerManagerListener implements Listener {
         }
         else if (title.startsWith(SpawnerManagerGUI.GROUP_EDIT_TITLE_PREFIX)) {
             if (slot == 22) { // Back
-                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0));
+                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), getSelected(player), isSelectionMode(player));
                 return;
             }
 
@@ -226,17 +273,86 @@ public class SpawnerManagerListener implements Listener {
                 player.sendMessage(ChatColor.GRAY + "キャンセルするには 'cancel' と入力してください。");
             }
         }
+        else if (title.equals(SpawnerManagerGUI.SELECT_EDIT_TITLE)) {
+            if (slot == 22) { // Back
+                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), getSelected(player), isSelectionMode(player));
+                return;
+            }
+
+            String setting = null;
+            switch (slot) {
+                case 0: setting = "mobtype"; break;
+                case 9: setting = "maxmobs"; break;
+                case 10: setting = "moblevel"; break;
+                case 11: setting = "radius"; break;
+                case 12: setting = "activationrange"; break;
+                case 13: setting = "leashrange"; break;
+                case 14: setting = "cooldown"; break;
+                case 15: setting = "warmup"; break;
+                case 16: setting = "amount"; break;
+            }
+
+            if (setting != null) {
+                pendingSelectedEditSetting.put(player.getUniqueId(), setting);
+                player.closeInventory();
+                player.sendMessage(ChatColor.YELLOW + "一括変更する値をチャットで入力してください (" + setting + ")");
+                player.sendMessage(ChatColor.GRAY + "キャンセルするには 'cancel' と入力してください。");
+            }
+        }
+        else if (title.equals(SpawnerManagerGUI.CONFIRM_DELETE_SELECTED_TITLE)) {
+            if (slot == 11) {
+                java.util.Set<String> set = getSelected(player);
+                if (set.isEmpty()) {
+                    player.sendMessage(ChatColor.RED + "選択されていません。");
+                    SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), set, isSelectionMode(player));
+                    return;
+                }
+                player.closeInventory();
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        for (String name : new java.util.HashSet<>(set)) {
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mm s remove " + name);
+                        }
+                        player.sendMessage(ChatColor.RED + "選択した " + set.size() + " 個のスポナーを削除しました。");
+                        clearSelection(player);
+                        SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), getSelected(player), isSelectionMode(player));
+                    }
+                }.runTask(plugin);
+            } else if (slot == 15 || slot == 22) {
+                SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), getSelected(player), isSelectionMode(player));
+            }
+        }
     }
 
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
+        // レガシーなチャットイベント（1.15系〜）
         Player player = event.getPlayer();
-        
-        if (pendingIndividualEditSetting.containsKey(player.getUniqueId())) {
+        String message = event.getMessage();
+        boolean handled = handleChatInput(player, message);
+        if (handled) {
             event.setCancelled(true);
+        }
+    }
+
+    // 注意: Bukkit のリスナーはベースの org.bukkit.event.Event では登録できないため、
+    // ここでの Paper 1.19+ の AsyncChatEvent 反映用リフレクションハンドラは削除しました。
+    // 本プラグインは 1.15 系ターゲットのため、従来の AsyncPlayerChatEvent ハンドラ（onChat）で十分に動作します。
+
+    // 共通のチャット入力処理。処理した場合 true を返す（元のチャット送信はキャンセルされるべき）。
+    private boolean handleChatInput(Player player, String rawMessage) {
+        // どの待機状態でもなければ処理しない
+        boolean waitingIndividual = pendingIndividualEditSetting.containsKey(player.getUniqueId());
+        boolean waitingSelected = pendingSelectedEditSetting.containsKey(player.getUniqueId());
+        boolean waitingGroup = pendingGroupEditSetting.containsKey(player.getUniqueId());
+        if (!waitingIndividual && !waitingSelected && !waitingGroup) return false;
+
+        String value = rawMessage;
+
+        if (waitingIndividual) {
             String spawnerName = pendingIndividualSpawner.remove(player.getUniqueId());
             String setting = pendingIndividualEditSetting.remove(player.getUniqueId());
-            String value = event.getMessage();
 
             if (value.equalsIgnoreCase("cancel")) {
                 player.sendMessage(ChatColor.RED + "編集をキャンセルしました。");
@@ -246,7 +362,7 @@ public class SpawnerManagerListener implements Listener {
                         SpawnerManagerGUI.openIndividualEdit(player, spawnerName);
                     }
                 }.runTask(plugin);
-                return;
+                return true;
             }
 
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mm s set " + spawnerName + " " + setting + " " + value);
@@ -258,49 +374,83 @@ public class SpawnerManagerListener implements Listener {
                     SpawnerManagerGUI.openIndividualEdit(player, spawnerName);
                 }
             }.runTask(plugin);
-            return;
+            return true;
         }
 
-        if (!pendingGroupEditSetting.containsKey(player.getUniqueId())) return;
+        if (waitingSelected) {
+            String setting = pendingSelectedEditSetting.remove(player.getUniqueId());
 
-        event.setCancelled(true);
-        String setting = pendingGroupEditSetting.remove(player.getUniqueId());
-        String value = event.getMessage();
+            if (value.equalsIgnoreCase("cancel")) {
+                player.sendMessage(ChatColor.RED + "編集をキャンセルしました。");
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        SpawnerManagerGUI.openSelectedEdit(player, getSelected(player));
+                    }
+                }.runTask(plugin);
+                return true;
+            }
 
-        if (value.equalsIgnoreCase("cancel")) {
-            player.sendMessage(ChatColor.RED + "編集をキャンセルしました。");
+            java.util.Set<String> set = getSelected(player);
+            if (set.isEmpty()) {
+                player.sendMessage(ChatColor.RED + "選択が空です。");
+                return true;
+            }
+
+            player.sendMessage(ChatColor.GREEN + "選択中のスポナー " + set.size() + " 個の " + setting + " を " + value + " に変更しています...");
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    SpawnerManagerGUI.openGroupEdit(player, currentFilterValue.get(player.getUniqueId()));
+                    for (String name : set) {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mm s set " + name + " " + setting + " " + value);
+                    }
+                    player.sendMessage(ChatColor.GREEN + "変更が完了しました。");
+                    SpawnerManagerGUI.openSelectedEdit(player, set);
                 }
             }.runTask(plugin);
-            return;
+            return true;
         }
 
-        String group = currentFilterValue.get(player.getUniqueId());
-        java.util.List<MythicSpawner> spawners = MythicMobs.inst().getSpawnerManager().getSpawners().stream()
-                .filter(s -> group.equalsIgnoreCase(s.getGroup()))
-                .collect(java.util.stream.Collectors.toList());
+        if (waitingGroup) {
+            String setting = pendingGroupEditSetting.remove(player.getUniqueId());
 
-        if (spawners.isEmpty()) {
-            player.sendMessage(ChatColor.RED + "対象のスポナーが見つかりませんでした。");
-            return;
-        }
-
-        player.sendMessage(ChatColor.GREEN + group + " グループのスポナー " + spawners.size() + " 個の " + setting + " を " + value + " に変更しています...");
-
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (MythicSpawner s : spawners) {
-                    // mm spawners set <name> <setting> <value>
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mm s set " + s.getInternalName() + " " + setting + " " + value);
-                }
-                player.sendMessage(ChatColor.GREEN + "変更が完了しました。");
-                SpawnerManagerGUI.openGroupEdit(player, group);
+            if (value.equalsIgnoreCase("cancel")) {
+                player.sendMessage(ChatColor.RED + "編集をキャンセルしました。");
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        SpawnerManagerGUI.openGroupEdit(player, currentFilterValue.get(player.getUniqueId()));
+                    }
+                }.runTask(plugin);
+                return true;
             }
-        }.runTask(plugin);
+
+            String group = currentFilterValue.get(player.getUniqueId());
+            java.util.List<MythicSpawner> spawners = MythicMobs.inst().getSpawnerManager().getSpawners().stream()
+                    .filter(s -> group.equalsIgnoreCase(s.getGroup()))
+                    .collect(java.util.stream.Collectors.toList());
+
+            if (spawners.isEmpty()) {
+                player.sendMessage(ChatColor.RED + "対象のスポナーが見つかりませんでした。");
+                return true;
+            }
+
+            player.sendMessage(ChatColor.GREEN + group + " グループのスポナー " + spawners.size() + " 個の " + setting + " を " + value + " に変更しています...");
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    for (MythicSpawner s : spawners) {
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mm s set " + s.getInternalName() + " " + setting + " " + value);
+                    }
+                    player.sendMessage(ChatColor.GREEN + "変更が完了しました。");
+                    SpawnerManagerGUI.openGroupEdit(player, group);
+                }
+            }.runTask(plugin);
+            return true;
+        }
+
+        return false;
     }
 
     @EventHandler
@@ -361,5 +511,19 @@ public class SpawnerManagerListener implements Listener {
         settings.put("amount", amount);
 
         originalIndividualSettings.put(player.getUniqueId(), settings);
+    }
+
+    private java.util.Set<String> getSelected(Player player) {
+        return selectedSpawners.computeIfAbsent(player.getUniqueId(), k -> new java.util.HashSet<>());
+    }
+
+    private boolean isSelectionMode(Player player) {
+        return selectionMode.getOrDefault(player.getUniqueId(), false);
+    }
+
+    private void clearSelection(Player player) {
+        java.util.Set<String> set = selectedSpawners.get(player.getUniqueId());
+        if (set != null) set.clear();
+        selectionMode.put(player.getUniqueId(), false);
     }
 }

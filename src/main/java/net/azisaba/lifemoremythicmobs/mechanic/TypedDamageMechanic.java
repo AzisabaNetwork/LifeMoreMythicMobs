@@ -11,10 +11,8 @@ import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderDouble
 import io.lumine.xikage.mythicmobs.skills.variables.VariableRegistry;
 import io.lumine.xikage.mythicmobs.skills.variables.VariableScope;
 import io.lumine.xikage.mythicmobs.MythicMobs;
-import io.lumine.xikage.mythicmobs.mobs.ActiveMob;
 
 import java.util.Map;
-import java.util.Optional;
 
 public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEntitySkill {
 
@@ -51,37 +49,39 @@ public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEn
             return false;
         }
 
-        double base = amount.get(data, target) * data.getPower();
+        double evaluatedAmount = amount.get(data, target);
+        double power = data.getPower();
+        double base = evaluatedAmount * power;
+
+        double multiplier = 1.0;
+        double targetAuraMod = 1.0;
+        int resLevel = 0;
+        double upgradeRes = 0.0;
+        double casterAuraMod = 1.0;
+        int dmgLevel = 0;
+        double upgradeDmg = 0.0;
 
         if (!element.isEmpty()) {
-            double multiplier = 1.0;
 
             // 被ダメ側の補正 (Aura + Upgrade)
             Map<String, Double> targetMods = TypeBuffMechanic.getCombinedMods(target.getUniqueId());
-            double targetAuraMod = targetMods.getOrDefault(element, 1.0);
+            targetAuraMod = targetMods.getOrDefault(element, 1.0);
 
             VariableRegistry targetVars = MythicMobs.inst().getVariableManager().getRegistry(VariableScope.CASTER, data, target);
-            int resLevel = targetVars.getInt("upg_total_" + element.toLowerCase() + "_res");
-            double upgradeRes = resLevel * 0.01;
+            resLevel = targetVars.getInt("upg_total_" + element.toLowerCase() + "_res");
+            upgradeRes = resLevel * 0.01;
 
             multiplier *= Math.max(0, targetAuraMod - upgradeRes);
 
-            // MythicMobs の DamageModifiers を反映
-            Optional<ActiveMob> am = MythicMobs.inst().getMobManager().getActiveMob(target.getUniqueId());
-            if (am.isPresent()) {
-                Map<String, Double> modifiers = am.get().getType().getDamageModifiers();
-                if (modifiers.containsKey(element.toUpperCase())) {
-                    multiplier *= modifiers.get(element.toUpperCase());
-                }
-            }
+            // MythicMobs の DamageModifiers は SkillAdapter#doDamage 側で適用されるため、ここでは扱わない
 
             // 与ダメ側の補正 (Aura + Upgrade)
             Map<String, Double> casterMods = TypeOffensiveBuffMechanic.getCombinedMods(data.getCaster().getEntity().getUniqueId());
-            double casterAuraMod = casterMods.getOrDefault(element, 1.0);
+            casterAuraMod = casterMods.getOrDefault(element, 1.0);
 
             VariableRegistry casterVars = MythicMobs.inst().getVariableManager().getRegistry(VariableScope.CASTER, data, data.getCaster().getEntity());
-            int dmgLevel = casterVars.getInt("upg_total_" + element.toLowerCase() + "_dmg");
-            double upgradeDmg = dmgLevel * 0.01;
+            dmgLevel = casterVars.getInt("upg_total_" + element.toLowerCase() + "_dmg");
+            upgradeDmg = dmgLevel * 0.01;
 
             multiplier *= Math.max(0, casterAuraMod + upgradeDmg);
 
@@ -102,7 +102,6 @@ public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEn
         }
 
         try {
-
             data.getCaster().setUsingDamageSkill(true);
             SkillAdapter.get().doDamage(meta, target);
 

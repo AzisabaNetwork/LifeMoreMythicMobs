@@ -10,6 +10,7 @@ import net.azisaba.lifemoremythicmobs.listener.Register;
 import net.azisaba.lifemoremythicmobs.mechanic.ModifyPlayerAttributeMechanic;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -28,7 +29,14 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
         if (!Objects.requireNonNull(getConfig().getString("server-override", "")).isEmpty()) {
             server = getConfig().getString("server-override", "");
         }
-        Objects.requireNonNull(getCommand("lmmm")).setExecutor(new RootCommand(this));
+        // Safely obtain and register the root command; avoid crashing on missing command definition
+        PluginCommand root = getCommand("lmmm");
+        if (root == null) {
+            getLogger().severe("Command 'lmmm' is not defined in plugin.yml or failed to load. Disabling plugin to avoid errors.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        root.setExecutor(new RootCommand(this));
         getServer().getPluginManager().registerEvents(new Register(), this);
         getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.listener.SpawnerToolListener(this), this);
         getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.listener.SpawnerManagerListener(this), this);
