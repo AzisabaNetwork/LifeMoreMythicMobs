@@ -8,6 +8,9 @@ import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.api.skills.damage.DamageMetadata;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
+import io.lumine.mythic.core.skills.variables.VariableRegistry;
+import io.lumine.mythic.core.skills.variables.VariableScope;
+import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.damage.DamagingMechanic;
 
@@ -48,17 +51,41 @@ public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEn
             return SkillResult.CONDITION_FAILED;
         }
 
-        double base = amount.get(data.getCaster()) * data.getPower();
+        double evaluatedAmount = amount.get(data, target);
+        double power = data.getPower();
+        double base = evaluatedAmount * power;
+
+        double multiplier = 1.0;
+        double targetAuraMod = 1.0;
+        int resLevel = 0;
+        double upgradeRes = 0.0;
+        double casterAuraMod = 1.0;
+        int dmgLevel = 0;
+        double upgradeDmg = 0.0;
 
         if (!element.isEmpty()) {
-            Map<String, Double> mods =
-                    TypeBuffMechanic.getCombinedMods(target.getUniqueId());
 
-            Double multiplier = mods.get(element);
+            // 被ダメ側の補正 (Aura + Upgrade)
+            Map<String, Double> targetMods = TypeBuffMechanic.getCombinedMods(target.getUniqueId());
+            targetAuraMod = targetMods.getOrDefault(element, 1.0);
 
-            if (multiplier != null) {
-                base *= multiplier;
-            }
+            VariableRegistry targetVars = MythicBukkit.inst().getVariableManager().getRegistry(VariableScope.CASTER, data, target);
+            resLevel = targetVars.getInt("upg_total_" + element.toLowerCase() + "_res");
+            upgradeRes = resLevel * 0.01;
+
+            multiplier *= Math.max(0, targetAuraMod - upgradeRes);
+
+            // 与ダメ側の補正 (Aura + Upgrade)
+            Map<String, Double> casterMods = TypeOffensiveBuffMechanic.getCombinedMods(data.getCaster().getEntity().getUniqueId());
+            casterAuraMod = casterMods.getOrDefault(element, 1.0);
+
+            VariableRegistry casterVars = MythicBukkit.inst().getVariableManager().getRegistry(VariableScope.CASTER, data, data.getCaster().getEntity());
+            dmgLevel = casterVars.getInt("upg_total_" + element.toLowerCase() + "_dmg");
+            upgradeDmg = dmgLevel * 0.01;
+
+            multiplier *= Math.max(0, casterAuraMod + upgradeDmg);
+
+            base *= multiplier;
         }
 
         DamageMetadata meta = new DamageMetadata(
