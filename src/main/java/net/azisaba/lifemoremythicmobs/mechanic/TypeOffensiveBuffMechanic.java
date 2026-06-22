@@ -8,6 +8,7 @@ import io.lumine.xikage.mythicmobs.skills.Skill;
 import io.lumine.xikage.mythicmobs.skills.SkillMechanic;
 import io.lumine.xikage.mythicmobs.skills.SkillMetadata;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.AuraSkillHelper;
 import net.azisaba.lifemoremythicmobs.util.SkillUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -48,11 +49,11 @@ public class TypeOffensiveBuffMechanic extends SkillMechanic implements ITargete
         this.duration = config.getInteger(new String[]{"duration", "d"}, 100);
         this.maxStacks = config.getInteger(new String[]{"maxstacks", "ms"}, 1);
         this.stackTimer = config.getBoolean(new String[]{"stacktimer", "st"}, false);
-        this.refreshDuration = config.getBoolean(new String[]{"refleshduration", "rd"}, false);
+        this.refreshDuration = config.getBoolean(new String[]{"refreshDuration", "rd"}, false);
         this.interval = config.getInteger(new String[]{"interval", "i"}, 4);
-        this.onStartSkillName = config.getString(new String[]{"onStartSkill", "onstart", "os"}, "");
-        this.onTickSkillName = config.getString(new String[]{"onTickSkill", "ontick", "ot"}, "");
-        this.onEndSkillName = config.getString(new String[]{"onEndSkill", "onend", "oe"}, "");
+        this.onStartSkillName = config.getString(new String[]{"onStart", "oS"}, "");
+        this.onTickSkillName = config.getString(new String[]{"onTick", "oT"}, "");
+        this.onEndSkillName = config.getString(new String[]{"onEnd", "oE"}, "");
     }
 
     private static Map<String, Double> parseMods(String raw) {
@@ -68,7 +69,7 @@ public class TypeOffensiveBuffMechanic extends SkillMechanic implements ITargete
                 continue;
             }
             try {
-                String valStr = parts[1];
+                String valStr = parts[1].replace("+", "");
                 double modValue;
                 if (valStr.contains("%")) {
                     modValue = Double.parseDouble(valStr.replace("%", "")) / 100.0;
@@ -274,7 +275,7 @@ public class TypeOffensiveBuffMechanic extends SkillMechanic implements ITargete
             if (!skillOpt.isPresent()) return;
             Skill skill = skillOpt.get();
             SkillMetadata meta = originMeta.deepClone();
-            meta.setTrigger(getTargetEntity());
+            AuraSkillHelper.setMeta(meta, getTargetEntity());
             meta.getVariables().putString("aura-name", auraName);
             meta.getVariables().putInt("aura-stacks", getStacks(targetUUID, auraName));
             meta.getVariables().putInt("aura-duration", ticksRemaining);

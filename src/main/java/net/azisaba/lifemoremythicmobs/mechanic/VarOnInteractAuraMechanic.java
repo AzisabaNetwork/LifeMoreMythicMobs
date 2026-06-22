@@ -7,6 +7,7 @@ import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
 import io.lumine.xikage.mythicmobs.skills.*;
 import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderInt;
 import io.lumine.xikage.mythicmobs.skills.placeholders.parsers.PlaceholderString;
+import net.azisaba.lifemoremythicmobs.util.AuraSkillHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -122,7 +123,7 @@ public class VarOnInteractAuraMechanic extends SkillMechanic implements ITargete
             Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(skillName);
             maybeSkill.ifPresent(skill -> {
                 SkillMetadata clone = data.deepClone();
-                clone.setTrigger(BukkitAdapter.adapt(player));
+                AuraSkillHelper.setMeta(clone, BukkitAdapter.adapt(player));
                 skill.execute(clone);
             });
         }

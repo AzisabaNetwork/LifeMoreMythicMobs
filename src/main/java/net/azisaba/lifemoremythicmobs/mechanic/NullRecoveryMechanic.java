@@ -2,9 +2,10 @@ package net.azisaba.lifemoremythicmobs.mechanic;
 
 import io.lumine.xikage.mythicmobs.MythicMobs;
 import io.lumine.xikage.mythicmobs.adapters.AbstractEntity;
-import io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter;
 import io.lumine.xikage.mythicmobs.io.MythicLineConfig;
 import io.lumine.xikage.mythicmobs.skills.*;
+import net.azisaba.lifemoremythicmobs.util.AuraSkillHelper;
+import net.azisaba.lifemoremythicmobs.util.GlobalCooldownManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -14,7 +15,6 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEntitySkill {
@@ -29,6 +29,10 @@ public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEnti
     protected final int duration;
     protected final int tickInterval;
     protected final String amount;
+    protected final boolean globalCooldown;
+    protected final int gcdTime;
+    protected final String gcdName;
+    protected final String onFail;
 
     public NullRecoveryMechanic(MythicLineConfig config) {
         super(config.getLine(), config);
@@ -40,6 +44,10 @@ public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEnti
         this.duration = config.getInteger(new String[]{"duration", "d", "持続時間"}, 100);
         this.tickInterval = config.getInteger(new String[]{"tickInterval", "ti"}, 1);
         this.amount = config.getString(new String[]{"amount", "a", "量"}, "100%");
+        this.globalCooldown = config.getBoolean(new String[]{"globalcooldown", "gcd"}, false);
+        this.gcdTime = config.getInteger(new String[]{"gcdtime"}, 100);
+        this.gcdName = config.getString(new String[]{"gcdname"}, "default");
+        this.onFail = config.getString(new String[]{"onFail", "of"}, null);
     }
 
     public static void remove(AbstractEntity target, String auraName) {
@@ -51,7 +59,16 @@ public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEnti
 
     @Override
     public boolean castAtEntity(SkillMetadata skillMetadata, AbstractEntity abstractEntity) {
+        if (globalCooldown && GlobalCooldownManager.isOnCooldown(gcdName)) {
+            executeSkillStatic(onFail, skillMetadata, abstractEntity);
+            return false;
+        }
+
         String identifier = abstractEntity.getUniqueId().toString() + ":" + this.auraName;
+
+        if (globalCooldown) {
+            GlobalCooldownManager.setCooldown(gcdName, gcdTime);
+        }
 
         if (activeAuras.containsKey(identifier)) {
             activeAuras.get(identifier).refresh(this.duration);
@@ -60,6 +77,10 @@ public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEnti
 
         new NullRecoveryAura(abstractEntity, skillMetadata, identifier);
         return true;
+    }
+
+    private void executeSkillStatic(String skillName, SkillMetadata data, AbstractEntity target) {
+        AuraSkillHelper.executeSkill(skillName, data, target);
     }
 
     private class NullRecoveryAura implements Listener, Runnable {
@@ -138,13 +159,7 @@ public class NullRecoveryMechanic extends SkillMechanic implements ITargetedEnti
         }
 
         private void executeSkill(String skillName) {
-            if (skillName == null || skillName.isEmpty()) return;
-            Optional<Skill> maybeSkill = MythicMobs.inst().getSkillManager().getSkill(skillName);
-            maybeSkill.ifPresent(skill -> {
-                SkillMetadata clone = data.deepClone();
-                clone.setTrigger(target);
-                skill.execute(clone);
-            });
+            AuraSkillHelper.executeSkill(skillName, data, target);
         }
     }
 }

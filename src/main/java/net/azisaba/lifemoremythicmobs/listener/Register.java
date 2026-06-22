@@ -194,6 +194,9 @@ public class Register implements Listener {
         if ( condition.equalsIgnoreCase("hasTypeBuff") || condition.equalsIgnoreCase("hastBuff") ) {
             e.register(new HasTypeBuffCondition(e.getConfig()));
         }
+        if ( condition.equalsIgnoreCase("isOnGlobalCooldown") || condition.equalsIgnoreCase("isOnGCD") || condition.equalsIgnoreCase("onGCD") ) {
+            e.register(new IsOnGlobalCooldownCondition(e.getConfig()));
+        }
     }
 
     @EventHandler
@@ -210,6 +213,7 @@ public class Register implements Listener {
         CasterAttackPlaceholder.register(manager);
         CasterLuckPlaceholder.register(manager);
         PvELevelPlaceholder.register(manager);
+        PotionLevelPlaceholder.register(manager);
     }
 
     @EventHandler
