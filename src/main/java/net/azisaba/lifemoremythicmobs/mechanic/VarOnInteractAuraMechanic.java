@@ -12,6 +12,7 @@ import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.util.AuraSkillHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -127,7 +128,7 @@ public class VarOnInteractAuraMechanic extends SkillMechanic implements ITargete
             Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
             maybeSkill.ifPresent(skill -> {
                 SkillMetadata clone = data.deepClone();
-                clone.setTrigger(BukkitAdapter.adapt(player));
+                AuraSkillHelper.setMeta(clone, BukkitAdapter.adapt(player));
                 skill.execute(clone);
             });
         }

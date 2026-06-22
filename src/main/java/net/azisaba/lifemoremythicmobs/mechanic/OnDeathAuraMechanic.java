@@ -9,6 +9,7 @@ import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.util.AuraSkillHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,7 +19,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntitySkill {
@@ -26,6 +26,7 @@ public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntit
     private static final Map<String, DeathAura> activeAuras = new ConcurrentHashMap<>();
 
     protected final String auraName;
+    protected final String onStartSkill;
     protected final String onDeathSkill;
     protected final String onTickSkill;
     protected final String onEndSkill;
@@ -35,9 +36,10 @@ public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntit
     public OnDeathAuraMechanic(SkillExecutor executor, MythicLineConfig config) {
         super(executor, config.getLine(), config);
         this.auraName = config.getString(new String[]{"auraName", "aura", "n"}, "death_aura");
+        this.onStartSkill = config.getString(new String[]{"onStart", "oS"}, null);
         this.onDeathSkill = config.getString(new String[]{"onDeath", "od"}, null);
-        this.onTickSkill = config.getString(new String[]{"onTick", "ot"}, null);
-        this.onEndSkill = config.getString(new String[]{"onEnd", "oe"}, null);
+        this.onTickSkill = config.getString(new String[]{"onTick", "oT"}, null);
+        this.onEndSkill = config.getString(new String[]{"onEnd", "oE"}, null);
         this.duration = config.getInteger(new String[]{"duration", "d"}, 200);
         this.tickInterval = config.getInteger(new String[]{"tickInterval", "ti"}, 1);
     }
@@ -79,6 +81,7 @@ public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntit
             activeAuras.put(id, this);
             Bukkit.getPluginManager().registerEvents(this, plugin);
             this.taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this, 0L, 1L);
+            AuraSkillHelper.executeSkill(onStartSkill, data, target);
         }
 
         public void refresh(int newDuration) {
@@ -115,17 +118,11 @@ public class OnDeathAuraMechanic extends SkillMechanic implements ITargetedEntit
             Bukkit.getScheduler().cancelTask(taskId);
             HandlerList.unregisterAll(this);
             activeAuras.remove(id);
-            if (timeOut) executeSkill(onEndSkill);
+            if (timeOut) AuraSkillHelper.executeSkill(onEndSkill, data, target);
         }
 
         private void executeSkill(String skillName) {
-            if (skillName == null || skillName.isEmpty()) return;
-            Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
-            maybeSkill.ifPresent(skill -> {
-                SkillMetadata clone = data.deepClone();
-                clone.setTrigger(target);
-                skill.execute(clone);
-            });
+            AuraSkillHelper.executeSkill(skillName, data, target);
         }
     }
 }

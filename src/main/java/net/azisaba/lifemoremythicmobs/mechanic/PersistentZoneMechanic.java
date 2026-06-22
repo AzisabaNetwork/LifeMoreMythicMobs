@@ -9,6 +9,7 @@ import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.AuraSkillHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -16,26 +17,33 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 public class PersistentZoneMechanic extends SkillMechanic implements ITargetedLocationSkill, ITargetedEntitySkill {
+    private final String onStartSkill;
+    private final String onTickSkill;
+    private final String onEndSkill;
     private final String onEnterSkill;
     private final String onStaySkill;
     private final String onLeaveSkill;
     private final double radius;
     private final int duration;
     private final int interval;
+    private final int tickInterval;
 
     public PersistentZoneMechanic(SkillExecutor executor, MythicLineConfig config) {
         super(executor, config.getLine(), config);
-        this.onEnterSkill = config.getString(new String[]{"onEnter", "oe"});
-        this.onStaySkill = config.getString(new String[]{"onStay", "os"});
-        this.onLeaveSkill = config.getString(new String[]{"onLeave", "ol"});
+        this.onStartSkill = config.getString(new String[]{"onStart", "oS"}, null);
+        this.onTickSkill = config.getString(new String[]{"onTick", "oT"}, null);
+        this.onEndSkill = config.getString(new String[]{"onEnd", "oE"}, null);
+        this.onEnterSkill = config.getString(new String[]{"onEnter", "oe", "oEn"}, null);
+        this.onStaySkill = config.getString(new String[]{"onStay", "os", "oSt"}, null);
+        this.onLeaveSkill = config.getString(new String[]{"onLeave", "ol"}, null);
         this.radius = config.getDouble(new String[]{"radius", "r"}, 5.0);
         this.duration = config.getInteger(new String[]{"duration", "d"}, 100);
         this.interval = config.getInteger(new String[]{"interval", "i"}, 20);
+        this.tickInterval = Math.max(1, config.getInteger(new String[]{"tickInterval", "ti"}, 1));
     }
 
     @Override
@@ -58,11 +66,13 @@ public class PersistentZoneMechanic extends SkillMechanic implements ITargetedLo
         private final AbstractLocation location;
         private final Set<UUID> currentEntities = new HashSet<>();
         private int elapsed = 0;
+        private int tickCount = 0;
 
         public ZoneTask(LifeMoreMythicMobs plugin, SkillMetadata data, AbstractLocation location) {
             this.data = data;
             this.location = location;
             this.runTaskTimer(plugin, 0L, (long) interval);
+            executeSkillForCaster(onStartSkill);
         }
 
         @Override
@@ -71,8 +81,14 @@ public class PersistentZoneMechanic extends SkillMechanic implements ITargetedLo
                 for (UUID uuid : currentEntities) {
                     executeSkill(onLeaveSkill, uuid);
                 }
+                executeSkillForCaster(onEndSkill);
                 this.cancel();
                 return;
+            }
+
+            tickCount++;
+            if (onTickSkill != null && tickCount % tickInterval == 0) {
+                executeSkillForCaster(onTickSkill);
             }
 
             Location bukkitLoc = BukkitAdapter.adapt(location);
@@ -104,13 +120,12 @@ public class PersistentZoneMechanic extends SkillMechanic implements ITargetedLo
             if (skillName == null) return;
             Entity bukkitEntity = Bukkit.getEntity(targetUUID);
             if (bukkitEntity == null) return;
+            AuraSkillHelper.executeSkill(skillName, data, BukkitAdapter.adapt(bukkitEntity));
+        }
 
-            Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
-            maybeSkill.ifPresent(skill -> {
-                SkillMetadata newData = data.deepClone();
-                newData.setTrigger(BukkitAdapter.adapt(bukkitEntity));
-                skill.execute(newData);
-            });
+        private void executeSkillForCaster(String skillName) {
+            if (skillName == null) return;
+            AuraSkillHelper.executeSkill(skillName, data, data.getCaster().getEntity());
         }
     }
 }

@@ -12,6 +12,7 @@ import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.utils.Schedulers;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.util.AuraSkillHelper;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -25,6 +26,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
+import net.azisaba.lifemoremythicmobs.util.GlobalCooldownManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,10 @@ public class ModifyPlayerAttributeMechanic extends SkillMechanic implements ITar
     protected final String onTickSkill;
     protected final String onEndSkill;
     protected final int tickInterval;
+    protected final boolean globalCooldown;
+    protected final int gcdTime;
+    protected final String gcdName;
+    protected final String onFail;
 
     public ModifyPlayerAttributeMechanic(SkillExecutor executor, MythicLineConfig config) {
         super(executor, config.getLine(), config);
@@ -60,6 +66,10 @@ public class ModifyPlayerAttributeMechanic extends SkillMechanic implements ITar
         this.onTickSkill = config.getString(new String[]{"onTick", "ot"}, null);
         this.onEndSkill = config.getString(new String[]{"onEnd", "oe"}, null);
         this.tickInterval = Math.max(1, config.getInteger(new String[]{"tickInterval", "ti"}, 1));
+        this.globalCooldown = config.getBoolean(new String[]{"globalcooldown", "gcd"}, false);
+        this.gcdTime = config.getInteger(new String[]{"gcdtime"}, 100);
+        this.gcdName = config.getString(new String[]{"gcdname"}, "default");
+        this.onFail = config.getString(new String[]{"onFail", "of"}, null);
 
         registerListener();
     }
@@ -151,6 +161,14 @@ public class ModifyPlayerAttributeMechanic extends SkillMechanic implements ITar
 
     @Override
     public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
+        if (globalCooldown && GlobalCooldownManager.isOnCooldown(gcdName)) {
+            executeSkillOnFail(onFail, data, target);
+            return SkillResult.CONDITION_FAILED;
+        }
+
+        if (globalCooldown) {
+            GlobalCooldownManager.setCooldown(gcdName, gcdTime);
+        }
         String resolvedAmount = this.amountStr.get(data, target);
 
         Schedulers.sync().run(() -> {
@@ -178,6 +196,16 @@ public class ModifyPlayerAttributeMechanic extends SkillMechanic implements ITar
             }
         });
         return SkillResult.SUCCESS;
+    }
+
+    private void executeSkillOnFail(String skillName, SkillMetadata data, AbstractEntity target) {
+        if (skillName == null || skillName.isEmpty()) return;
+        Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
+        maybeSkill.ifPresent(skill -> {
+            SkillMetadata clone = data.deepClone();
+            clone.setTrigger(target);
+            skill.execute(clone);
+        });
     }
 
     private Attribute parseAttribute(String name) {
@@ -378,13 +406,7 @@ public class ModifyPlayerAttributeMechanic extends SkillMechanic implements ITar
         }
 
         private void executeSkill(String skillName) {
-            if (skillName == null || skillName.isEmpty()) return;
-            Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
-            maybeSkill.ifPresent(skill -> {
-                SkillMetadata clone = data.deepClone();
-                clone.setTrigger(BukkitAdapter.adapt(entity));
-                skill.execute(clone);
-            });
+            AuraSkillHelper.executeSkill(skillName, data, BukkitAdapter.adapt(entity));
         }
     }
 }
