@@ -8,6 +8,7 @@ import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDespawnEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicReloadedEvent;
 import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicTargeterLoadEvent;
 import io.lumine.xikage.mythicmobs.skills.placeholders.PlaceholderManager;
+import net.azisaba.lifemoremythicmobs.util.PlaceholderUtil;
 import net.azisaba.lifemoremythicmobs.condition.*;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.placeholder.*;
@@ -206,14 +207,16 @@ public class Register implements Listener {
 
     public static void reloadPlaceholders() {
         PlaceholderManager manager = MythicMobs.inst().getPlaceholderManager();
-        MMIDPlaceholder.register(manager);
-        ItemTagPlaceholder.register(manager);
-        ServerNamePlaceholder.register(manager);
-        CasterArmorPlaceholder.register(manager);
-        CasterAttackPlaceholder.register(manager);
-        CasterLuckPlaceholder.register(manager);
-        PvELevelPlaceholder.register(manager);
-        PotionLevelPlaceholder.register(manager);
+        PlaceholderUtil.withInitializedSuppressed(manager, () -> {
+            MMIDPlaceholder.register(manager);
+            ItemTagPlaceholder.register(manager);
+            ServerNamePlaceholder.register(manager);
+            CasterArmorPlaceholder.register(manager);
+            CasterAttackPlaceholder.register(manager);
+            CasterLuckPlaceholder.register(manager);
+            PvELevelPlaceholder.register(manager);
+            PotionLevelPlaceholder.register(manager);
+        });
     }
 
     @EventHandler
