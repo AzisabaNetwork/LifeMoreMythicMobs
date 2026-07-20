@@ -1,7 +1,6 @@
 package net.azisaba.lifemoremythicmobs.listener;
 
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.api.skills.SkillManager;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.events.MythicConditionLoadEvent;
@@ -11,13 +10,11 @@ import io.lumine.mythic.bukkit.events.MythicMobDespawnEvent;
 import io.lumine.mythic.bukkit.events.MythicReloadedEvent;
 import io.lumine.mythic.bukkit.events.MythicTargeterLoadEvent;
 import io.lumine.mythic.core.skills.SkillExecutor;
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.azisaba.lifemoremythicmobs.condition.*;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.mechanic.mahjong.*;
 import net.azisaba.lifemoremythicmobs.placeholder.*;
 import net.azisaba.lifemoremythicmobs.targeter.SphereTargeter;
-import net.azisaba.lifemoremythicmobs.targeters.*;
 import net.azisaba.lifemoremythicmobs.util.CustomAura;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -121,7 +118,7 @@ public class Register implements Listener {
             e.register(new ChangeItemNBTMechanic(executor, config));
         }
         if (mechanic.equalsIgnoreCase("changeMythicItem") || mechanic.equalsIgnoreCase("mmchange")) {
-            e.register(new ItemChangeMechanic(executor, config));
+            e.register(new ChangeMythicItem(executor, config));
         }
         if (mechanic.equalsIgnoreCase("getItemNBT")) {
             e.register(new GetItemNBTMechanic(executor, config));

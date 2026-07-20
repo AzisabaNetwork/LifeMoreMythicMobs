@@ -18,12 +18,12 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Optional;
 
 /** Replaces a player's main-hand MythicItem with another MythicItem. */
-public class ItemChangeMechanic extends SkillMechanic implements ITargetedEntitySkill {
+public class ChangeMythicItem extends SkillMechanic implements ITargetedEntitySkill {
 
     private final String fromItemName;
     private final String toItemName;
 
-    public ItemChangeMechanic(SkillExecutor executor, MythicLineConfig config) {
+    public ChangeMythicItem(SkillExecutor executor, MythicLineConfig config) {
         super(executor, config.getLine(), config);
         this.fromItemName = config.getString(new String[]{"from", "f"}, "");
         this.toItemName = config.getString(new String[]{"to", "t"}, "");
