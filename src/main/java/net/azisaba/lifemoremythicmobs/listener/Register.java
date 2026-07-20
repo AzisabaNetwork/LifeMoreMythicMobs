@@ -120,6 +120,9 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("changeItemNBT") ) {
             e.register(new ChangeItemNBTMechanic(executor, config));
         }
+        if (mechanic.equalsIgnoreCase("changeMythicItem") || mechanic.equalsIgnoreCase("mmchange")) {
+            e.register(new ItemChangeMechanic(executor, config));
+        }
         if (mechanic.equalsIgnoreCase("getItemNBT")) {
             e.register(new GetItemNBTMechanic(executor, config));
         }
