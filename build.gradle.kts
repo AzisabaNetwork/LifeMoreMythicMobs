@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "net.azisaba.lifemoremythicmobs"
-version = "1.21.11+2.5.0"
+version = "2.5.1+1.21.11"
 
 repositories {
     mavenCentral()
