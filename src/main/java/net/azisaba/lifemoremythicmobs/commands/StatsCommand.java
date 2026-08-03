@@ -28,7 +28,7 @@ public class StatsCommand extends SubCommand {
     }
 
     @Override
-    public void execute(@NotNull Player player, @NotNull String @NotNull [] args) {
+    public void execute(@NotNull Player player, @NotNull String[] args) {
         player.sendMessage(ChatColor.GOLD + "========== [ ステータス ] ==========");
 
         // 全てのバニラ属性の表示

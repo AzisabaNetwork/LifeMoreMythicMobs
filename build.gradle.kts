@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "net.azisaba.lifemoremythicmobs"
-version = "1.21.11+2.4.11"
+version = "1.21.11+2.5.0"
 
 repositories {
     mavenCentral()
@@ -35,10 +35,10 @@ repositories {
 }
 
 dependencies {
-    implementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    implementation("io.lumine:Mythic-Dist:5.12.0")
+    compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    compileOnly("io.lumine:Mythic-Dist:5.12.0")
     compileOnly("com.github.MyPetORG.MyPet:mypet-api:5c8ceeac6a")
-    // compileOnly("net.azisaba:lifepvelevel:2.0.9+1.15.2") // 一時的に無効化
+    compileOnly("net.azisaba:lifepvelevel:1.21.11+2.0.2")
     compileOnly("org.jetbrains:annotations:24.0.1")
     compileOnly("org.json:json:20231013")
 

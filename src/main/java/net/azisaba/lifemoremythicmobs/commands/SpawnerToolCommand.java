@@ -26,7 +26,7 @@ public class SpawnerToolCommand extends SubCommand {
     }
 
     @Override
-    public void execute(@NotNull Player player, @NotNull String @NotNull [] args) {
+    public void execute(@NotNull Player player, @NotNull String[] args) {
         if (args.length > 0) {
             if (args[0].equalsIgnoreCase("list")) {
                 SpawnerManagerGUI.openMain(player);
@@ -51,7 +51,7 @@ public class SpawnerToolCommand extends SubCommand {
     }
 
     @Override
-    public @NotNull List<String> suggest(@NotNull Player player, @NotNull String @NotNull [] args) {
+    public @NotNull List<String> suggest(@NotNull Player player, @NotNull String[] args) {
         if (args.length == 1) {
             return Arrays.asList("create", "list").stream()
                     .filter(s -> s.startsWith(args[0].toLowerCase()))

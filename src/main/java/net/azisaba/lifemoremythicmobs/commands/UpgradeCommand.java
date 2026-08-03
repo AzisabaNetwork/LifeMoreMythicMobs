@@ -26,7 +26,7 @@ public class UpgradeCommand extends SubCommand {
     }
 
     @Override
-    public void execute(@NotNull Player player, @NotNull String @NotNull [] args) {
+    public void execute(@NotNull Player player, @NotNull String[] args) {
         if (!LifeMoreMythicMobs.inst().server.equalsIgnoreCase("lifeevent")) {
             player.sendMessage(ChatColor.RED + "このサーバーでは能力強化を使用できません。");
             return;
@@ -63,7 +63,7 @@ public class UpgradeCommand extends SubCommand {
     }
 
     @Override
-    public @NotNull List<String> suggest(@NotNull Player player, @NotNull String @NotNull [] args) {
+    public @NotNull List<String> suggest(@NotNull Player player, @NotNull String[] args) {
         if (args.length == 1) {
             List<String> suggestions = new java.util.ArrayList<>(UpgradeStatManager.ALL_PROFILES);
             suggestions.add("clear");
