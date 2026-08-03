@@ -135,6 +135,9 @@ public class SpawnerManagerListener implements Listener {
                 int page = currentPage.getOrDefault(player.getUniqueId(), 0) + 1;
                 currentPage.put(player.getUniqueId(), page);
                 SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), page);
+            } else if (slot == 49) {
+                SpawnerManagerGUI.openMain(player);
+            }
         } 
         else if (title.startsWith(SpawnerManagerGUI.DETAIL_TITLE_PREFIX)) {
             String spawnerName = title.substring(SpawnerManagerGUI.DETAIL_TITLE_PREFIX.length());

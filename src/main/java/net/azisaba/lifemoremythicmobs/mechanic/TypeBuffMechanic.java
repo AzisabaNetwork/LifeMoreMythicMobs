@@ -149,7 +149,7 @@ public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySk
                     }
                 }
             }
-        }
+        });
         Map<String, Double> combined = new HashMap<>();
         deltaAccum.forEach((element, totalDelta) ->
                 combined.put(element, 1.0 + totalDelta)

@@ -142,7 +142,7 @@ public class SpawnerManagerGUI {
     }
 
     public static void openGroupEdit(Player player, String groupName) {
-        List<MythicSpawner> spawners = MythicMobs.inst().getSpawnerManager().getSpawners().stream()
+        List<MythicSpawner> spawners = MythicBukkit.inst().getSpawnerManager().getSpawners().stream()
                 .filter(s -> groupName.equalsIgnoreCase(s.getGroup()))
                 .collect(Collectors.toList());
 
@@ -208,7 +208,7 @@ public class SpawnerManagerGUI {
     }
 
     public static void openIndividualEdit(Player player, String spawnerName) {
-        MythicSpawner s = MythicMobs.inst().getSpawnerManager().getSpawnerByName(spawnerName);
+        MythicSpawner s = MythicBukkit.inst().getSpawnerManager().getSpawnerByName(spawnerName);
         if (s == null) {
             player.sendMessage(ChatColor.RED + "スポナーが見つかりませんでした。");
             return;
