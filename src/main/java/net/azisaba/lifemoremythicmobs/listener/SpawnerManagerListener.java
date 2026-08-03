@@ -7,7 +7,7 @@ import io.lumine.mythic.core.spawning.spawners.MythicSpawner;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.azisaba.lifemoremythicmobs.gui.SpawnerManagerGUI;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -48,7 +48,7 @@ public class SpawnerManagerListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        String title = event.getView().getTitle();
+        String title = LegacyText.plain(event.getView().title());
         if (!title.startsWith("スポナー管理") && 
             !title.startsWith(SpawnerManagerGUI.SPAWNER_LIST_TITLE_PREFIX) && 
             !title.startsWith(SpawnerManagerGUI.DETAIL_TITLE_PREFIX) &&
@@ -80,7 +80,7 @@ public class SpawnerManagerListener implements Listener {
         } 
         else if (title.equals(SpawnerManagerGUI.WORLD_LIST_TITLE)) {
             if (slot < 45) {
-                String worldName = ChatColor.stripColor(clicked.getItemMeta().getDisplayName());
+                String worldName = LegacyText.plain(clicked.getItemMeta().displayName());
                 currentFilterType.put(player.getUniqueId(), "world");
                 currentFilterValue.put(player.getUniqueId(), worldName);
                 currentPage.put(player.getUniqueId(), 0);
@@ -103,7 +103,7 @@ public class SpawnerManagerListener implements Listener {
         } 
         else if (title.equals(SpawnerManagerGUI.GROUP_LIST_TITLE)) {
             if (slot < 45) {
-                String groupName = ChatColor.stripColor(clicked.getItemMeta().getDisplayName());
+                String groupName = LegacyText.plain(clicked.getItemMeta().displayName());
                 currentFilterType.put(player.getUniqueId(), "group");
                 currentFilterValue.put(player.getUniqueId(), groupName);
                 currentPage.put(player.getUniqueId(), 0);
@@ -126,7 +126,7 @@ public class SpawnerManagerListener implements Listener {
         } 
         else if (title.startsWith(SpawnerManagerGUI.SPAWNER_LIST_TITLE_PREFIX)) {
             if (slot < 45) {
-                String spawnerName = ChatColor.stripColor(clicked.getItemMeta().getDisplayName());
+                String spawnerName = LegacyText.plain(clicked.getItemMeta().displayName());
                 if (spawnerName.startsWith("[選択] ")) {
                     spawnerName = spawnerName.substring("[選択] ".length());
                 }
@@ -135,10 +135,10 @@ public class SpawnerManagerListener implements Listener {
                     java.util.Set<String> set = getSelected(player);
                     if (set.contains(spawnerName)) {
                         set.remove(spawnerName);
-                        player.sendMessage(ChatColor.YELLOW + "選択解除: " + spawnerName + ChatColor.GRAY + " (選択数: " + set.size() + ")");
+                        player.sendMessage(LegacyText.YELLOW + "選択解除: " + spawnerName + LegacyText.GRAY + " (選択数: " + set.size() + ")");
                     } else {
                         set.add(spawnerName);
-                        player.sendMessage(ChatColor.GREEN + "選択: " + spawnerName + ChatColor.GRAY + " (選択数: " + set.size() + ")");
+                        player.sendMessage(LegacyText.GREEN + "選択: " + spawnerName + LegacyText.GRAY + " (選択数: " + set.size() + ")");
                     }
                     SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), set, true);
                 } else {
@@ -160,14 +160,14 @@ public class SpawnerManagerListener implements Listener {
             } else if (slot == 48) { // 選択一括編集
                 java.util.Set<String> set = getSelected(player);
                 if (set.isEmpty()) {
-                    player.sendMessage(ChatColor.RED + "選択されていません。");
+                    player.sendMessage(LegacyText.RED + "選択されていません。");
                     return;
                 }
                 SpawnerManagerGUI.openSelectedEdit(player, set);
             } else if (slot == 50) { // 選択一括削除
                 java.util.Set<String> set = getSelected(player);
                 if (set.isEmpty()) {
-                    player.sendMessage(ChatColor.RED + "選択されていません。");
+                    player.sendMessage(LegacyText.RED + "選択されていません。");
                     return;
                 }
                 SpawnerManagerGUI.openConfirmBulkDeleteSelected(player, set.size());
@@ -193,13 +193,13 @@ public class SpawnerManagerListener implements Listener {
                 MythicSpawner s = MythicBukkit.inst().getSpawnerManager().getSpawnerByName(spawnerName);
                 if (s != null) {
                     player.teleport(BukkitAdapter.adapt(s.getLocation()));
-                    player.sendMessage(ChatColor.GREEN + "テレポートしました: " + spawnerName);
+                    player.sendMessage(LegacyText.GREEN + "テレポートしました: " + spawnerName);
                 }
             } else if (slot == 14) { // Visualize
                 visualizeSpawner(player, spawnerName);
             } else if (slot == 16) { // Delete
                 player.performCommand("mm spawners remove " + spawnerName);
-                player.sendMessage(ChatColor.RED + "スポナーを削除しました: " + spawnerName);
+                player.sendMessage(LegacyText.RED + "スポナーを削除しました: " + spawnerName);
                 SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), getSelected(player), isSelectionMode(player));
             } else if (slot == 22) { // Back
                 SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), getSelected(player), isSelectionMode(player));
@@ -231,10 +231,10 @@ public class SpawnerManagerListener implements Listener {
                     if (original != null && original.containsKey(setting)) {
                         String originalValue = original.get(setting);
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mm s set " + spawnerName + " " + setting + " " + originalValue);
-                        player.sendMessage(ChatColor.GREEN + spawnerName + " の " + setting + " を編集前の値 (" + originalValue + ") に戻しました。");
+                        player.sendMessage(LegacyText.GREEN + spawnerName + " の " + setting + " を編集前の値 (" + originalValue + ") に戻しました。");
                         SpawnerManagerGUI.openIndividualEdit(player, spawnerName);
                     } else {
-                        player.sendMessage(ChatColor.RED + "編集前の値が見つかりません。");
+                        player.sendMessage(LegacyText.RED + "編集前の値が見つかりません。");
                     }
                     return;
                 }
@@ -242,8 +242,8 @@ public class SpawnerManagerListener implements Listener {
                 pendingIndividualSpawner.put(player.getUniqueId(), spawnerName);
                 pendingIndividualEditSetting.put(player.getUniqueId(), setting);
                 player.closeInventory();
-                player.sendMessage(ChatColor.YELLOW + "変更する値をチャットで入力してください (" + setting + ")");
-                player.sendMessage(ChatColor.GRAY + "キャンセルするには 'cancel' と入力してください。");
+                player.sendMessage(LegacyText.YELLOW + "変更する値をチャットで入力してください (" + setting + ")");
+                player.sendMessage(LegacyText.GRAY + "キャンセルするには 'cancel' と入力してください。");
             }
         }
         else if (title.startsWith(SpawnerManagerGUI.GROUP_EDIT_TITLE_PREFIX)) {
@@ -268,8 +268,8 @@ public class SpawnerManagerListener implements Listener {
             if (setting != null) {
                 pendingGroupEditSetting.put(player.getUniqueId(), setting);
                 player.closeInventory();
-                player.sendMessage(ChatColor.YELLOW + "一括変更する値をチャットで入力してください (" + setting + ")");
-                player.sendMessage(ChatColor.GRAY + "キャンセルするには 'cancel' と入力してください。");
+                player.sendMessage(LegacyText.YELLOW + "一括変更する値をチャットで入力してください (" + setting + ")");
+                player.sendMessage(LegacyText.GRAY + "キャンセルするには 'cancel' と入力してください。");
             }
         }
         else if (title.equals(SpawnerManagerGUI.SELECT_EDIT_TITLE)) {
@@ -294,15 +294,15 @@ public class SpawnerManagerListener implements Listener {
             if (setting != null) {
                 pendingSelectedEditSetting.put(player.getUniqueId(), setting);
                 player.closeInventory();
-                player.sendMessage(ChatColor.YELLOW + "一括変更する値をチャットで入力してください (" + setting + ")");
-                player.sendMessage(ChatColor.GRAY + "キャンセルするには 'cancel' と入力してください。");
+                player.sendMessage(LegacyText.YELLOW + "一括変更する値をチャットで入力してください (" + setting + ")");
+                player.sendMessage(LegacyText.GRAY + "キャンセルするには 'cancel' と入力してください。");
             }
         }
         else if (title.equals(SpawnerManagerGUI.CONFIRM_DELETE_SELECTED_TITLE)) {
             if (slot == 11) {
                 java.util.Set<String> set = getSelected(player);
                 if (set.isEmpty()) {
-                    player.sendMessage(ChatColor.RED + "選択されていません。");
+                    player.sendMessage(LegacyText.RED + "選択されていません。");
                     SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), set, isSelectionMode(player));
                     return;
                 }
@@ -313,7 +313,7 @@ public class SpawnerManagerListener implements Listener {
                         for (String name : new java.util.HashSet<>(set)) {
                             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mm s remove " + name);
                         }
-                        player.sendMessage(ChatColor.RED + "選択した " + set.size() + " 個のスポナーを削除しました。");
+                        player.sendMessage(LegacyText.RED + "選択した " + set.size() + " 個のスポナーを削除しました。");
                         clearSelection(player);
                         SpawnerManagerGUI.openSpawnerList(player, currentFilterType.get(player.getUniqueId()), currentFilterValue.get(player.getUniqueId()), currentPage.getOrDefault(player.getUniqueId(), 0), getSelected(player), isSelectionMode(player));
                     }
@@ -354,7 +354,7 @@ public class SpawnerManagerListener implements Listener {
             String setting = pendingIndividualEditSetting.remove(player.getUniqueId());
 
             if (value.equalsIgnoreCase("cancel")) {
-                player.sendMessage(ChatColor.RED + "編集をキャンセルしました。");
+                player.sendMessage(LegacyText.RED + "編集をキャンセルしました。");
                 new BukkitRunnable() {
                     @Override
                     public void run() {
@@ -365,7 +365,7 @@ public class SpawnerManagerListener implements Listener {
             }
 
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mm s set " + spawnerName + " " + setting + " " + value);
-            player.sendMessage(ChatColor.GREEN + spawnerName + " の " + setting + " を " + value + " に変更しました。");
+            player.sendMessage(LegacyText.GREEN + spawnerName + " の " + setting + " を " + value + " に変更しました。");
 
             new BukkitRunnable() {
                 @Override
@@ -380,7 +380,7 @@ public class SpawnerManagerListener implements Listener {
             String setting = pendingSelectedEditSetting.remove(player.getUniqueId());
 
             if (value.equalsIgnoreCase("cancel")) {
-                player.sendMessage(ChatColor.RED + "編集をキャンセルしました。");
+                player.sendMessage(LegacyText.RED + "編集をキャンセルしました。");
                 new BukkitRunnable() {
                     @Override
                     public void run() {
@@ -392,18 +392,18 @@ public class SpawnerManagerListener implements Listener {
 
             java.util.Set<String> set = getSelected(player);
             if (set.isEmpty()) {
-                player.sendMessage(ChatColor.RED + "選択が空です。");
+                player.sendMessage(LegacyText.RED + "選択が空です。");
                 return true;
             }
 
-            player.sendMessage(ChatColor.GREEN + "選択中のスポナー " + set.size() + " 個の " + setting + " を " + value + " に変更しています...");
+            player.sendMessage(LegacyText.GREEN + "選択中のスポナー " + set.size() + " 個の " + setting + " を " + value + " に変更しています...");
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     for (String name : set) {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mm s set " + name + " " + setting + " " + value);
                     }
-                    player.sendMessage(ChatColor.GREEN + "変更が完了しました。");
+                    player.sendMessage(LegacyText.GREEN + "変更が完了しました。");
                     SpawnerManagerGUI.openSelectedEdit(player, set);
                 }
             }.runTask(plugin);
@@ -414,7 +414,7 @@ public class SpawnerManagerListener implements Listener {
             String setting = pendingGroupEditSetting.remove(player.getUniqueId());
 
             if (value.equalsIgnoreCase("cancel")) {
-                player.sendMessage(ChatColor.RED + "編集をキャンセルしました。");
+                player.sendMessage(LegacyText.RED + "編集をキャンセルしました。");
                 new BukkitRunnable() {
                     @Override
                     public void run() {
@@ -430,11 +430,11 @@ public class SpawnerManagerListener implements Listener {
                     .collect(java.util.stream.Collectors.toList());
 
             if (spawners.isEmpty()) {
-                player.sendMessage(ChatColor.RED + "対象のスポナーが見つかりませんでした。");
+                player.sendMessage(LegacyText.RED + "対象のスポナーが見つかりませんでした。");
                 return true;
             }
 
-            player.sendMessage(ChatColor.GREEN + group + " グループのスポナー " + spawners.size() + " 個の " + setting + " を " + value + " に変更しています...");
+            player.sendMessage(LegacyText.GREEN + group + " グループのスポナー " + spawners.size() + " 個の " + setting + " を " + value + " に変更しています...");
 
             new BukkitRunnable() {
                 @Override
@@ -442,7 +442,7 @@ public class SpawnerManagerListener implements Listener {
                     for (MythicSpawner s : spawners) {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mm s set " + s.getInternalName() + " " + setting + " " + value);
                     }
-                    player.sendMessage(ChatColor.GREEN + "変更が完了しました。");
+                    player.sendMessage(LegacyText.GREEN + "変更が完了しました。");
                     SpawnerManagerGUI.openGroupEdit(player, group);
                 }
             }.runTask(plugin);
@@ -469,9 +469,9 @@ public class SpawnerManagerListener implements Listener {
         AbstractLocation aloc = s.getLocation();
         Location loc = BukkitAdapter.adapt(aloc).add(0.5, 0, 0.5);
         
-        player.sendMessage(ChatColor.GREEN + "スポナー '" + spawnerName + "' の位置を可視化しています (10秒間)");
+        player.sendMessage(LegacyText.GREEN + "スポナー '" + spawnerName + "' の位置を可視化しています (10秒間)");
 
-        org.bukkit.entity.FallingBlock fb = loc.getWorld().spawnFallingBlock(loc, org.bukkit.Material.SPAWNER, (byte) 0);
+        org.bukkit.entity.FallingBlock fb = loc.getWorld().spawnFallingBlock(loc, org.bukkit.Material.SPAWNER.createBlockData());
         fb.setGravity(false);
         fb.setGlowing(true);
         fb.setDropItem(false);

@@ -95,18 +95,18 @@ public class ItemUtil {
     @Contract("null, _ -> !null")
     public static String getLoreLine(@Nullable ItemStack stack, int lineNumber) {
         if (stack == null || stack.getType().isAir()) return "";
-        if (!stack.hasItemMeta() || !stack.getItemMeta().hasLore()) return "";
-        List<String> lore = stack.getItemMeta().getLore();
+        if (!stack.hasItemMeta() || stack.getItemMeta().lore() == null) return "";
+        List<net.kyori.adventure.text.Component> lore = stack.getItemMeta().lore();
         if (lore == null) return "";
         if (lore.size() <= lineNumber) return "";
-        return lore.get(lineNumber);
+        return LegacyText.plain(lore.get(lineNumber));
     }
 
     @Contract("null -> !null")
     public static String getDisplayName(@Nullable ItemStack stack) {
         if (stack == null || stack.getType().isAir()) return "";
-        if (!stack.hasItemMeta() || !stack.getItemMeta().hasDisplayName()) return "";
-        return stack.getItemMeta().getDisplayName();
+        if (!stack.hasItemMeta() || stack.getItemMeta().displayName() == null) return "";
+        return LegacyText.plain(stack.getItemMeta().displayName());
     }
 
     public static @NotNull VariableRegistry getPlayerVariable(@NotNull Player player) {

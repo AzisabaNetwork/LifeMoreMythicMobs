@@ -5,7 +5,7 @@ import net.azisaba.lifemoremythicmobs.gui.UpgradeGUI;
 import net.azisaba.lifemoremythicmobs.upgrade.UpgradeStatManager;
 import net.azisaba.lifemoremythicmobs.upgrade.UpgradeStatManager.StatType;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,7 +26,7 @@ public class UpgradeListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        String title = event.getView().getTitle();
+        String title = LegacyText.plain(event.getView().title());
         if (!title.startsWith(UpgradeGUI.TITLE_PREFIX)) return;
 
         event.setCancelled(true);
@@ -60,7 +60,7 @@ public class UpgradeListener implements Listener {
             Objective obj = sb.getObjective(objectiveName);
 
             if (obj == null) {
-                player.sendMessage(ChatColor.RED + "エラー: スコアボード項目 '" + objectiveName + "' が見つかりません。");
+                player.sendMessage(LegacyText.RED + "エラー: スコアボード項目 '" + objectiveName + "' が見つかりません。");
                 return;
             }
 
@@ -69,30 +69,30 @@ public class UpgradeListener implements Listener {
 
             if (event.isLeftClick()) {
                 if (currentLevel >= UpgradeStatManager.MAX_LEVEL) {
-                    player.sendMessage(ChatColor.RED + "既に最大レベルに達しています。");
+                    player.sendMessage(LegacyText.RED + "既に最大レベルに達しています。");
                     return;
                 }
                 int cost = (currentLevel + 1) * 5;
                 if (currentPoints >= cost) {
                     score.setScore(currentPoints - cost);
                     UpgradeStatManager.setLevel(player, profile, selectedType, currentLevel + 1);
-                    player.sendMessage(ChatColor.GREEN + selectedType.displayName + " をレベル " + (currentLevel + 1) + " に強化しました！");
+                    player.sendMessage(LegacyText.GREEN + selectedType.displayName + " をレベル " + (currentLevel + 1) + " に強化しました！");
                     UpgradeGUI.open(player, profile); // GUIを更新
                 } else {
-                    player.sendMessage(ChatColor.RED + "ポイントが足りません！ (必要: " + cost + ")");
+                    player.sendMessage(LegacyText.RED + "ポイントが足りません！ (必要: " + cost + ")");
                 }
             } else if (event.isRightClick()) {
                 if (currentLevel > 0) {
                     int refund = (currentLevel * 5) / 2;
                     score.setScore(currentPoints + refund);
                     UpgradeStatManager.setLevel(player, profile, selectedType, currentLevel - 1);
-                    player.sendMessage(ChatColor.YELLOW + selectedType.displayName + " の強化を取り消しました。(レベル " + (currentLevel - 1) + ")");
+                    player.sendMessage(LegacyText.YELLOW + selectedType.displayName + " の強化を取り消しました。(レベル " + (currentLevel - 1) + ")");
                     if (refund > 0) {
-                        player.sendMessage(ChatColor.GRAY + "ポイントが " + refund + " 返却されました。");
+                        player.sendMessage(LegacyText.GRAY + "ポイントが " + refund + " 返却されました。");
                     }
                     UpgradeGUI.open(player, profile); // GUIを更新
                 } else {
-                    player.sendMessage(ChatColor.RED + "これ以上レベルを下げることはできません。");
+                    player.sendMessage(LegacyText.RED + "これ以上レベルを下げることはできません。");
                 }
             }
         }

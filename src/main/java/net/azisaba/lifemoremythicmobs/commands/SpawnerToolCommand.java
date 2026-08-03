@@ -3,7 +3,7 @@ package net.azisaba.lifemoremythicmobs.commands;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.azisaba.lifemoremythicmobs.gui.SpawnerManagerGUI;
 import net.azisaba.lifemoremythicmobs.gui.SpawnerToolGUI;
-import org.bukkit.ChatColor;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -37,13 +37,13 @@ public class SpawnerToolCommand extends SubCommand {
             }
         }
 
-        player.sendMessage(ChatColor.YELLOW + "使用法: /lmmm spawner <create|list>");
+        player.sendMessage(LegacyText.YELLOW + "使用法: /lmmm spawner <create|list>");
     }
 
     private void openTool(Player player) {
         ItemStack item = player.getInventory().getItemInMainHand();
         if (item == null || item.getType() == Material.AIR) {
-            player.sendMessage(ChatColor.RED + "アイテムを手に持ってください。");
+            player.sendMessage(LegacyText.RED + "アイテムを手に持ってください。");
             return;
         }
 

@@ -8,7 +8,7 @@ import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import net.azisaba.lifemoremythicmobs.util.ItemUtil;
-import org.bukkit.ChatColor;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
@@ -84,7 +84,7 @@ public class SetLoreLineVarMechanic extends SkillMechanic implements ITargetedEn
                 }
             }
         }
-        if (stripColor) line = ChatColor.stripColor(line);
+        if (stripColor) line = LegacyText.stripColor(line);
         ItemUtil.setVariable(skillMetadata, varName, line);
         return SkillResult.SUCCESS;
     }

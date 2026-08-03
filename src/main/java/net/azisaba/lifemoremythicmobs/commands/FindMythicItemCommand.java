@@ -3,10 +3,14 @@ package net.azisaba.lifemoremythicmobs.commands;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.core.items.MythicItem;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import net.md_5.bungee.api.chat.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -34,10 +38,10 @@ public class FindMythicItemCommand extends SubCommand {
     @Override
     public void execute(@NotNull Player player, @NotNull String[] args) {
         if (args.length == 0) {
-            player.sendMessage(ChatColor.RED + "使用法: /lmmm findMythicItem <name=アイテム名 | model=モデル番号 | material=アイテムID | enchant=エンチャント名>");
+            player.sendMessage(LegacyText.RED + "使用法: /lmmm findMythicItem <name=アイテム名 | model=モデル番号 | material=アイテムID | enchant=エンチャント名>");
             return;
         }
-        player.sendMessage(ChatColor.YELLOW + "アイテムを検索しています...");
+        player.sendMessage(LegacyText.YELLOW + "アイテムを検索しています...");
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             List<MythicItem> matchedItems = new ArrayList<>();
             Collection<MythicItem> allItems = MythicBukkit.inst().getItemManager().getItems();
@@ -55,16 +59,16 @@ public class FindMythicItemCommand extends SubCommand {
                     String lowerArg = arg.toLowerCase();
                     if (lowerArg.startsWith("name=")) {
                         String query = lowerArg.substring(5);
-                        String displayName = (meta != null && meta.hasDisplayName()) ? meta.getDisplayName() : "";
-                        if (!ChatColor.stripColor(displayName).toLowerCase().contains(query)) {
+                        String displayName = meta != null && meta.displayName() != null ? LegacyText.plain(meta.displayName()) : "";
+                        if (!LegacyText.stripColor(displayName).toLowerCase().contains(query)) {
                             isMatch = false;
                         }
                     } else if (lowerArg.startsWith("lore=")) {
                         String query = lowerArg.substring(5);
                         boolean loreHit = false;
-                        if (meta != null && meta.hasLore()) {
-                            for (String line : meta.getLore()) {
-                                if (ChatColor.stripColor(line).toLowerCase().contains(query)) {
+                        if (meta != null && meta.lore() != null) {
+                            for (Component line : meta.lore()) {
+                                if (LegacyText.plain(line).toLowerCase().contains(query)) {
                                     loreHit = true;
                                     break;
                                 }
@@ -74,7 +78,8 @@ public class FindMythicItemCommand extends SubCommand {
                     } else if (lowerArg.startsWith("model=") || lowerArg.startsWith("data=")) {
                         try {
                             int queryVal = Integer.parseInt(lowerArg.substring(6));
-                            if (meta == null || !meta.hasCustomModelData() || meta.getCustomModelData() != queryVal) {
+                            if (meta == null || meta.getCustomModelDataComponent().getFloats().isEmpty()
+                                    || meta.getCustomModelDataComponent().getFloats().getFirst().intValue() != queryVal) {
                                 isMatch = false;
                             }
                         } catch (NumberFormatException e) {
@@ -97,8 +102,8 @@ public class FindMythicItemCommand extends SubCommand {
                         }
                         if (!enchantHit) isMatch = false;
                     } else {
-                        String displayName = (meta != null && meta.hasDisplayName()) ? meta.getDisplayName() : "";
-                        if (!ChatColor.stripColor(displayName).toLowerCase().contains(lowerArg)) {
+                        String displayName = meta != null && meta.displayName() != null ? LegacyText.plain(meta.displayName()) : "";
+                        if (!LegacyText.stripColor(displayName).toLowerCase().contains(lowerArg)) {
                             isMatch = false;
                         }
                     }
@@ -116,19 +121,18 @@ public class FindMythicItemCommand extends SubCommand {
 
     private void sendResult(Player player, List<MythicItem> items) {
         if (items.isEmpty()) {
-            player.sendMessage(ChatColor.YELLOW + "条件に一致するアイテムは見つかりませんでした");
+            player.sendMessage(LegacyText.YELLOW + "条件に一致するアイテムは見つかりませんでした");
         } else {
-            player.sendMessage(ChatColor.GREEN + "=== 検索結果 (" + items.size() + "件) ===");
+            player.sendMessage(LegacyText.GREEN + "=== 検索結果 (" + items.size() + "件) ===");
             for (MythicItem item : items) {
                 String mmid = item.getInternalName();
                 String displayName = item.getDisplayName();
                 if (displayName == null) displayName = mmid;
-                TextComponent message = new TextComponent(ChatColor.GOLD + "- " + ChatColor.RESET + ChatColor.translateAlternateColorCodes('&', displayName));
-                ComponentBuilder hoverText = new ComponentBuilder(ChatColor.YELLOW + "ID: " + mmid + "\n");
-                hoverText.append(ChatColor.GRAY + "クリックでアイテムを入手");
-                message.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText.create()));
-                message.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/mm items give " + player.getName() + " " + mmid));
-                player.spigot().sendMessage(message);
+                Component message = LegacyText.component(LegacyText.GOLD + "- " + LegacyText.RESET)
+                        .append(LegacyText.ampersandComponent(displayName))
+                        .hoverEvent(HoverEvent.showText(LegacyText.component(LegacyText.YELLOW + "ID: " + mmid + "\n" + LegacyText.GRAY + "クリックでアイテムを入手")))
+                        .clickEvent(ClickEvent.suggestCommand("/mm items give " + player.getName() + " " + mmid));
+                player.sendMessage(message);
             }
         }
     }
@@ -152,7 +156,7 @@ public class FindMythicItemCommand extends SubCommand {
                     .collect(Collectors.toList());
         } else if (currentArg.startsWith("enchant=")) {
             String val = currentArg.substring(8);
-            return Arrays.stream(Enchantment.values())
+            return RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).stream()
                     .map(ench -> "enchant=" + ench.getKey().getKey().toLowerCase())
                     .filter(s -> s.startsWith("enchant=" + val))
                     .collect(Collectors.toList());

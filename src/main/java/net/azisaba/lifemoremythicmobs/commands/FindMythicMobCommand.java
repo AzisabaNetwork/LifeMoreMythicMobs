@@ -3,12 +3,11 @@ package net.azisaba.lifemoremythicmobs.commands;
 import io.lumine.mythic.api.mobs.MythicMob;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -36,10 +35,10 @@ public class FindMythicMobCommand extends SubCommand {
     @Override
     public void execute(@NotNull Player player, @NotNull String[] args) {
         if (args.length == 0) {
-            player.sendMessage(ChatColor.RED + "使用法: /lmmm findMythicMob <表示名 | name=表示名 | type=モブタイプ | health=HP>");
+            player.sendMessage(LegacyText.RED + "使用法: /lmmm findMythicMob <表示名 | name=表示名 | type=モブタイプ | health=HP>");
             return;
         }
-        player.sendMessage(ChatColor.YELLOW + "Mobを検索しています...");
+        player.sendMessage(LegacyText.YELLOW + "Mobを検索しています...");
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             List<MythicMob> matchedMobs = new ArrayList<>();
             Collection<MythicMob> mobTypes = MythicBukkit.inst().getMobManager().getMobTypes();
@@ -74,30 +73,22 @@ public class FindMythicMobCommand extends SubCommand {
 
     private void sendResult(Player player, List<MythicMob> mobs) {
         if (mobs.isEmpty()) {
-            player.sendMessage(ChatColor.YELLOW + "該当するMobが見つかりませんでした。");
+            player.sendMessage(LegacyText.YELLOW + "該当するMobが見つかりませんでした。");
             return;
         }
-        player.sendMessage(ChatColor.GREEN + "=== Mob検索結果 (" + mobs.size() + "件) ===");
+        player.sendMessage(LegacyText.GREEN + "=== Mob検索結果 (" + mobs.size() + "件) ===");
         for (MythicMob mob : mobs) {
             String internalName = mob.getInternalName();
             String displayName = mob.getDisplayName() != null ? mob.getDisplayName().get() : "No DisplayName";
             double hp = mob.getHealth().get();
             String entityType = mob.getEntityType() != null ? mob.getEntityType().toString() : "UNKNOWN";
 
-            TextComponent mainComponent = new TextComponent(ChatColor.GOLD + internalName);
-            TextComponent infoComponent = new TextComponent(ChatColor.GRAY + " (" + entityType + " / " + hp + "HP)");
-            TextComponent nameComponent = new TextComponent(ChatColor.WHITE + " -> " + ChatColor.translateAlternateColorCodes('&', displayName));
-
-            ComponentBuilder hover = new ComponentBuilder(ChatColor.YELLOW + "ID: " + internalName + "\n");
-            hover.append(ChatColor.GREEN + "クリックでスポーンエッグを入手");
-            mainComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hover.create()));
-
             String command = "/mm eggs give " + player.getName() + " " + internalName;
-            mainComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, command));
-
-            mainComponent.addExtra(infoComponent);
-            mainComponent.addExtra(nameComponent);
-            player.spigot().sendMessage(mainComponent);
+            Component message = LegacyText.component(LegacyText.GOLD + internalName + LegacyText.GRAY + " (" + entityType + " / " + hp + "HP)" + LegacyText.WHITE + " -> ")
+                    .append(LegacyText.ampersandComponent(displayName))
+                    .hoverEvent(HoverEvent.showText(LegacyText.component(LegacyText.YELLOW + "ID: " + internalName + "\n" + LegacyText.GREEN + "クリックでスポーンエッグを入手")))
+                    .clickEvent(ClickEvent.runCommand(command));
+            player.sendMessage(message);
         }
     }
 
@@ -105,7 +96,7 @@ public class FindMythicMobCommand extends SubCommand {
         if (mob.getDisplayName() == null) return false;
         String displayName = mob.getDisplayName().get();
         if (displayName == null) return false;
-        String stripped = ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', displayName)).toLowerCase();
+        String stripped = LegacyText.stripColor(LegacyText.translateAlternateColorCodes('&', displayName)).toLowerCase();
         return stripped.contains(query.toLowerCase());
     }
 

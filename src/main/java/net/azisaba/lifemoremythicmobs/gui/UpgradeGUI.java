@@ -3,7 +3,7 @@ package net.azisaba.lifemoremythicmobs.gui;
 import net.azisaba.lifemoremythicmobs.upgrade.UpgradeStatManager;
 import net.azisaba.lifemoremythicmobs.upgrade.UpgradeStatManager.StatType;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -19,7 +19,7 @@ public class UpgradeGUI {
     public static final int[] SLOTS = {10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25};
 
     public static void open(Player player, String profile) {
-        Inventory inv = Bukkit.createInventory(null, 54, TITLE_PREFIX + profile);
+        Inventory inv = Bukkit.createInventory(null, 54, LegacyText.component(TITLE_PREFIX + profile));
 
         List<StatType> types = getDisplayedTypes(profile);
 
@@ -27,7 +27,7 @@ public class UpgradeGUI {
             inv.setItem(SLOTS[i], createStatItem(player, profile, types.get(i)));
         }
 
-        inv.setItem(49, createItem(Material.BARRIER, ChatColor.RED + "閉じる"));
+        inv.setItem(49, createItem(Material.BARRIER, LegacyText.RED + "閉じる"));
 
         player.openInventory(inv);
     }
@@ -63,23 +63,23 @@ public class UpgradeGUI {
 
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatColor.GOLD + type.displayName + (isMax ? ChatColor.RED + " [MAX]" : ""));
+        meta.displayName(LegacyText.component(LegacyText.GOLD + type.displayName + (isMax ? LegacyText.RED + " [MAX]" : "")));
 
         List<String> lore = new ArrayList<>();
-        lore.add(ChatColor.YELLOW + "現在のレベル: " + ChatColor.WHITE + level + (isMax ? ChatColor.RED + " (最大)" : ""));
+        lore.add(LegacyText.YELLOW + "現在のレベル: " + LegacyText.WHITE + level + (isMax ? LegacyText.RED + " (最大)" : ""));
 
         String effectValue = "+" + (int)(level * type.perLevel * 100) + "%";
 
-        lore.add(ChatColor.YELLOW + "効果: " + ChatColor.WHITE + effectValue);
+        lore.add(LegacyText.YELLOW + "効果: " + LegacyText.WHITE + effectValue);
         lore.add("");
         if (!isMax) {
-            lore.add(ChatColor.AQUA + "次へのコスト: " + ChatColor.GREEN + cost + " ポイント");
+            lore.add(LegacyText.AQUA + "次へのコスト: " + LegacyText.GREEN + cost + " ポイント");
             lore.add("");
         }
-        lore.add(ChatColor.WHITE + "左クリックして強化");
-        lore.add(ChatColor.WHITE + "右クリックして強化を取り消し");
+        lore.add(LegacyText.WHITE + "左クリックして強化");
+        lore.add(LegacyText.WHITE + "右クリックして強化を取り消し");
 
-        meta.setLore(lore);
+        meta.lore(LegacyText.components(lore));
         item.setItemMeta(meta);
         return item;
     }
@@ -87,7 +87,7 @@ public class UpgradeGUI {
     private static ItemStack createItem(Material mat, String name) {
         ItemStack item = new ItemStack(mat);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(name);
+        meta.displayName(LegacyText.component(name));
         item.setItemMeta(meta);
         return item;
     }

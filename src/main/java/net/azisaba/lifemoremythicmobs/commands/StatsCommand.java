@@ -3,7 +3,7 @@ package net.azisaba.lifemoremythicmobs.commands;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.azisaba.lifemoremythicmobs.upgrade.UpgradeStatManager;
 import net.azisaba.lifemoremythicmobs.upgrade.UpgradeStatManager.StatType;
-import org.bukkit.ChatColor;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
@@ -29,7 +29,7 @@ public class StatsCommand extends SubCommand {
 
     @Override
     public void execute(@NotNull Player player, @NotNull String[] args) {
-        player.sendMessage(ChatColor.GOLD + "========== [ ステータス ] ==========");
+        player.sendMessage(LegacyText.GOLD + "========== [ ステータス ] ==========");
 
         // 全てのバニラ属性の表示
         for (Attribute attribute : Registry.ATTRIBUTE) {
@@ -38,7 +38,7 @@ public class StatsCommand extends SubCommand {
                 String label = getAttributeLabel(attribute);
                 double value = instance.getValue();
                 String formatted = String.format("%.2f", value);
-                player.sendMessage(ChatColor.YELLOW + label + ": " + ChatColor.WHITE + formatted);
+                player.sendMessage(LegacyText.YELLOW + label + ": " + LegacyText.WHITE + formatted);
             }
         }
 
@@ -46,7 +46,7 @@ public class StatsCommand extends SubCommand {
         String serverName = LifeMoreMythicMobs.inst().server;
         if (serverName.equalsIgnoreCase("lifeevent")) {
             player.sendMessage("");
-            player.sendMessage(ChatColor.GOLD + "--- [ 能力強化 (Upgrade) ] ---");
+            player.sendMessage(LegacyText.GOLD + "--- [ 能力強化 (Upgrade) ] ---");
 
             // Upgrade 属性の表示
             for (StatType type : StatType.values()) {
@@ -55,11 +55,11 @@ public class StatsCommand extends SubCommand {
                     level += UpgradeStatManager.getLevel(player, profile, type);
                 }
                 double boost = level * type.perLevel * 100.0;
-                player.sendMessage(ChatColor.YELLOW + type.displayName + ": " + ChatColor.WHITE + level + " Lv " + ChatColor.GRAY + "(+" + (int) boost + "%)");
+                player.sendMessage(LegacyText.YELLOW + type.displayName + ": " + LegacyText.WHITE + level + " Lv " + LegacyText.GRAY + "(+" + (int) boost + "%)");
             }
         }
 
-        player.sendMessage(ChatColor.GOLD + "====================================");
+        player.sendMessage(LegacyText.GOLD + "====================================");
     }
 
     private String getAttributeLabel(Attribute attribute) {

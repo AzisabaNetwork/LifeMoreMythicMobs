@@ -4,7 +4,7 @@ import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.azisaba.lifemoremythicmobs.gui.UpgradeGUI;
 import net.azisaba.lifemoremythicmobs.upgrade.UpgradeStatManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,27 +28,27 @@ public class UpgradeCommand extends SubCommand {
     @Override
     public void execute(@NotNull Player player, @NotNull String[] args) {
         if (!LifeMoreMythicMobs.inst().server.equalsIgnoreCase("lifeevent")) {
-            player.sendMessage(ChatColor.RED + "このサーバーでは能力強化を使用できません。");
+            player.sendMessage(LegacyText.RED + "このサーバーでは能力強化を使用できません。");
             return;
         }
         if (args.length > 0) {
             if (args[0].equalsIgnoreCase("clear")) {
                 if (!player.hasPermission("lifemoremythicmobs.lmmm")) {
-                    player.sendMessage(ChatColor.RED + "権限がありません。");
+                    player.sendMessage(LegacyText.RED + "権限がありません。");
                     return;
                 }
                 if (args.length < 3) {
-                    player.sendMessage(ChatColor.RED + "使用法: /lmmm upgrade clear <player> <profile>");
+                    player.sendMessage(LegacyText.RED + "使用法: /lmmm upgrade clear <player> <profile>");
                     return;
                 }
                 Player target = Bukkit.getPlayer(args[1]);
                 if (target == null) {
-                    player.sendMessage(ChatColor.RED + "プレイヤーが見つかりません。");
+                    player.sendMessage(LegacyText.RED + "プレイヤーが見つかりません。");
                     return;
                 }
                 String profile = args[2];
                 UpgradeStatManager.clearProfile(target, profile);
-                player.sendMessage(ChatColor.GREEN + target.getName() + " のプロファイル '" + profile + "' をクリアしました。");
+                player.sendMessage(LegacyText.GREEN + target.getName() + " のプロファイル '" + profile + "' をクリアしました。");
                 return;
             }
 

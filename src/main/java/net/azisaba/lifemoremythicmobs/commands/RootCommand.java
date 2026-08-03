@@ -1,7 +1,7 @@
 package net.azisaba.lifemoremythicmobs.commands;
 
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import org.bukkit.ChatColor;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -37,7 +37,7 @@ public class RootCommand implements TabExecutor {
             return true;
         }
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "プレイヤーのみが実行できます");
+            sender.sendMessage(LegacyText.RED + "プレイヤーのみが実行できます");
             return true;
         }
         SubCommand subCommand = commands.stream()
@@ -50,7 +50,7 @@ public class RootCommand implements TabExecutor {
         }
 
         if (!sender.hasPermission("lifemoremythicmobs.lmmm") && !sender.hasPermission("lifemoremythicmobs.command." + subCommand.getName().toLowerCase())) {
-            sender.sendMessage(ChatColor.RED + "このコマンドを実行する権限がありません。");
+            sender.sendMessage(LegacyText.RED + "このコマンドを実行する権限がありません。");
             return true;
         }
 
@@ -60,7 +60,7 @@ public class RootCommand implements TabExecutor {
 
     private void sendHelp(CommandSender sender) {
         for (SubCommand command : commands) {
-            sender.sendMessage(ChatColor.AQUA + "/lmmm " + command.getName());
+            sender.sendMessage(LegacyText.AQUA + "/lmmm " + command.getName());
         }
     }
 

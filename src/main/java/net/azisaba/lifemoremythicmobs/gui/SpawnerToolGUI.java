@@ -1,7 +1,7 @@
 package net.azisaba.lifemoremythicmobs.gui;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -17,7 +17,7 @@ public class SpawnerToolGUI {
     public static final String TITLE = "スポナー設置ツールの設定";
 
     public static void open(Player player, ItemStack item, Map<String, String> data) {
-        Inventory inv = Bukkit.createInventory(null, 27, TITLE);
+        Inventory inv = Bukkit.createInventory(null, 27, LegacyText.component(TITLE));
 
         String currentMob = (data != null && data.containsKey("mob")) ? data.get("mob") : "未設定";
         String currentSpawner = (data != null && data.containsKey("spawner")) ? data.get("spawner") : "未設定";
@@ -26,7 +26,7 @@ public class SpawnerToolGUI {
         ItemStack icon = item.clone();
         ItemMeta iconMeta = icon.getItemMeta();
         if (iconMeta != null) {
-            iconMeta.setDisplayName(ChatColor.WHITE + "対象アイテム");
+            iconMeta.displayName(LegacyText.component(LegacyText.WHITE + "対象アイテム"));
             icon.setItemMeta(iconMeta);
         }
         inv.setItem(0, icon);
@@ -37,8 +37,8 @@ public class SpawnerToolGUI {
 
         ItemStack completeItem = new ItemStack(Material.EMERALD_BLOCK);
         ItemMeta completeMeta = completeItem.getItemMeta();
-        completeMeta.setDisplayName(ChatColor.GREEN + "作成完了");
-        completeMeta.setLore(Collections.singletonList(ChatColor.GRAY + "手に持っているアイテムをツール化します"));
+        completeMeta.displayName(LegacyText.component(LegacyText.GREEN + "作成完了"));
+        completeMeta.lore(LegacyText.components(Collections.singletonList(LegacyText.GRAY + "手に持っているアイテムをツール化します")));
         completeItem.setItemMeta(completeMeta);
         inv.setItem(8, completeItem);
 
@@ -75,8 +75,8 @@ public class SpawnerToolGUI {
         ItemStack cancelItem = new ItemStack(Material.YELLOW_WOOL);
         ItemMeta cancelMeta = cancelItem.getItemMeta();
         if (cancelMeta != null) {
-            cancelMeta.setDisplayName(ChatColor.RED + "キャンセル");
-            cancelMeta.setLore(Collections.singletonList(ChatColor.GRAY + "設定を破棄して閉じます"));
+            cancelMeta.displayName(LegacyText.component(LegacyText.RED + "キャンセル"));
+            cancelMeta.lore(LegacyText.components(Collections.singletonList(LegacyText.GRAY + "設定を破棄して閉じます")));
             cancelItem.setItemMeta(cancelMeta);
         }
         inv.setItem(26, cancelItem);
@@ -99,13 +99,13 @@ public class SpawnerToolGUI {
         ItemStack item = new ItemStack(finalMaterial);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.YELLOW + name);
-            meta.setLore(Arrays.asList(
-                    ChatColor.GRAY + desc,
-                    ChatColor.WHITE + "左クリックしてチャットで入力",
-                    ChatColor.WHITE + "右クリックしてリセット",
-                    ChatColor.AQUA + "現在の設定: " + current
-            ));
+            meta.displayName(LegacyText.component(LegacyText.YELLOW + name));
+            meta.lore(LegacyText.components(Arrays.asList(
+                    LegacyText.GRAY + desc,
+                    LegacyText.WHITE + "左クリックしてチャットで入力",
+                    LegacyText.WHITE + "右クリックしてリセット",
+                    LegacyText.AQUA + "現在の設定: " + current
+            )));
 
             if (isSet && allowEnchant) {
                 meta.addEnchant(org.bukkit.enchantments.Enchantment.UNBREAKING, 1, true);

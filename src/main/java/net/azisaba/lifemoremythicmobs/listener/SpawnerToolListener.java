@@ -4,7 +4,7 @@ import io.lumine.mythic.bukkit.MythicBukkit;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.azisaba.lifemoremythicmobs.gui.SpawnerToolGUI;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -44,7 +44,7 @@ public class SpawnerToolListener implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!event.getView().getTitle().equals(SpawnerToolGUI.TITLE)) return;
+        if (!LegacyText.plain(event.getView().title()).equals(SpawnerToolGUI.TITLE)) return;
         event.setCancelled(true);
 
         Player player = (Player) event.getWhoClicked();
@@ -58,7 +58,7 @@ public class SpawnerToolListener implements Listener {
             }
             waitingForMobName.put(player.getUniqueId(), "mob");
             player.closeInventory();
-            player.sendMessage(ChatColor.YELLOW + "チャットにMythicMobの名前を入力してください。");
+            player.sendMessage(LegacyText.YELLOW + "チャットにMythicMobの名前を入力してください。");
         } else if (slot == 3) {
             if (isRightClick) {
                 removeData(player, "spawner");
@@ -66,7 +66,7 @@ public class SpawnerToolListener implements Listener {
             }
             waitingForSpawnerName.put(player.getUniqueId(), "spawner");
             player.closeInventory();
-            player.sendMessage(ChatColor.YELLOW + "チャットにスポナーのベース名を入力してください。");
+            player.sendMessage(LegacyText.YELLOW + "チャットにスポナーのベース名を入力してください。");
         } else if (slot == 5) {
             if (isRightClick) {
                 removeData(player, "group");
@@ -74,7 +74,7 @@ public class SpawnerToolListener implements Listener {
             }
             waitingForGroupName.put(player.getUniqueId(), "group");
             player.closeInventory();
-            player.sendMessage(ChatColor.YELLOW + "チャットにスポナーのグループ名を入力してください。");
+            player.sendMessage(LegacyText.YELLOW + "チャットにスポナーのグループ名を入力してください。");
         } else if (slot == 8) {
             complete(player);
         } else if (slot >= 9 && slot < 18) {
@@ -86,7 +86,7 @@ public class SpawnerToolListener implements Listener {
             }
             waitingForOption.put(player.getUniqueId(), opt);
             player.closeInventory();
-            player.sendMessage(ChatColor.YELLOW + "チャットにオプション '" + opt + "' の値を入力してください。");
+            player.sendMessage(LegacyText.YELLOW + "チャットにオプション '" + opt + "' の値を入力してください。");
         } else if (slot >= 18 && slot < 27) {
             String[] options = {"UseWorldScaling", "PlayerRange", "Amount"};
             int index = slot - 18;
@@ -98,12 +98,12 @@ public class SpawnerToolListener implements Listener {
                 }
                 waitingForOption.put(player.getUniqueId(), opt);
                 player.closeInventory();
-                player.sendMessage(ChatColor.YELLOW + "チャットにオプション '" + opt + "' の値を入力してください。");
+                player.sendMessage(LegacyText.YELLOW + "チャットにオプション '" + opt + "' の値を入力してください。");
             }
         } else if (slot == 26) {
             sessionData.remove(player.getUniqueId());
             player.closeInventory();
-            player.sendMessage(ChatColor.YELLOW + "設定をキャンセルしました。");
+            player.sendMessage(LegacyText.YELLOW + "設定をキャンセルしました。");
         }
     }
 
@@ -111,7 +111,7 @@ public class SpawnerToolListener implements Listener {
         UUID uuid = player.getUniqueId();
         if (sessionData.containsKey(uuid)) {
             sessionData.get(uuid).remove(key);
-            player.sendMessage(ChatColor.YELLOW + "設定をリセットしました。");
+            player.sendMessage(LegacyText.YELLOW + "設定をリセットしました。");
             SpawnerToolGUI.open(player, player.getInventory().getItemInMainHand(), sessionData.get(uuid));
         }
     }
@@ -130,7 +130,7 @@ public class SpawnerToolListener implements Listener {
             data.put("mob", mobName);
 
             Bukkit.getScheduler().runTask(plugin, () -> {
-                player.sendMessage(ChatColor.GREEN + "モブ名をセットしました: " + mobName);
+                player.sendMessage(LegacyText.GREEN + "モブ名をセットしました: " + mobName);
                 SpawnerToolGUI.open(player, player.getInventory().getItemInMainHand(), sessionData.get(uuid));
             });
         } else if (waitingForSpawnerName.containsKey(uuid)) {
@@ -142,7 +142,7 @@ public class SpawnerToolListener implements Listener {
             data.put("spawner", spawnerName);
 
             Bukkit.getScheduler().runTask(plugin, () -> {
-                player.sendMessage(ChatColor.GREEN + "スポナーベース名をセットしました: " + spawnerName);
+                player.sendMessage(LegacyText.GREEN + "スポナーベース名をセットしました: " + spawnerName);
                 SpawnerToolGUI.open(player, player.getInventory().getItemInMainHand(), sessionData.get(uuid));
             });
         } else if (waitingForGroupName.containsKey(uuid)) {
@@ -154,7 +154,7 @@ public class SpawnerToolListener implements Listener {
             data.put("group", groupName);
 
             Bukkit.getScheduler().runTask(plugin, () -> {
-                player.sendMessage(ChatColor.GREEN + "スポナーグループをセットしました: " + groupName);
+                player.sendMessage(LegacyText.GREEN + "スポナーグループをセットしました: " + groupName);
                 SpawnerToolGUI.open(player, player.getInventory().getItemInMainHand(), sessionData.get(uuid));
             });
         } else if (waitingForOption.containsKey(uuid)) {
@@ -166,7 +166,7 @@ public class SpawnerToolListener implements Listener {
             data.put("opt." + opt, value);
 
             Bukkit.getScheduler().runTask(plugin, () -> {
-                player.sendMessage(ChatColor.GREEN + "オプション '" + opt + "' をセットしました: " + value);
+                player.sendMessage(LegacyText.GREEN + "オプション '" + opt + "' をセットしました: " + value);
                 SpawnerToolGUI.open(player, player.getInventory().getItemInMainHand(), sessionData.get(uuid));
             });
         }
@@ -177,13 +177,13 @@ public class SpawnerToolListener implements Listener {
         Map<String, String> data = sessionData.get(uuid);
 
         if (data == null || !data.containsKey("mob") || !data.containsKey("spawner")) {
-            player.sendMessage(ChatColor.RED + "モブ名とスポナーベース名の両方を設定してください。");
+            player.sendMessage(LegacyText.RED + "モブ名とスポナーベース名の両方を設定してください。");
             return;
         }
 
         ItemStack item = player.getInventory().getItemInMainHand();
         if (item == null || item.getType() == Material.AIR) {
-            player.sendMessage(ChatColor.RED + "アイテムを手に持っていません。");
+            player.sendMessage(LegacyText.RED + "アイテムを手に持っていません。");
             return;
         }
 
@@ -193,7 +193,7 @@ public class SpawnerToolListener implements Listener {
 
         // 見た目の更新
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatColor.AQUA + "スポナー設置ツール: " + mob);
+        meta.displayName(LegacyText.component(LegacyText.AQUA + "スポナー設置ツール: " + mob));
         meta.addEnchant(Enchantment.UNBREAKING, 1, true);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         
@@ -216,7 +216,7 @@ public class SpawnerToolListener implements Listener {
 
         sessionData.remove(uuid);
         player.closeInventory();
-        player.sendMessage(ChatColor.GREEN + "スポナー設置ツールが完成しました！");
+        player.sendMessage(LegacyText.GREEN + "スポナー設置ツールが完成しました！");
     }
 
     @EventHandler
@@ -258,9 +258,9 @@ public class SpawnerToolListener implements Listener {
         }
 
         if (group != null && !group.isEmpty()) {
-            player.sendMessage(ChatColor.GREEN + "スポナーを作成し、グループ '" + group + "' に追加しました: " + finalName + " (" + mob + ")");
+            player.sendMessage(LegacyText.GREEN + "スポナーを作成し、グループ '" + group + "' に追加しました: " + finalName + " (" + mob + ")");
         } else {
-            player.sendMessage(ChatColor.GREEN + "スポナーを作成しました: " + finalName + " (" + mob + ")");
+            player.sendMessage(LegacyText.GREEN + "スポナーを作成しました: " + finalName + " (" + mob + ")");
         }
     }
 

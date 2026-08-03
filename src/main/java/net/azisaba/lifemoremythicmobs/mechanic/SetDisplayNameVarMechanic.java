@@ -8,7 +8,7 @@ import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import net.azisaba.lifemoremythicmobs.util.ItemUtil;
-import org.bukkit.ChatColor;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
@@ -38,7 +38,7 @@ public class SetDisplayNameVarMechanic extends SkillMechanic implements ITargete
                 name = ItemUtil.getDisplayName(stack);
             }
         }
-        if (stripColor) name = ChatColor.stripColor(name);
+        if (stripColor) name = LegacyText.stripColor(name);
         ItemUtil.setVariable(skillMetadata, varName, name);
         return SkillResult.SUCCESS;
     }
