@@ -109,8 +109,9 @@ public class ItemUtil {
         return LegacyText.plain(stack.getItemMeta().displayName());
     }
 
-    public static @NotNull VariableRegistry getPlayerVariable(@NotNull Player player) {
-        return MythicBukkit.inst().getPlayerManager().getProfile(player).getVariables();
+    public static @Nullable VariableRegistry getPlayerVariable(@NotNull Player player) {
+        io.lumine.mythic.core.players.PlayerData profile = MythicBukkit.inst().getPlayerManager().getProfile(player);
+        return profile != null ? profile.getVariables() : null;
     }
 
     public static boolean hasUseAnimation(@NotNull org.bukkit.Material material) {

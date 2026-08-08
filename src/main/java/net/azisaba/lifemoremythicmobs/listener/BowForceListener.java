@@ -1,5 +1,6 @@
 package net.azisaba.lifemoremythicmobs.listener;
 
+import io.lumine.mythic.core.skills.variables.VariableRegistry;
 import net.azisaba.lifemoremythicmobs.util.ItemUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,7 +11,11 @@ public class BowForceListener implements Listener {
     @EventHandler
     public void onShootBow(EntityShootBowEvent e) {
         if (e.getEntity() instanceof Player) {
-            ItemUtil.getPlayerVariable((Player) e.getEntity()).putFloat("bow-tension", e.getForce());
+            VariableRegistry registry = ItemUtil.getPlayerVariable((Player) e.getEntity());
+            if (registry != null) {
+                registry.putFloat("bow-tension", e.getForce());
+            }
         }
     }
 }
+

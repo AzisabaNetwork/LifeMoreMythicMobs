@@ -1,6 +1,7 @@
 package net.azisaba.lifemoremythicmobs.upgrade;
 
 import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.players.PlayerData;
 import io.lumine.mythic.core.skills.variables.VariableRegistry;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import org.bukkit.entity.Player;
@@ -34,7 +35,11 @@ public class UpgradeStatManager {
     }
 
     public static void updateAllStats(Player player) {
-        VariableRegistry registry = MythicBukkit.inst().getPlayerManager().getProfile(player).getVariables();
+        if (player == null) return;
+        PlayerData profile = MythicBukkit.inst().getPlayerManager().getProfile(player);
+        if (profile == null) return;
+        VariableRegistry registry = profile.getVariables();
+        if (registry == null) return;
         
         boolean isLifeEvent = LifeMoreMythicMobs.inst().server.equalsIgnoreCase("lifeevent");
 
@@ -42,8 +47,8 @@ public class UpgradeStatManager {
             double totalLevel = 0;
             // lifeevent サーバーの場合のみレベルを合算
             if (isLifeEvent) {
-                for (String profile : ALL_PROFILES) {
-                    String varName = "upg_" + profile + "_" + type.name().toLowerCase() + "_lv";
+                for (String p : ALL_PROFILES) {
+                    String varName = "upg_" + p + "_" + type.name().toLowerCase() + "_lv";
                     if (registry.has(varName)) {
                         totalLevel += registry.getInt(varName);
                     }
@@ -58,20 +63,32 @@ public class UpgradeStatManager {
     }
 
     public static int getLevel(Player player, String profile, StatType type) {
-        VariableRegistry registry = MythicBukkit.inst().getPlayerManager().getProfile(player).getVariables();
+        if (player == null) return 0;
+        PlayerData playerProfile = MythicBukkit.inst().getPlayerManager().getProfile(player);
+        if (playerProfile == null) return 0;
+        VariableRegistry registry = playerProfile.getVariables();
+        if (registry == null) return 0;
         String varName = "upg_" + profile + "_" + type.name().toLowerCase() + "_lv";
         return registry.has(varName) ? registry.getInt(varName) : 0;
     }
 
     public static void setLevel(Player player, String profile, StatType type, int level) {
-        VariableRegistry registry = MythicBukkit.inst().getPlayerManager().getProfile(player).getVariables();
+        if (player == null) return;
+        PlayerData playerProfile = MythicBukkit.inst().getPlayerManager().getProfile(player);
+        if (playerProfile == null) return;
+        VariableRegistry registry = playerProfile.getVariables();
+        if (registry == null) return;
         String varName = "upg_" + profile + "_" + type.name().toLowerCase() + "_lv";
         registry.putInt(varName, level);
         updateAllStats(player);
     }
     
     public static void clearProfile(Player player, String profile) {
-        VariableRegistry registry = MythicBukkit.inst().getPlayerManager().getProfile(player).getVariables();
+        if (player == null) return;
+        PlayerData playerProfile = MythicBukkit.inst().getPlayerManager().getProfile(player);
+        if (playerProfile == null) return;
+        VariableRegistry registry = playerProfile.getVariables();
+        if (registry == null) return;
         for (StatType type : StatType.values()) {
             String varName = "upg_" + profile + "_" + type.name().toLowerCase() + "_lv";
             registry.remove(varName);
@@ -79,3 +96,4 @@ public class UpgradeStatManager {
         updateAllStats(player);
     }
 }
+
