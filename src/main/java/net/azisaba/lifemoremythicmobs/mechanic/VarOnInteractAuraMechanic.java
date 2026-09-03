@@ -134,3 +134,5 @@ public class VarOnInteractAuraMechanic extends SkillMechanic implements ITargete
         }
     }
 }
+
+

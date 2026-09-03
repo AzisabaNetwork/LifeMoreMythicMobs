@@ -89,3 +89,6 @@ public class SetLoreLineVarMechanic extends SkillMechanic implements ITargetedEn
         return SkillResult.SUCCESS;
     }
 }
+
+
+

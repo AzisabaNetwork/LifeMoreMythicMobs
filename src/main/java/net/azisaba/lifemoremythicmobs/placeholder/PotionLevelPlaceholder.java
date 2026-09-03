@@ -1,5 +1,7 @@
 package net.azisaba.lifemoremythicmobs.placeholder;
 
+import net.azisaba.lifemoremythicmobs.util.PlaceholderFactory;
+
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.core.skills.placeholders.Placeholder;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
@@ -23,11 +25,11 @@ public class PotionLevelPlaceholder {
         for (PotionEffectType type : PotionEffectType.values()) {
             if (type == null || type.getName() == null) continue;
             String name = type.getName().toLowerCase();
-            manager.register("target." + name + ".level", Placeholder.target((meta, abstractEntity, s) ->
+            manager.register("target." + name + ".level", PlaceholderFactory.target((meta, abstractEntity, s) ->
                     getPotionLevel(abstractEntity, type)));
-            manager.register("caster." + name + ".level", Placeholder.meta((meta, s) ->
+            manager.register("caster." + name + ".level", PlaceholderFactory.meta((meta, s) ->
                     meta.getCaster() != null ? getPotionLevel(meta.getCaster().getEntity(), type) : "0"));
-            manager.register("skill." + name + ".level", Placeholder.meta((meta, s) ->
+            manager.register("skill." + name + ".level", PlaceholderFactory.meta((meta, s) ->
                     meta.getCaster() != null ? getPotionLevel(meta.getCaster().getEntity(), type) : "0"));
         }
     }

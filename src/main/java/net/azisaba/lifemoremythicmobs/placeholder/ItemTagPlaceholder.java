@@ -1,5 +1,7 @@
 package net.azisaba.lifemoremythicmobs.placeholder;
 
+import net.azisaba.lifemoremythicmobs.util.PlaceholderFactory;
+
 import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
 import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.core.skills.placeholders.Placeholder;
@@ -17,13 +19,13 @@ public class ItemTagPlaceholder {
 
     public static void register(PlaceholderManager manager) {
         for (String tag : TAGS) {
-            manager.register("caster.mainhand.tag." + tag, Placeholder.meta((meta, s) -> {
+            manager.register("caster.mainhand.tag." + tag, PlaceholderFactory.meta((meta, s) -> {
                 Entity entity = BukkitAdapter.adapt(meta.getCaster().getEntity());
                 if (!(entity instanceof Player)) return null;
                 ItemStack stack = ((Player) entity).getInventory().getItemInMainHand();
                 return String.valueOf(ItemUtil.resolveTagAsString(stack, tag));
             }));
-            manager.register("caster.offhand.tag." + tag, Placeholder.meta((meta, s) -> {
+            manager.register("caster.offhand.tag." + tag, PlaceholderFactory.meta((meta, s) -> {
                 Entity entity = BukkitAdapter.adapt(meta.getCaster().getEntity());
                 if (!(entity instanceof Player)) return null;
                 ItemStack stack = ((Player) entity).getInventory().getItemInOffHand();

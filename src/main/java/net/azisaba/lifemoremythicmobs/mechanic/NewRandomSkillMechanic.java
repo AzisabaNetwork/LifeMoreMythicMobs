@@ -79,3 +79,5 @@ public class NewRandomSkillMechanic extends SkillMechanic implements ITargetedEn
         }
     }
 }
+
+

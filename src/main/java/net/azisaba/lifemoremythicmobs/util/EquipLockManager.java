@@ -17,4 +17,8 @@ public class EquipLockManager {
    public synchronized void removeLock(UUID uuid) {
       lockMap.computeIfPresent(uuid, (k, v) -> v <= 1 ? null : v - 1);
    }
+
+   public synchronized boolean isLocked(org.bukkit.entity.Player player) {
+      return player != null && lockMap.getOrDefault(player.getUniqueId(), 0) > 0;
+   }
 }

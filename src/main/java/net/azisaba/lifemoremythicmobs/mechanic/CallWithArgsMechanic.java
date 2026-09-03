@@ -48,3 +48,5 @@ public class CallWithArgsMechanic extends SkillMechanic implements ITargetedEnti
         return SkillResult.SUCCESS;
     }
 }
+
+

@@ -33,3 +33,6 @@ public class VarReplaceRegexMechanic extends SkillMechanic implements ITargetedE
         return SkillResult.SUCCESS;
     }
 }
+
+
+

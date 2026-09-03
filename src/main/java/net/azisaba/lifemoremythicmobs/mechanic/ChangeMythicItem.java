@@ -60,3 +60,6 @@ public class ChangeMythicItem extends SkillMechanic implements ITargetedEntitySk
         return SkillResult.SUCCESS;
     }
 }
+
+
+

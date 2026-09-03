@@ -34,3 +34,6 @@ public class VarSubstringMechanic extends SkillMechanic implements ITargetedEnti
         return SkillResult.SUCCESS;
     }
 }
+
+
+

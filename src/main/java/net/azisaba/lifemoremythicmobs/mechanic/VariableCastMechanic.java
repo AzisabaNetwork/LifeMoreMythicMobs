@@ -47,3 +47,5 @@ public class VariableCastMechanic extends SkillMechanic implements ITargetedEnti
         }
     }
 }
+
+

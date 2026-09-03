@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "net.azisaba.lifemoremythicmobs"
-version = "2.5.2+1.21.11"
+version = "2.5.3-1.21.11"
 
 repositories {
     mavenCentral()
@@ -36,9 +36,13 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
-    compileOnly("io.lumine:Mythic-Dist:5.12.0")
+    val mythicMobsJar = providers.gradleProperty("mythicMobsJar").orNull
+    if (mythicMobsJar != null) {
+        compileOnly(files(mythicMobsJar))
+    } else {
+        compileOnly("io.lumine:Mythic-Dist:5.12.0")
+    }
     compileOnly("com.github.MyPetORG.MyPet:mypet-api:5c8ceeac6a")
-    compileOnly("net.azisaba:lifepvelevel:1.21.11+2.0.2")
     compileOnly("org.jetbrains:annotations:24.0.1")
     compileOnly("org.json:json:20231013")
 

@@ -11,11 +11,16 @@ import io.lumine.mythic.bukkit.events.MythicReloadedEvent;
 import io.lumine.mythic.bukkit.events.MythicTargeterLoadEvent;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import net.azisaba.lifemoremythicmobs.util.PlaceholderUtil;
+import net.azisaba.lifemoremythicmobs.util.TimerRepository;
+import net.azisaba.lifemoremythicmobs.util.TimerService;
 import net.azisaba.lifemoremythicmobs.condition.*;
+import net.azisaba.lifemoremythicmobs.conditions.*;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.mechanic.mahjong.*;
 import net.azisaba.lifemoremythicmobs.placeholder.*;
+import net.azisaba.lifemoremythicmobs.placeholders.*;
 import net.azisaba.lifemoremythicmobs.targeter.SphereTargeter;
+import net.azisaba.lifemoremythicmobs.targeters.*;
 import net.azisaba.lifemoremythicmobs.util.CustomAura;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,6 +30,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public class Register implements Listener {
+    private static TimerService timerService;
+    private static TimerRepository timerRepository;
+
+    public Register() {
+    }
+
+    public Register(TimerService timerService, TimerRepository timerRepository) {
+        Register.timerService = timerService;
+        Register.timerRepository = timerRepository;
+    }
 
     @EventHandler
     public void onMythicMechanicLoad(@NotNull MythicMechanicLoadEvent e) {
@@ -85,7 +100,7 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("fakeblock") ) {
             e.register(new FakeBlockMechanic(executor, config));
         }
-        if ( mechanic.equalsIgnoreCase("onDeath") || mechanic.equalsIgnoreCase("onDeathAura") ) {
+        if ( mechanic.equalsIgnoreCase("lmonDeath") || mechanic.equalsIgnoreCase("onDeathAura") ) {
             e.register(new OnDeathAuraMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("onKill") || mechanic.equalsIgnoreCase("onKillAura") ) {
@@ -264,6 +279,9 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("ParticleSphereCustom") ) {
             e.register(new ParticleSphereCustomEffect(executor, config));
         }
+        if ( mechanic.equalsIgnoreCase("ParticleOrbitalCustom") ) {
+            e.register(new ParticleOrbitalCustomEffect(executor, config));
+        }
         if ( mechanic.equalsIgnoreCase("NamedTotem") ) {
             e.register(new NamedTotemMechanic(executor, config));
         }
@@ -291,13 +309,13 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("SetMetaSkillVariable") ) {
             e.register(new SetMetaSkillVariableMechanic(executor, config));
         }
-        if ( mechanic.equalsIgnoreCase("VSkill") ) {
+        if ( mechanic.equalsIgnoreCase("lmVSkill") ) {
             e.register(new VSkillMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("HudText") ) {
             e.register(new HudTextMechanic(executor, config));
         }
-        if ( mechanic.equalsIgnoreCase("ProjectileVelocity") ) {
+        if ( mechanic.equalsIgnoreCase("lmProjectileVelocity") ) {
             e.register(new ProjectileVelocityMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("RandomOrbitPoint") ) {
@@ -345,7 +363,7 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("OnAttackExtend") ) {
             e.register(new OnAttackExtendMechanic(executor, config));
         }
-        if ( mechanic.equalsIgnoreCase("OnSwing") ) {
+        if ( mechanic.equalsIgnoreCase("lmOnSwing") ) {
             e.register(new OnSwingMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("SwitchCustom") ) {
@@ -376,13 +394,13 @@ public class Register implements Listener {
         if ( condition.equalsIgnoreCase("HasEmptyInventorySlot") ) {
             e.register(new HasEmptyInventorySlotCondition(config));
         }
-        if ( condition.equalsIgnoreCase("HasItem") ) {
+        if ( condition.equalsIgnoreCase("lmHasItem") ) {
             e.register(new HasItemCondition(config));
         }
-        if ( condition.equalsIgnoreCase("BowTension") ) {
+        if ( condition.equalsIgnoreCase("lmBowTension") ) {
             e.register(new BowTensionCondition(config));
         }
-        if ( condition.equalsIgnoreCase("PlayersInRadius") ) {
+        if ( condition.equalsIgnoreCase("lmPlayersInRadius") ) {
             e.register(new PlayersInRadiusCondition(config));
         }
         if ( condition.equalsIgnoreCase("DayOfWeek") ) {
@@ -399,13 +417,16 @@ public class Register implements Listener {
         }
         if ( condition.equalsIgnoreCase("valCompare") ||
                 condition.equalsIgnoreCase("valCompares") ||
-                condition.equalsIgnoreCase("compareValues") ||
-                condition.equalsIgnoreCase("compareValue")
+                condition.equalsIgnoreCase("lmcompareValues") ||
+                condition.equalsIgnoreCase("lmcompareValue")
         ) {
             e.register(new ValCompareCondition(config));
         }
         if ( condition.equalsIgnoreCase("itemInSlot") ) {
             e.register(new ItemInSlotCondition(config));
+        }
+        if ( condition.equalsIgnoreCase("ItemLore") ) {
+            e.register(new ItemLoreCondition(config));
         }
         if ( condition.equalsIgnoreCase("typeBuffStacks") || condition.equalsIgnoreCase("tBuffStacks") ) {
             e.register(new TypeBuffStacksCondition(config));
@@ -422,6 +443,23 @@ public class Register implements Listener {
         if ( condition.equalsIgnoreCase("isOnGlobalCooldown") || condition.equalsIgnoreCase("isOnGCD") || condition.equalsIgnoreCase("onGCD") ) {
             e.register(new IsOnGlobalCooldownCondition(e.getConfig()));
         }
+
+        // === IgaCustom conditions ===
+        if (condition.equalsIgnoreCase("cuboidCustom")) e.register(new CuboidCustomCondition(config.getLine(), config));
+        if (condition.equalsIgnoreCase("notHasAura")) e.register(new NotHasAuraCondition(config));
+        if (condition.equalsIgnoreCase("HasAttribute")) e.register(new HasAttributeCondition(config));
+        if (condition.equalsIgnoreCase("NearbyEntity")) e.register(new NearbyEntityCondition(config));
+        if (condition.equalsIgnoreCase("ChinChiroMenashi")) e.register(new ChinChiroMenashiCondition(config.getLine(), config));
+        if (condition.equalsIgnoreCase("HutagoAngelNearby")) e.register(new HutagoAngelNearbyCondition(config));
+        if (condition.equalsIgnoreCase("lmGamemode")) e.register(new GamemodeCondition(config));
+        if (condition.equalsIgnoreCase("Not")) e.register(new NotCondition(config));
+        if (condition.equalsIgnoreCase("And")) e.register(new AndCondition(config));
+        if (condition.equalsIgnoreCase("Or")) e.register(new OrCondition(config));
+        if (condition.equalsIgnoreCase("WorldNotInConfig")) e.register(new WorldNotInConfigCondition(config.getLine(), config));
+        if (condition.equalsIgnoreCase("ChinChiro456")) e.register(new ChinChiro456Condition(config.getLine(), config));
+        if (condition.equalsIgnoreCase("HealthCompare")) e.register(new HealthCompareCondition(config.getLine(), config));
+        if (condition.equalsIgnoreCase("WearingSlot")) e.register(new WearingSlotCondition(config.getLine(), config));
+        if (condition.equalsIgnoreCase("HasMythicItem")) e.register(new HasMythicItemCondition(config));
     }
 
     @EventHandler
@@ -440,6 +478,13 @@ public class Register implements Listener {
             CasterLuckPlaceholder.register(manager);
             PvELevelPlaceholder.register(manager);
             PotionLevelPlaceholder.register(manager);
+            ConfigStringPlaceholder.register(manager);
+            OriginLocationXPlaceholder.register(manager);
+            OriginLocationYPlaceholder.register(manager);
+            OriginLocationZPlaceholder.register(manager);
+            if (timerService != null && timerRepository != null) {
+                TimerElapsedPlaceholder.register(manager, timerService, timerRepository);
+            }
         });
     }
 
@@ -447,10 +492,22 @@ public class Register implements Listener {
     public void onMythicTargeterLoad(@NotNull MythicTargeterLoadEvent e) {
         String targeter = e.getTargeterName();
         // Existing targeters
-        if ( targeter.equalsIgnoreCase("Sphere") ) {
+        if ( targeter.equalsIgnoreCase("lmSphere") ) {
             e.register(new SphereTargeter(e.getContainer().getManager(), e.getConfig()));
         }
-        // TODO: IgaCustom targeters
+        // IgaCustom targeters
+        SkillExecutor executor = e.getContainer().getManager();
+        MythicLineConfig config = e.getConfig();
+        if (targeter.equalsIgnoreCase("lmringAroundOrigin")) e.register(new RingAroundOriginTargeter(executor, config));
+        if (targeter.equalsIgnoreCase("SummonsOfCaster")) e.register(new SummonsOfCasterTargeter(executor, config));
+        if (targeter.equalsIgnoreCase("DirectionalOffset")) e.register(new DirectionalOffsetTargeter(executor, config));
+        if (targeter.equalsIgnoreCase("PlayersInRadiusLimitVariable")) e.register(new PlayersInRadiusLimitVariableTargeter(executor, config));
+        if (targeter.equalsIgnoreCase("PlayersFacingCaster")) e.register(new PlayersFacingCasterTargeter(executor, config));
+        if (targeter.equalsIgnoreCase("AngleOffsetLocation")) e.register(new AngleOffsetLocationTargeter(executor, config));
+        if (targeter.equalsIgnoreCase("EntitiesNearOriginCustom")) e.register(new EntitiesNearOriginCustomTargeter(executor, config));
+        if (targeter.equalsIgnoreCase("RandomAroundCasterLocation")) e.register(new RandomAroundCasterLocationTargeter(executor, config));
+        if (targeter.equalsIgnoreCase("RandomOriginPoints")) e.register(new RandomOriginPointsTargeter(executor, config));
+        if (targeter.equalsIgnoreCase("LivingInRadiusCustom")) e.register(new LivingInRadiusCustomTargeter(executor, config));
     }
 
     @EventHandler

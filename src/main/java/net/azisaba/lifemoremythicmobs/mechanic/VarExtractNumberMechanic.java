@@ -40,3 +40,6 @@ public class VarExtractNumberMechanic extends SkillMechanic implements ITargeted
         return SkillResult.SUCCESS;
     }
 }
+
+
+

@@ -1,0 +1,42 @@
+server-override: ""
+
+igaConditions:
+  worldsNotInConfig:
+    worlds:
+      - onigokko
+    regions:
+      - cl_0
+
+effects-clear:
+  enabled: true
+  worlds:
+    - waveEvent
+    - onigokko
+  delay-ticks: 40
+  exclude-effects: []
+
+armorGuard:
+  enabled: true
+  armor:
+    o2_min_factor: 0.0
+    o2_max_factor: 3.0
+    negative_prod_to_zero: true
+    final_min: 0.0
+    final_max: 1000.0
+  armor_toughness:
+    o2_min_factor: 0.0
+    o2_max_factor: 3.0
+    negative_prod_to_zero: true
+    final_min: 0.0
+    final_max: 1000.0
+  period_check_ticks: 10
+  debug: false
+  players_only: true
+  safety:
+    tiny_prod_epsilon: 1.0E-6
+    huge_prod_cap: 1.0E6
+    o2_patch_abs_cap: 4.0
+    add_patch_abs_cap: 1000.0
+
+# Copy the existing IgaCustomMythicMobs database section here on the server.
+# Timer persistence is enabled automatically when this section is configured.

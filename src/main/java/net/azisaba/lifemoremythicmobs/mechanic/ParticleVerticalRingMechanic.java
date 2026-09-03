@@ -70,3 +70,6 @@ public class ParticleVerticalRingMechanic extends SkillMechanic implements ITarg
         return SkillResult.SUCCESS;
     }
 }
+
+
+

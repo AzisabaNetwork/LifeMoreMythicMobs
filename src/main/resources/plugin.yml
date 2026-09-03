@@ -10,6 +10,10 @@ commands:
   lmmm:
     aliases: [lmm]
     description: Main command of LifeMoreMythicMobs
+  itemattr:
+    description: Open attribute editor for main-hand item
+    usage: /itemattr
+    permission: itemattreditor.use
 
 permissions:
   lifemoremythicmobs.lmmm:
@@ -30,3 +34,5 @@ permissions:
   lifemoremythicmobs.command.stats:
     description: Allows use of /lmmm stats command
     default: true
+  itemattreditor.use:
+    default: op

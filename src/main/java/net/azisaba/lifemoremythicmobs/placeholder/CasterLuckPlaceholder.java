@@ -1,5 +1,7 @@
 package net.azisaba.lifemoremythicmobs.placeholder;
 
+import net.azisaba.lifemoremythicmobs.util.PlaceholderFactory;
+
 import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
 import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.core.skills.placeholders.Placeholder;
@@ -10,7 +12,7 @@ import org.bukkit.entity.LivingEntity;
 
 public class CasterLuckPlaceholder {
     public static void register(PlaceholderManager manager) {
-        manager.register("caster.luck", Placeholder.meta(((placeholderMeta, s) -> {
+        manager.register("caster.luck", PlaceholderFactory.meta(((placeholderMeta, s) -> {
             Entity entity = BukkitAdapter.adapt(placeholderMeta.getCaster().getEntity());
             if (entity instanceof LivingEntity) {
                 LivingEntity living = (LivingEntity) entity;

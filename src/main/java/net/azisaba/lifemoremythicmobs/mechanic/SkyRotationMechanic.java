@@ -70,3 +70,5 @@ public class SkyRotationMechanic extends SkillMechanic implements ITargetedEntit
         return SkillResult.SUCCESS;
     }
 }
+
+

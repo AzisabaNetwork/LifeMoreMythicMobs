@@ -49,3 +49,5 @@ public class GetItemNBTMechanic extends SkillMechanic implements ITargetedEntity
         return SkillResult.CONDITION_FAILED;
     }
 }
+
+
