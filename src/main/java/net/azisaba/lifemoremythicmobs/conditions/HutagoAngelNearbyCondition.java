@@ -28,6 +28,9 @@ public class HutagoAngelNearbyCondition extends SkillCondition implements ICaste
    }
 
    public boolean check(SkillCaster caster) {
+      if (Bukkit.isPrimaryThread()) {
+         return this.runCheckSync(caster);
+      }
       try {
          Future<Boolean> future = Bukkit.getScheduler().callSyncMethod(JavaPlugin.getPlugin(LifeMoreMythicMobs.class), () -> this.runCheckSync(caster));
          return future.get();

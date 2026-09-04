@@ -28,13 +28,7 @@ public final class AuraSkillHelper {
         Optional<Skill> maybeSkill = MythicBukkit.inst().getSkillManager().getSkill(skillName);
         maybeSkill.ifPresent(skill -> {
             SkillMetadata clone = data.deepClone();
-            Entity bukkitEntity = BukkitAdapter.adapt(target);
-            ActiveMob activeMob = MythicBukkit.inst().getMobManager().getMythicMobInstance(bukkitEntity);
-            if (activeMob != null) {
-                clone.setCaster(activeMob);
-            }
-            clone.setTrigger(target);
-            clone.setEntityTarget(target);
+            setMeta(clone, target);
             skill.execute(clone);
         });
     }

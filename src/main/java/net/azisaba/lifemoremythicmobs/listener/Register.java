@@ -112,7 +112,7 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("removeCustomAura") || mechanic.equalsIgnoreCase("removeCAura") ) {
             e.register(new RemoveCustomAuraMechanic(executor, config));
         }
-        if ( mechanic.equalsIgnoreCase("modifyPlayerAttribute") || mechanic.equalsIgnoreCase("modPAttribute") ) {
+        if ( mechanic.equalsIgnoreCase("modifyPlayerAttribute") || mechanic.equalsIgnoreCase("modPAttribute") || mechanic.equalsIgnoreCase("modPlayerAttribute") ) {
             e.register(new ModifyPlayerAttributeMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("MMLuckEval") ) {
@@ -231,7 +231,7 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("Rrraytrace") ) {
             e.register(new RrraytraceMechanic(executor, config));
         }
-        if ( mechanic.equalsIgnoreCase("ModifyAttribute") ) {
+        if ( mechanic.equalsIgnoreCase("ModifyAttribute") || mechanic.equalsIgnoreCase("modAttribute") ) {
             e.register(new ModifyAttributeMechanic(executor, config));
         }
         if ( mechanic.equalsIgnoreCase("SetItemLore") ) {
@@ -379,6 +379,9 @@ public class Register implements Listener {
     public void onMythicConditionLoad(@NotNull MythicConditionLoadEvent e) {
 
         String condition = e.getConditionName();
+        if (condition.startsWith("?")) {
+            condition = condition.substring(1).trim();
+        }
         MythicLineConfig config = e.getConfig();
 
         // === Existing LifeMore conditions ===
@@ -397,7 +400,7 @@ public class Register implements Listener {
         if ( condition.equalsIgnoreCase("lmHasItem") ) {
             e.register(new HasItemCondition(config));
         }
-        if ( condition.equalsIgnoreCase("lmBowTension") ) {
+        if ( condition.equalsIgnoreCase("lmBowTension") || condition.equalsIgnoreCase("bowTension") || condition.equalsIgnoreCase("bowshoottension") ) {
             e.register(new BowTensionCondition(config));
         }
         if ( condition.equalsIgnoreCase("lmPlayersInRadius") ) {
@@ -418,7 +421,9 @@ public class Register implements Listener {
         if ( condition.equalsIgnoreCase("valCompare") ||
                 condition.equalsIgnoreCase("valCompares") ||
                 condition.equalsIgnoreCase("lmcompareValues") ||
-                condition.equalsIgnoreCase("lmcompareValue")
+                condition.equalsIgnoreCase("lmcompareValue") ||
+                condition.equalsIgnoreCase("compareValues") ||
+                condition.equalsIgnoreCase("compareValue")
         ) {
             e.register(new ValCompareCondition(config));
         }
@@ -446,7 +451,7 @@ public class Register implements Listener {
 
         // === IgaCustom conditions ===
         if (condition.equalsIgnoreCase("cuboidCustom")) e.register(new CuboidCustomCondition(config.getLine(), config));
-        if (condition.equalsIgnoreCase("notHasAura")) e.register(new NotHasAuraCondition(config));
+        if (condition.equalsIgnoreCase("notHasAura") || condition.equalsIgnoreCase("nothasaura")) e.register(new NotHasAuraCondition(config));
         if (condition.equalsIgnoreCase("HasAttribute")) e.register(new HasAttributeCondition(config));
         if (condition.equalsIgnoreCase("NearbyEntity")) e.register(new NearbyEntityCondition(config));
         if (condition.equalsIgnoreCase("ChinChiroMenashi")) e.register(new ChinChiroMenashiCondition(config.getLine(), config));
@@ -458,8 +463,11 @@ public class Register implements Listener {
         if (condition.equalsIgnoreCase("WorldNotInConfig")) e.register(new WorldNotInConfigCondition(config.getLine(), config));
         if (condition.equalsIgnoreCase("ChinChiro456")) e.register(new ChinChiro456Condition(config.getLine(), config));
         if (condition.equalsIgnoreCase("HealthCompare")) e.register(new HealthCompareCondition(config.getLine(), config));
-        if (condition.equalsIgnoreCase("WearingSlot")) e.register(new WearingSlotCondition(config.getLine(), config));
-        if (condition.equalsIgnoreCase("HasMythicItem")) e.register(new HasMythicItemCondition(config));
+        if (condition.equalsIgnoreCase("WearingSlot") || condition.equalsIgnoreCase("wearing") || condition.equalsIgnoreCase("wearingslot")) e.register(new WearingSlotCondition(config.getLine(), config));
+        if (condition.equalsIgnoreCase("HasMythicItem") || condition.equalsIgnoreCase("hasmmitem") || condition.equalsIgnoreCase("hasitemcustom")) e.register(new HasMythicItemCondition(config));
+        if (condition.equalsIgnoreCase("warmup")) e.register(new WarmupCondition(config));
+        if (condition.equalsIgnoreCase("triggerwithin")) e.register(new TriggerWithinCondition(config, false));
+        if (condition.equalsIgnoreCase("triggernotwithin")) e.register(new TriggerWithinCondition(config, true));
     }
 
     @EventHandler
@@ -491,6 +499,9 @@ public class Register implements Listener {
     @EventHandler
     public void onMythicTargeterLoad(@NotNull MythicTargeterLoadEvent e) {
         String targeter = e.getTargeterName();
+        if (targeter.startsWith("@")) {
+            targeter = targeter.substring(1).trim();
+        }
         // Existing targeters
         if ( targeter.equalsIgnoreCase("lmSphere") ) {
             e.register(new SphereTargeter(e.getContainer().getManager(), e.getConfig()));
@@ -504,10 +515,10 @@ public class Register implements Listener {
         if (targeter.equalsIgnoreCase("PlayersInRadiusLimitVariable")) e.register(new PlayersInRadiusLimitVariableTargeter(executor, config));
         if (targeter.equalsIgnoreCase("PlayersFacingCaster")) e.register(new PlayersFacingCasterTargeter(executor, config));
         if (targeter.equalsIgnoreCase("AngleOffsetLocation")) e.register(new AngleOffsetLocationTargeter(executor, config));
-        if (targeter.equalsIgnoreCase("EntitiesNearOriginCustom")) e.register(new EntitiesNearOriginCustomTargeter(executor, config));
+        if (targeter.equalsIgnoreCase("EntitiesNearOriginCustom") || targeter.equalsIgnoreCase("ENOC")) e.register(new EntitiesNearOriginCustomTargeter(executor, config));
         if (targeter.equalsIgnoreCase("RandomAroundCasterLocation")) e.register(new RandomAroundCasterLocationTargeter(executor, config));
-        if (targeter.equalsIgnoreCase("RandomOriginPoints")) e.register(new RandomOriginPointsTargeter(executor, config));
-        if (targeter.equalsIgnoreCase("LivingInRadiusCustom")) e.register(new LivingInRadiusCustomTargeter(executor, config));
+        if (targeter.equalsIgnoreCase("RandomOriginPoints") || targeter.equalsIgnoreCase("rop") || targeter.equalsIgnoreCase("randomorigin")) e.register(new RandomOriginPointsTargeter(executor, config));
+        if (targeter.equalsIgnoreCase("LivingInRadiusCustom") || targeter.equalsIgnoreCase("livingEntitiesInRadiusCustom") || targeter.equalsIgnoreCase("entitiesInRadiusCustom") || targeter.equalsIgnoreCase("EIRC")) e.register(new LivingInRadiusCustomTargeter(executor, config));
     }
 
     @EventHandler

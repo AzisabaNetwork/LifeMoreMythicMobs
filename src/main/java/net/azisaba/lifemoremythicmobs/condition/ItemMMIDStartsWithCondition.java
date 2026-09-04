@@ -59,15 +59,11 @@ public class ItemMMIDStartsWithCondition extends SkillCondition implements IEnti
             item = inv.getItemInMainHand();
         }
 
-        if (item == null || item.getAmount() == 0) {
-            return false;
-        }
-
         if (item == null || item.getAmount() == 0 || item.getType().isAir()) {
             return false;
         }
         String mmid = MythicBukkit.inst().getItemManager().getMythicTypeFromItem(item);
-        if (mmid.isEmpty()) return false;
+        if (mmid == null || mmid.isEmpty()) return false;
 
         String checkID = this.ignoreCase ? mmid.toLowerCase() : mmid;
         String checkPrefix = this.ignoreCase ? this.prefix.toLowerCase() : this.prefix;

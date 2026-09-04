@@ -19,6 +19,9 @@ import io.lumine.mythic.api.skills.conditions.ISkillMetaComparisonCondition;
 import io.lumine.mythic.api.skills.conditions.ISkillMetaCondition;
 
 
+import io.lumine.mythic.core.skills.conditions.CustomCondition;
+import io.lumine.mythic.core.skills.conditions.InvalidCondition;
+
 public class NotCondition
    extends SkillCondition
    implements ISkillMetaCondition,
@@ -71,7 +74,10 @@ public class NotCondition
       }
    }
 
-   private static SkillCondition unwrap(SkillCondition c) {
+   private static Object unwrap(SkillCondition c) {
+      if (c instanceof CustomCondition cc) {
+         return cc.getCondition().orElse(null);
+      }
       return c;
    }
 
@@ -93,7 +99,9 @@ public class NotCondition
       if (this.inner == null) {
          return this.passOnError;
       } else {
-         SkillCondition ic = unwrap(this.inner);
+         Object ic = unwrap(this.inner);
+         if (ic == null) return this.passOnError;
+         if (ic instanceof InvalidCondition) return true;
          if (ic instanceof ISkillMetaCondition) {
             return this.not(((ISkillMetaCondition)ic).check(meta));
          } else if (ic instanceof ICasterCondition) {
@@ -110,7 +118,9 @@ public class NotCondition
       if (this.inner == null) {
          return this.passOnError;
       } else {
-         SkillCondition ic = unwrap(this.inner);
+         Object ic = unwrap(this.inner);
+         if (ic == null) return this.passOnError;
+         if (ic instanceof InvalidCondition) return true;
          if (ic instanceof ICasterCondition) {
             return this.not(((ICasterCondition)ic).check(caster));
          } else if (ic instanceof IEntityCondition) {
@@ -125,7 +135,9 @@ public class NotCondition
       if (this.inner == null) {
          return this.passOnError;
       } else {
-         SkillCondition ic = unwrap(this.inner);
+         Object ic = unwrap(this.inner);
+         if (ic == null) return this.passOnError;
+         if (ic instanceof InvalidCondition) return true;
          if (ic instanceof IEntityCondition) {
             return this.not(((IEntityCondition)ic).check(entity));
          } else {
@@ -138,8 +150,9 @@ public class NotCondition
       if (this.inner == null) {
          return this.passOnError;
       }
-
-      SkillCondition ic = unwrap(this.inner);
+      Object ic = unwrap(this.inner);
+      if (ic == null) return this.passOnError;
+      if (ic instanceof InvalidCondition) return true;
       return ic instanceof ILocationCondition ? this.not(((ILocationCondition)ic).check(loc)) : false;
    }
 
@@ -147,7 +160,9 @@ public class NotCondition
       if (this.inner == null) {
          return this.passOnError;
       } else {
-         SkillCondition ic = unwrap(this.inner);
+         Object ic = unwrap(this.inner);
+         if (ic == null) return this.passOnError;
+         if (ic instanceof InvalidCondition) return true;
          if (ic instanceof IEntityComparisonCondition) {
             return this.not(((IEntityComparisonCondition)ic).check(base, target));
          } else if (ic instanceof IEntityCondition) {
@@ -162,7 +177,9 @@ public class NotCondition
       if (this.inner == null) {
          return this.passOnError;
       } else {
-         SkillCondition ic = unwrap(this.inner);
+         Object ic = unwrap(this.inner);
+         if (ic == null) return this.passOnError;
+         if (ic instanceof InvalidCondition) return true;
          if (ic instanceof ILocationComparisonCondition) {
             return this.not(((ILocationComparisonCondition)ic).check(base, target));
          } else {
@@ -175,7 +192,9 @@ public class NotCondition
       if (this.inner == null) {
          return this.passOnError;
       } else {
-         SkillCondition ic = unwrap(this.inner);
+         Object ic = unwrap(this.inner);
+         if (ic == null) return this.passOnError;
+         if (ic instanceof InvalidCondition) return true;
          if (ic instanceof IEntityLocationComparisonCondition) {
             return this.not(((IEntityLocationComparisonCondition)ic).check(base, target));
          } else {
@@ -188,7 +207,9 @@ public class NotCondition
       if (this.inner == null) {
          return this.passOnError;
       } else {
-         SkillCondition ic = unwrap(this.inner);
+         Object ic = unwrap(this.inner);
+         if (ic == null) return this.passOnError;
+         if (ic instanceof InvalidCondition) return true;
          if (ic instanceof ISkillMetaComparisonCondition) {
             return this.not(((ISkillMetaComparisonCondition)ic).check(meta, target));
          } else {

@@ -16,7 +16,7 @@ public class NotHasAuraCondition extends SkillCondition implements IEntityCondit
    }
 
    public boolean check(AbstractEntity target) {
-      return target != null && !this.auraName.isEmpty()
+      return target != null && this.auraName != null && !this.auraName.isEmpty()
          ? !getPlugin().getSkillManager().getAuraManager().getAuraRegistry(target).hasAura(this.auraName)
          : false;
    }
