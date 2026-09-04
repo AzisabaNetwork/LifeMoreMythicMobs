@@ -52,7 +52,8 @@ public class ItemUtil {
             return registry.getString(name);
         }
         if (varName.startsWith("target.")) {
-            VariableRegistry registry = MythicBukkit.inst().getVariableManager().getRegistry(VariableScope.CASTER, skillMetadata, skillMetadata.getTrigger());
+            if (skillMetadata.getTrigger() == null) return null;
+            VariableRegistry registry = MythicBukkit.inst().getVariableManager().getRegistry(VariableScope.TARGET, skillMetadata, skillMetadata.getTrigger());
             String name = varName.startsWith("target.var.") ? varName.substring("target.var.".length()) : varName.substring("target.".length());
             return registry.getString(name);
         }
@@ -76,7 +77,8 @@ public class ItemUtil {
             registry.putString(name, value);
         }
         if (varName.startsWith("target.")) {
-            VariableRegistry registry = MythicBukkit.inst().getVariableManager().getRegistry(VariableScope.CASTER, skillMetadata, skillMetadata.getTrigger());
+            if (skillMetadata.getTrigger() == null) return;
+            VariableRegistry registry = MythicBukkit.inst().getVariableManager().getRegistry(VariableScope.TARGET, skillMetadata, skillMetadata.getTrigger());
             String name = varName.startsWith("target.var.") ? varName.substring("target.var.".length()) : varName.substring("target.".length());
             registry.putString(name, value);
         }

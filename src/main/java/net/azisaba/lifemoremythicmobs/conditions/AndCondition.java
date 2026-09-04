@@ -15,6 +15,7 @@ import io.lumine.mythic.api.skills.conditions.ILocationComparisonCondition;
 import io.lumine.mythic.api.skills.conditions.ILocationCondition;
 import io.lumine.mythic.api.skills.conditions.ISkillMetaComparisonCondition;
 import io.lumine.mythic.api.skills.conditions.ISkillMetaCondition;
+import io.lumine.mythic.core.skills.conditions.CustomCondition;
 import io.lumine.mythic.core.skills.conditions.InvalidCondition;
 
 import java.util.function.Supplier;
@@ -90,7 +91,10 @@ public class AndCondition
       return this.passOnError;
    }
 
-   private static SkillCondition unwrap(SkillCondition c) {
+   private static Object unwrap(SkillCondition c) {
+      if (c instanceof CustomCondition cc) {
+         return cc.getCondition().orElse(null);
+      }
       return c;
    }
 
@@ -98,8 +102,10 @@ public class AndCondition
       if (sc == null) {
          return this.failPolicy();
       } else {
-         SkillCondition c = unwrap(sc);
-         if (c instanceof InvalidCondition) {
+         Object c = unwrap(sc);
+         if (c == null) {
+            return this.failPolicy();
+         } else if (c instanceof InvalidCondition) {
             return true;
          } else if (c instanceof ISkillMetaCondition) {
             return ((ISkillMetaCondition)c).check(meta);
@@ -117,8 +123,10 @@ public class AndCondition
       if (sc == null) {
          return this.failPolicy();
       } else {
-         SkillCondition c = unwrap(sc);
-         if (c instanceof InvalidCondition) {
+         Object c = unwrap(sc);
+         if (c == null) {
+            return this.failPolicy();
+         } else if (c instanceof InvalidCondition) {
             return true;
          } else if (c instanceof ICasterCondition) {
             return ((ICasterCondition)c).check(caster);
@@ -134,8 +142,10 @@ public class AndCondition
       if (sc == null) {
          return this.failPolicy();
       } else {
-         SkillCondition c = unwrap(sc);
-         if (c instanceof InvalidCondition) {
+         Object c = unwrap(sc);
+         if (c == null) {
+            return this.failPolicy();
+         } else if (c instanceof InvalidCondition) {
             return true;
          } else if (c instanceof IEntityCondition) {
             return ((IEntityCondition)c).check(e);
@@ -149,8 +159,10 @@ public class AndCondition
       if (sc == null) {
          return this.failPolicy();
       } else {
-         SkillCondition c = unwrap(sc);
-         if (c instanceof InvalidCondition) {
+         Object c = unwrap(sc);
+         if (c == null) {
+            return this.failPolicy();
+         } else if (c instanceof InvalidCondition) {
             return true;
          } else {
             return c instanceof ILocationCondition ? ((ILocationCondition)c).check(l) : false;
@@ -162,8 +174,10 @@ public class AndCondition
       if (sc == null) {
          return this.failPolicy();
       } else {
-         SkillCondition c = unwrap(sc);
-         if (c instanceof InvalidCondition) {
+         Object c = unwrap(sc);
+         if (c == null) {
+            return this.failPolicy();
+         } else if (c instanceof InvalidCondition) {
             return true;
          } else if (c instanceof IEntityComparisonCondition) {
             return ((IEntityComparisonCondition)c).check(base, target);
@@ -179,8 +193,10 @@ public class AndCondition
       if (sc == null) {
          return this.failPolicy();
       } else {
-         SkillCondition c = unwrap(sc);
-         if (c instanceof InvalidCondition) {
+         Object c = unwrap(sc);
+         if (c == null) {
+            return this.failPolicy();
+         } else if (c instanceof InvalidCondition) {
             return true;
          } else if (c instanceof ILocationComparisonCondition) {
             return ((ILocationComparisonCondition)c).check(base, target);
@@ -194,8 +210,10 @@ public class AndCondition
       if (sc == null) {
          return this.failPolicy();
       } else {
-         SkillCondition c = unwrap(sc);
-         if (c instanceof InvalidCondition) {
+         Object c = unwrap(sc);
+         if (c == null) {
+            return this.failPolicy();
+         } else if (c instanceof InvalidCondition) {
             return true;
          } else if (c instanceof IEntityLocationComparisonCondition) {
             return ((IEntityLocationComparisonCondition)c).check(base, target);
@@ -209,8 +227,10 @@ public class AndCondition
       if (sc == null) {
          return this.failPolicy();
       } else {
-         SkillCondition c = unwrap(sc);
-         if (c instanceof InvalidCondition) {
+         Object c = unwrap(sc);
+         if (c == null) {
+            return this.failPolicy();
+         } else if (c instanceof InvalidCondition) {
             return true;
          } else if (c instanceof ISkillMetaComparisonCondition) {
             return ((ISkillMetaComparisonCondition)c).check(meta, target);

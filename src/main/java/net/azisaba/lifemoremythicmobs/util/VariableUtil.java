@@ -24,39 +24,38 @@ public class VariableUtil {
             variableName = variableName.substring("var.".length());
          }
 
-         String registry = scopeString;
-         VariableScope scope;
+          VariableScope scope;
          switch (scopeString.hashCode()) {
             case -1367559124:
-               if (!registry.equals("caster")) {
+               if (!scopeString.equals("caster")) {
                   return false;
                }
 
                scope = VariableScope.CASTER;
                break;
             case -1243020381:
-               if (!registry.equals("global")) {
+               if (!scopeString.equals("global")) {
                   return false;
                }
 
                scope = VariableScope.GLOBAL;
                break;
             case -880905839:
-               if (!registry.equals("target")) {
+               if (!scopeString.equals("target")) {
                   return false;
                }
 
                scope = VariableScope.TARGET;
                break;
             case 109496913:
-               if (!registry.equals("skill")) {
+               if (!scopeString.equals("skill")) {
                   return false;
                }
 
                scope = VariableScope.SKILL;
                break;
             case 113318802:
-               if (registry.equals("world")) {
+               if (scopeString.equals("world")) {
                   scope = VariableScope.WORLD;
                   break;
                }

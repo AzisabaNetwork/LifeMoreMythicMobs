@@ -7,11 +7,12 @@ import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.items.ItemManager;
 import io.lumine.mythic.core.items.MythicItem;
 import io.lumine.mythic.core.skills.SkillCondition;
+import io.lumine.mythic.api.skills.conditions.IEntityCondition;
 import io.lumine.mythic.core.utils.jnbt.CompoundTag;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-public class HasMythicItemCondition extends SkillCondition {
+public class HasMythicItemCondition extends SkillCondition implements IEntityCondition {
    private final String itemName;
    private final int amount;
 
@@ -21,6 +22,7 @@ public class HasMythicItemCondition extends SkillCondition {
       this.amount = config.getInteger("amount", 1);
    }
 
+   @Override
    public boolean check(AbstractEntity entity) {
       if (!entity.isPlayer()) {
          return false;

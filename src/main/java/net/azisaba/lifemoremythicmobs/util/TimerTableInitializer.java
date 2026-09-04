@@ -1,5 +1,6 @@
 package net.azisaba.lifemoremythicmobs.util;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class TimerTableInitializer {
@@ -17,16 +18,16 @@ public class TimerTableInitializer {
 
    private static void createMySql() throws SQLException {
       String sql = "CREATE TABLE IF NOT EXISTS player_time_measure ( uuid VARCHAR(36) NOT NULL, purpose VARCHAR(64) NOT NULL, mcid VARCHAR(16) NOT NULL, elapsed_sec INT NOT NULL, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (uuid, purpose))";
-      DBConnector.runPrepareStatement(sql, ps -> ps.execute());
+      DBConnector.runPrepareStatement(sql, PreparedStatement::execute);
    }
 
    private static void createSqlite() throws SQLException {
       String sql = "CREATE TABLE IF NOT EXISTS player_time_measure ( uuid TEXT NOT NULL, purpose TEXT NOT NULL, mcid TEXT NOT NULL, elapsed_sec INTEGER NOT NULL, updated_at TEXT NOT NULL, PRIMARY KEY (uuid, purpose))";
-      DBConnector.runPrepareStatement(sql, ps -> ps.execute());
+      DBConnector.runPrepareStatement(sql, PreparedStatement::execute);
    }
 
    public static void dropAndCreate(String jdbcUrl) throws SQLException {
-      DBConnector.runPrepareStatement("DROP TABLE IF EXISTS player_time_measure", ps -> ps.execute());
+      DBConnector.runPrepareStatement("DROP TABLE IF EXISTS player_time_measure", PreparedStatement::execute);
       createIfNotExists(jdbcUrl);
    }
 }

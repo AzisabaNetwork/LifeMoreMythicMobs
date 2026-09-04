@@ -23,8 +23,9 @@ public class VarNotEqualsCondition extends SkillCondition implements ISkillMetaC
 
     @Override
     public boolean check(SkillMetadata skillMetadata) {
+        if (varName == null) return false;
         String actualValue =
-                value.startsWith("<") && value.endsWith(">")
+                value != null && value.startsWith("<") && value.endsWith(">")
                         ? ItemUtil.resolveVariable(skillMetadata, value.substring(1, value.length() - 1))
                         : value;
         String varValue = ItemUtil.resolveVariable(skillMetadata, varName);

@@ -19,6 +19,9 @@ import io.lumine.mythic.api.skills.conditions.ISkillMetaComparisonCondition;
 import io.lumine.mythic.api.skills.conditions.ISkillMetaCondition;
 
 
+import io.lumine.mythic.core.skills.conditions.CustomCondition;
+import io.lumine.mythic.core.skills.conditions.InvalidCondition;
+
 public class NotCondition
    extends SkillCondition
    implements ISkillMetaCondition,
@@ -71,7 +74,10 @@ public class NotCondition
       }
    }
 
-   private static SkillCondition unwrap(SkillCondition c) {
+   private static Object unwrap(SkillCondition c) {
+      if (c instanceof CustomCondition cc) {
+         return cc.getCondition().orElse(null);
+      }
       return c;
    }
 
@@ -100,7 +106,9 @@ public class NotCondition
       if (this.inner == null) {
          return this.passOnError;
       } else {
-         SkillCondition ic = unwrap(this.inner);
+         Object ic = unwrap(this.inner);
+         if (ic == null) return this.passOnError;
+         if (ic instanceof InvalidCondition) return true;
          if (ic instanceof ICasterCondition) {
             return this.not(((ICasterCondition)ic).check(caster));
          } else if (ic instanceof IEntityCondition) {
@@ -122,7 +130,6 @@ public class NotCondition
       if (this.inner == null) {
          return this.passOnError;
       }
-
       return this.not(this.inner.evaluateLocation(loc));
    }
 
@@ -137,7 +144,9 @@ public class NotCondition
       if (this.inner == null) {
          return this.passOnError;
       }
-      SkillCondition ic = unwrap(this.inner);
+      Object ic = unwrap(this.inner);
+      if (ic == null) return this.passOnError;
+      if (ic instanceof InvalidCondition) return true;
       if (ic instanceof ILocationComparisonCondition) {
          return this.not(((ILocationComparisonCondition)ic).check(base, target));
       }
@@ -158,6 +167,5 @@ public class NotCondition
       return this.not(this.inner.evaluateToEntity(meta, target));
    }
 }
-
 
 

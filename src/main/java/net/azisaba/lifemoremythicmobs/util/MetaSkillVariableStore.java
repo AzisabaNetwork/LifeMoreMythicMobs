@@ -103,16 +103,6 @@ public class MetaSkillVariableStore {
             Map<String, String> m = BY_WORLD.get(worldKey);
             return Optional.ofNullable(m == null ? null : m.get(varName));
          }
-         case CASTER:
-         default: {
-            UUID id = data.getCaster() != null ? data.getCaster().getEntity().getUniqueId() : null;
-            if (id == null) {
-               return Optional.empty();
-            }
-
-            Map<String, String> m = BY_ENTITY.get(id);
-            return Optional.ofNullable(m == null ? null : m.get(varName));
-         }
          case TARGET: {
             AbstractEntity t = resolveTarget(data, preferTarget);
             if (t == null) {
@@ -126,6 +116,16 @@ public class MetaSkillVariableStore {
             Map<String, String> m = BY_SKILL.get(data);
             return Optional.ofNullable(m == null ? null : m.get(varName));
          }
+          case CASTER:
+          default: {
+              UUID id = data.getCaster() != null ? data.getCaster().getEntity().getUniqueId() : null;
+              if (id == null) {
+                  return Optional.empty();
+              }
+
+              Map<String, String> m = BY_ENTITY.get(id);
+              return Optional.ofNullable(m == null ? null : m.get(varName));
+          }
       }
    }
 

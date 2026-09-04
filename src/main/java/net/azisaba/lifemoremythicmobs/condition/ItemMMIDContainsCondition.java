@@ -62,7 +62,7 @@ public class ItemMMIDContainsCondition extends SkillCondition implements IEntity
             return false;
         }
         String mmid = MythicBukkit.inst().getItemManager().getMythicTypeFromItem(item);
-        if (mmid.isEmpty()) return false;
+        if (mmid == null || mmid.isEmpty()) return false;
 
         String checkID = this.ignoreCase ? mmid.toLowerCase() : mmid;
         String checkContains = this.ignoreCase ? this.contains.toLowerCase() : this.contains;

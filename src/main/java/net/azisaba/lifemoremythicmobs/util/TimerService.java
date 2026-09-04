@@ -108,12 +108,11 @@ public class TimerService {
             return true;
          }
 
-         if (!(o instanceof TimerService.TimerKey)) {
+         if (!(o instanceof TimerKey other)) {
             return false;
          }
 
-         TimerService.TimerKey other = (TimerService.TimerKey)o;
-         return Objects.equals(this.uuid, other.uuid) && Objects.equals(this.purpose, other.purpose);
+          return Objects.equals(this.uuid, other.uuid) && Objects.equals(this.purpose, other.purpose);
       }
 
       @Override

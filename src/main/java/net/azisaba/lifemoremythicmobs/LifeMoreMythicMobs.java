@@ -50,7 +50,7 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
         if (!Objects.requireNonNull(getConfig().getString("server-override", "")).isEmpty()) {
             server = getConfig().getString("server-override", "");
         }
-        // Safely obtain and register the root command; avoid crashing on missing command definition
+        // Safely get and register the root command; avoid crashing on missing command definition
         PluginCommand root = getCommand("lmmm");
         if (root == null) {
             getLogger().severe("Command 'lmmm' is not defined in plugin.yml or failed to load. Disabling plugin to avoid errors.");
@@ -95,7 +95,7 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
 
         List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
         if (!players.isEmpty()) {
-            fetchServer(players.get(0));
+            fetchServer(players.getFirst());
         }
     }
 

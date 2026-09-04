@@ -4,14 +4,17 @@ import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.conditions.IEntityCondition;
 import io.lumine.mythic.api.skills.conditions.IEntityLocationComparisonCondition;
+import io.lumine.mythic.api.skills.conditions.ILocationCondition;
+import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
 import io.lumine.mythic.core.skills.SkillCondition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-public class CuboidCustomCondition extends SkillCondition implements IEntityLocationComparisonCondition {
+public class CuboidCustomCondition extends SkillCondition implements IEntityLocationComparisonCondition, IEntityCondition, ILocationCondition {
    private final PlaceholderString p1Raw;
    private final PlaceholderString p2Raw;
    private final String worldRaw;
@@ -25,6 +28,12 @@ public class CuboidCustomCondition extends SkillCondition implements IEntityLoca
 
    @Override
    public boolean check(AbstractEntity target, AbstractLocation location) {
+      return check(target);
+   }
+
+   @Override
+   public boolean check(AbstractEntity target) {
+      if (target == null || target.getBukkitEntity() == null) return false;
       String parsedP1 = this.p1Raw.get(target);
       String parsedP2 = this.p2Raw.get(target);
       World world = this.getTargetWorld(target);
@@ -32,6 +41,21 @@ public class CuboidCustomCondition extends SkillCondition implements IEntityLoca
       Location loc2 = this.parseLocation(parsedP2, world);
       Location targetLoc = target.getBukkitEntity().getLocation();
       return loc1 != null && loc2 != null && this.isWithinCuboid(targetLoc, loc1, loc2);
+   }
+
+   @Override
+   public boolean check(AbstractLocation location) {
+      if (location == null) return false;
+      Location targetLoc = BukkitAdapter.adapt(location);
+      World world = targetLoc != null ? targetLoc.getWorld() : null;
+      if (this.worldRaw != null) {
+         world = Bukkit.getWorld(this.worldRaw);
+      }
+      String parsedP1 = this.p1Raw.get();
+      String parsedP2 = this.p2Raw.get();
+      Location loc1 = this.parseLocation(parsedP1, world);
+      Location loc2 = this.parseLocation(parsedP2, world);
+      return targetLoc != null && loc1 != null && loc2 != null && this.isWithinCuboid(targetLoc, loc1, loc2);
    }
 
    private Location parseLocation(String input, World world) {
