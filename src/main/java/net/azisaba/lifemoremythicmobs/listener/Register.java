@@ -519,6 +519,22 @@ public class Register implements Listener {
         if (targeter.equalsIgnoreCase("RandomAroundCasterLocation")) e.register(new RandomAroundCasterLocationTargeter(executor, config));
         if (targeter.equalsIgnoreCase("RandomOriginPoints") || targeter.equalsIgnoreCase("rop") || targeter.equalsIgnoreCase("randomorigin")) e.register(new RandomOriginPointsTargeter(executor, config));
         if (targeter.equalsIgnoreCase("LivingInRadiusCustom") || targeter.equalsIgnoreCase("livingEntitiesInRadiusCustom") || targeter.equalsIgnoreCase("entitiesInRadiusCustom") || targeter.equalsIgnoreCase("EIRC")) e.register(new LivingInRadiusCustomTargeter(executor, config));
+        if (targeter.equalsIgnoreCase("~onAttack") || targeter.equalsIgnoreCase("onAttack")) {
+            e.register(new io.lumine.mythic.core.skills.targeters.IEntitySelector(executor, config) {
+                @Override
+                public java.util.HashSet<io.lumine.mythic.api.adapters.AbstractEntity> getEntities(io.lumine.mythic.api.skills.SkillMetadata data) {
+                    java.util.HashSet<io.lumine.mythic.api.adapters.AbstractEntity> targets = new java.util.HashSet<>();
+                    if (data != null) {
+                        if (data.getTrigger() != null) {
+                            targets.add(data.getTrigger());
+                        } else if (data.getCaster() != null && data.getCaster().getEntity() != null) {
+                            targets.add(data.getCaster().getEntity());
+                        }
+                    }
+                    return targets;
+                }
+            });
+        }
     }
 
     @EventHandler
