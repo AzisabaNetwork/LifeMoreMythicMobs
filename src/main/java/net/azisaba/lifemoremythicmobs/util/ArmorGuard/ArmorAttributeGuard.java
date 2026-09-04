@@ -75,11 +75,11 @@ public class ArmorAttributeGuard {
             this.guardAttribute(
                e,
                Attribute.ARMOR_TOUGHNESS,
-               this.settings.armor.o2Min,
-               this.settings.armor.o2Max,
-               this.settings.armor.negativeToZero,
-               this.settings.armor.finalMin,
-               this.settings.armor.finalMax
+               this.settings.toughness.o2Min,
+               this.settings.toughness.o2Max,
+               this.settings.toughness.negativeToZero,
+               this.settings.toughness.finalMin,
+               this.settings.toughness.finalMax
             );
          }
       }
@@ -207,7 +207,7 @@ public class ArmorAttributeGuard {
    }
 
    private static double sumAmount(Collection<AttributeModifier> mods) {
-      double s = 1.0;
+      double s = 0.0;
 
       for (AttributeModifier m : mods) {
          s += m.getAmount();

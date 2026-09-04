@@ -92,18 +92,8 @@ public class NotCondition
    public boolean check(SkillMetadata meta) {
       if (this.inner == null) {
          return this.passOnError;
-      } else {
-         SkillCondition ic = unwrap(this.inner);
-         if (ic instanceof ISkillMetaCondition) {
-            return this.not(((ISkillMetaCondition)ic).check(meta));
-         } else if (ic instanceof ICasterCondition) {
-            return this.not(((ICasterCondition)ic).check(meta.getCaster()));
-         } else if (ic instanceof IEntityCondition) {
-            return this.not(((IEntityCondition)ic).check(meta.getCaster().getEntity()));
-         } else {
-            return ic instanceof ILocationCondition ? this.not(((ILocationCondition)ic).check(meta.getCaster().getLocation())) : false;
-         }
       }
+      return this.not(this.inner.evaluateCaster(meta));
    }
 
    public boolean check(SkillCaster caster) {
@@ -124,14 +114,8 @@ public class NotCondition
    public boolean check(AbstractEntity entity) {
       if (this.inner == null) {
          return this.passOnError;
-      } else {
-         SkillCondition ic = unwrap(this.inner);
-         if (ic instanceof IEntityCondition) {
-            return this.not(((IEntityCondition)ic).check(entity));
-         } else {
-            return ic instanceof ILocationCondition ? this.not(((ILocationCondition)ic).check(entity.getLocation())) : false;
-         }
       }
+      return this.not(this.inner.evaluateEntity(entity));
    }
 
    public boolean check(AbstractLocation loc) {
@@ -139,62 +123,39 @@ public class NotCondition
          return this.passOnError;
       }
 
-      SkillCondition ic = unwrap(this.inner);
-      return ic instanceof ILocationCondition ? this.not(((ILocationCondition)ic).check(loc)) : false;
+      return this.not(this.inner.evaluateLocation(loc));
    }
 
    public boolean check(AbstractEntity base, AbstractEntity target) {
       if (this.inner == null) {
          return this.passOnError;
-      } else {
-         SkillCondition ic = unwrap(this.inner);
-         if (ic instanceof IEntityComparisonCondition) {
-            return this.not(((IEntityComparisonCondition)ic).check(base, target));
-         } else if (ic instanceof IEntityCondition) {
-            return this.not(((IEntityCondition)ic).check(target));
-         } else {
-            return ic instanceof ILocationCondition ? this.not(((ILocationCondition)ic).check(target.getLocation())) : false;
-         }
       }
+      return this.not(this.inner.evaluateToEntity(base, target));
    }
 
    public boolean check(AbstractLocation base, AbstractLocation target) {
       if (this.inner == null) {
          return this.passOnError;
-      } else {
-         SkillCondition ic = unwrap(this.inner);
-         if (ic instanceof ILocationComparisonCondition) {
-            return this.not(((ILocationComparisonCondition)ic).check(base, target));
-         } else {
-            return ic instanceof ILocationCondition ? this.not(((ILocationCondition)ic).check(target)) : false;
-         }
       }
+      SkillCondition ic = unwrap(this.inner);
+      if (ic instanceof ILocationComparisonCondition) {
+         return this.not(((ILocationComparisonCondition)ic).check(base, target));
+      }
+      return ic instanceof ILocationCondition && this.not(((ILocationCondition)ic).check(target));
    }
 
    public boolean check(AbstractEntity base, AbstractLocation target) {
       if (this.inner == null) {
          return this.passOnError;
-      } else {
-         SkillCondition ic = unwrap(this.inner);
-         if (ic instanceof IEntityLocationComparisonCondition) {
-            return this.not(((IEntityLocationComparisonCondition)ic).check(base, target));
-         } else {
-            return ic instanceof ILocationCondition ? this.not(((ILocationCondition)ic).check(target)) : false;
-         }
       }
+      return this.not(this.inner.evaluateToLocation(base, target));
    }
 
    public boolean check(SkillMetadata meta, AbstractEntity target) {
       if (this.inner == null) {
          return this.passOnError;
-      } else {
-         SkillCondition ic = unwrap(this.inner);
-         if (ic instanceof ISkillMetaComparisonCondition) {
-            return this.not(((ISkillMetaComparisonCondition)ic).check(meta, target));
-         } else {
-            return ic instanceof IEntityCondition ? this.not(((IEntityCondition)ic).check(target)) : false;
-         }
       }
+      return this.not(this.inner.evaluateToEntity(meta, target));
    }
 }
 

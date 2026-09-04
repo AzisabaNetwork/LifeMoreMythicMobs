@@ -24,7 +24,8 @@ public class OnAttackExtendMechanic extends OnAttackMechanic {
    }
 
    private double calculateDamage(SkillMetadata meta, AbstractEntity target, double baseDamage) {
-      return (baseDamage + this.damageAdd.get(meta, target)) * this.damageMult.get(meta, target);
+      double result = (baseDamage + this.damageAdd.get(meta, target)) * this.damageMult.get(meta, target);
+      return Double.isFinite(result) ? result : 0.0D;
    }
 
    public SkillResult castAtEntity(SkillMetadata data, AbstractEntity target) {
@@ -45,7 +46,7 @@ public class OnAttackExtendMechanic extends OnAttackMechanic {
                .filter(ev -> ev.getDamager().getUniqueId().equals(((AbstractEntity)this.entity.get()).getUniqueId()))
                .filter(ev -> {
                   Optional<Object> md = BukkitAdapter.adapt(ev.getDamager()).getMetadata("doing-skill-damage");
-                  return md.<Boolean>map(o -> !(Boolean)o).orElse(true);
+                  return md.map(o -> !(o instanceof Boolean value) || !value).orElse(true);
                })
                .handler(ev -> {
                   SkillMetadata meta = this.skillMetadata.deepClone();

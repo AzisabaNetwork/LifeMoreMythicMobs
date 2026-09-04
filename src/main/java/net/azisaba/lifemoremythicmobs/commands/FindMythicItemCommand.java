@@ -42,7 +42,10 @@ public class FindMythicItemCommand extends SubCommand {
             return;
         }
         player.sendMessage(LegacyText.YELLOW + "アイテムを検索しています...");
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        // MythicItem generation and Bukkit ItemMeta access are not thread-safe.
+        // Keep the scan on the server thread; running this asynchronously caused API calls and
+        // MythicMobs warnings to originate from a Craft Scheduler worker.
+        Bukkit.getScheduler().runTask(plugin, () -> {
             List<MythicItem> matchedItems = new ArrayList<>();
             Collection<MythicItem> allItems = MythicBukkit.inst().getItemManager().getItems();
             for (MythicItem mmItem : allItems) {
@@ -113,9 +116,7 @@ public class FindMythicItemCommand extends SubCommand {
                     matchedItems.add(mmItem);
                 }
             }
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                sendResult(player, matchedItems);
-            });
+            sendResult(player, matchedItems);
         });
     }
 

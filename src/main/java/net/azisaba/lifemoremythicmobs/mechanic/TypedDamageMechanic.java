@@ -80,6 +80,11 @@ public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEn
             base *= multiplier;
         }
 
+        // Preserve every finite 1.15.2 result, but never pass NaN/Infinity into MM/Bukkit.
+        if (!Double.isFinite(base)) {
+            base = 0.0D;
+        }
+
         if (resolvedElement != null && !resolvedElement.isEmpty()) {
             data.getVariables().putString("damage-type", resolvedElement);
         }
