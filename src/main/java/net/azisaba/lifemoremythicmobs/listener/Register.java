@@ -430,6 +430,9 @@ public class Register implements Listener {
         if ( condition.equalsIgnoreCase("itemInSlot") ) {
             e.register(new ItemInSlotCondition(config));
         }
+        if ( condition.equalsIgnoreCase("horoloItemInSlot") || condition.equalsIgnoreCase("hItemInSlot") ) {
+            e.register(new HoroloItemInSlotCondition(config));
+        }
         if ( condition.equalsIgnoreCase("ItemLore") ) {
             e.register(new ItemLoreCondition(config));
         }

@@ -4,6 +4,7 @@ main: net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs
 api-version: 1.21
 
 depend: [MythicMobs]
+softdepend: [HoroloCore]
 
 commands:
   lmmm:
