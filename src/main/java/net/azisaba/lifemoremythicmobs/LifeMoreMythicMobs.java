@@ -13,6 +13,7 @@ import net.azisaba.lifemoremythicmobs.listener.Register;
 import net.azisaba.lifemoremythicmobs.listener.DailyScoreResetter;
 import net.azisaba.lifemoremythicmobs.listener.EquipLockListener;
 import net.azisaba.lifemoremythicmobs.listener.KillMessageDamageListener;
+import net.azisaba.lifemoremythicmobs.listener.LegacyDamageModifiersListener;
 import net.azisaba.lifemoremythicmobs.listener.WorldChangeRemovePotionEffectListener;
 import net.azisaba.lifemoremythicmobs.mechanic.ModifyPlayerAttributeMechanic;
 import net.azisaba.lifemoremythicmobs.util.ArmorGuard.ArmorAttributeGuard;
@@ -73,6 +74,7 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
         getServer().getPluginManager().registerEvents(gui, this);
         getServer().getPluginManager().registerEvents(new WorldChangeRemovePotionEffectListener(this), this);
         getServer().getPluginManager().registerEvents(new KillMessageDamageListener(this), this);
+        getServer().getPluginManager().registerEvents(new LegacyDamageModifiersListener(), this);
         getServer().getPluginManager().registerEvents(new CharReorderGuiListener(), this);
         getServer().getPluginManager().registerEvents(new EquipLockListener(), this);
         Bukkit.getScheduler().runTask(this, Register::reloadPlaceholders);
