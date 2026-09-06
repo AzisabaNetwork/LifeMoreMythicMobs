@@ -37,8 +37,11 @@ public class PersistentZoneMechanic extends SkillMechanic implements ITargetedLo
         this.onStartSkill = config.getString(new String[]{"onStart", "oS"}, null);
         this.onTickSkill = config.getString(new String[]{"onTick", "oT"}, null);
         this.onEndSkill = config.getString(new String[]{"onEnd", "oE"}, null);
-        this.onEnterSkill = config.getString(new String[]{"onEnter", "oe", "oEn"}, null);
-        this.onStaySkill = config.getString(new String[]{"onStay", "os", "oSt"}, null);
+        // MythicMobs 5.x treats config keys case-insensitively. The old `oe` and
+        // `os` aliases therefore collide with onEnd (`oE`) and onStart (`oS`).
+        // Keep the unambiguous 5.x shorthands used by existing skill configs.
+        this.onEnterSkill = config.getString(new String[]{"onEnter", "oEn"}, null);
+        this.onStaySkill = config.getString(new String[]{"onStay", "oSt"}, null);
         this.onLeaveSkill = config.getString(new String[]{"onLeave", "ol"}, null);
         this.radius = config.getDouble(new String[]{"radius", "r"}, 5.0);
         this.duration = config.getInteger(new String[]{"duration", "d"}, 100);
