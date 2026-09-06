@@ -2,7 +2,9 @@ package net.azisaba.lifemoremythicmobs.condition;
 
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.conditions.IEntityCondition;
+import io.lumine.mythic.api.skills.conditions.ISkillMetaCondition;
 import io.lumine.mythic.core.skills.SkillCondition;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-public final class HoroloItemInSlotCondition extends SkillCondition implements IEntityCondition {
+public final class HoroloItemInSlotCondition extends SkillCondition implements IEntityCondition, ISkillMetaCondition {
   private final String mmid, operator;
   private final int required;
   private final boolean invert;
@@ -39,6 +41,16 @@ public final class HoroloItemInSlotCondition extends SkillCondition implements I
       default -> found >= required;
     };
     return invert != result;
+  }
+
+  /**
+   * Evaluates regular inline conditions ({@code ?horoloItemInSlot{...}})
+   * against the skill caster. IEntityCondition remains implemented so the
+   * condition can still be used explicitly as a target condition.
+   */
+  @Override
+  public boolean check(SkillMetadata metadata) {
+    return check(metadata.getCaster().getEntity());
   }
 
   private int count(Player player) {
