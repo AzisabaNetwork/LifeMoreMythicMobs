@@ -166,6 +166,9 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("typeDamage") || mechanic.equalsIgnoreCase("tDamage") ) {
             e.register(new TypedDamageMechanic(executor, config));
         }
+        if ( mechanic.equalsIgnoreCase("mobTDamage") || mechanic.equalsIgnoreCase("mTDamage") ) {
+            e.register(new MobTypedDamageMechanic(executor, config));
+        }
 
         // === IgaCustom mechanics ===
         if ( mechanic.equalsIgnoreCase("VarReplaceRegexCustom") ) {

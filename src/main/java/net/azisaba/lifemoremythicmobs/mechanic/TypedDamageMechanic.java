@@ -13,6 +13,8 @@ import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.damage.DamagingMechanic;
 
 import java.util.Map;
+import net.azisaba.lifemoremythicmobs.util.HoroloElementalDefenseBridge;
+import org.bukkit.entity.Player;
 
 public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEntitySkill {
 
@@ -70,6 +72,9 @@ public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEn
             // 与ダメ側の補正 (Aura + Upgrade)
             Map<String, Double> casterMods = TypeOffensiveBuffMechanic.getCombinedMods(data.getCaster().getEntity().getUniqueId());
             casterAuraMod = casterMods.getOrDefault(resolvedElement, 1.0);
+            if (data.getCaster().getEntity().getBukkitEntity() instanceof Player player) {
+                casterAuraMod += HoroloElementalDefenseBridge.outgoingDamage(player, resolvedElement);
+            }
 
             VariableRegistry casterVars = MythicBukkit.inst().getVariableManager().getRegistry(VariableScope.CASTER, data, data.getCaster().getEntity());
             dmgLevel = casterVars.getInt("upg_total_" + resolvedElement.toLowerCase() + "_dmg");
