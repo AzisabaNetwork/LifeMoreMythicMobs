@@ -1,16 +1,17 @@
 package net.azisaba.lifemoremythicmobs.targeters;
 
 import io.lumine.mythic.api.adapters.AbstractLocation;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.targeters.ILocationSelector;
-import java.util.HashSet;
-import java.util.concurrent.ThreadLocalRandom;
 import org.bukkit.Location;
 import org.bukkit.World;
+
+import java.util.HashSet;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomAroundCasterLocationTargeter extends ILocationSelector {
    private final PlaceholderString radiusArg;

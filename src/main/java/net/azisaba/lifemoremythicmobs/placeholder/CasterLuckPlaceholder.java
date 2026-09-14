@@ -1,10 +1,8 @@
 package net.azisaba.lifemoremythicmobs.placeholder;
 
-import net.azisaba.lifemoremythicmobs.util.PlaceholderFactory;
-
 import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
 import io.lumine.mythic.bukkit.BukkitAdapter;
-import io.lumine.mythic.core.skills.placeholders.Placeholder;
+import net.azisaba.lifemoremythicmobs.util.PlaceholderFactory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Entity;

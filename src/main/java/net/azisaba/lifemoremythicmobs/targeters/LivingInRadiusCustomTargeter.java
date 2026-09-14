@@ -1,16 +1,17 @@
 package net.azisaba.lifemoremythicmobs.targeters;
 
 import com.google.common.collect.Sets;
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.api.skills.SkillCaster;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.targeters.IEntitySelector;
 import io.lumine.mythic.core.utils.annotations.MythicTargeter;
+
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.logging.Logger;

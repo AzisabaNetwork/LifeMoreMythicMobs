@@ -1,18 +1,16 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import io.lumine.mythic.api.adapters.AbstractEntity;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.ITargetedEntitySkill;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
-import io.lumine.mythic.core.skills.damage.DamagingMechanic;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
-import java.util.Locale;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.damage.DamagingMechanic;
+import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -20,6 +18,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
+
+import java.util.Locale;
 
 public class KillMessageDamageMechanic extends DamagingMechanic implements ITargetedEntitySkill {
    private final Plugin plugin = JavaPlugin.getProvidingPlugin(this.getClass());

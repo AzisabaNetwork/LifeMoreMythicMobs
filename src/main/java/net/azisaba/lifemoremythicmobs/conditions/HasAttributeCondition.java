@@ -2,15 +2,16 @@ package net.azisaba.lifemoremythicmobs.conditions;
 
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.skills.SkillCondition;
 import io.lumine.mythic.api.skills.conditions.IEntityCondition;
-import java.util.Collection;
+import io.lumine.mythic.core.skills.SkillCondition;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Collection;
 
 public class HasAttributeCondition extends SkillCondition implements IEntityCondition {
    private final String slot;

@@ -1,31 +1,28 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.INoTargetSkill;
 import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class ReticleTittleMechanic extends SkillMechanic implements INoTargetSkill, ITargetedEntitySkill {
    private static final Pattern P_UNICODE = Pattern.compile("\\\\u([0-9a-fA-F]{4})");

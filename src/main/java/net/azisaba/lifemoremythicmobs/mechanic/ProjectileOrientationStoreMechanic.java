@@ -1,26 +1,24 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
-import net.azisaba.lifemoremythicmobs.util.VariableUtil;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.INoTargetSkill;
 import io.lumine.mythic.api.skills.IParentSkill;
-import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
-import java.util.Locale;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
+import net.azisaba.lifemoremythicmobs.util.VariableUtil;
 import org.bukkit.entity.Entity;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
-import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Locale;
 
 public class ProjectileOrientationStoreMechanic extends SkillMechanic implements INoTargetSkill {
    private final String yawVarPS;

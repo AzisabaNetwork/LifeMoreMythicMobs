@@ -1,18 +1,19 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.adapters.AbstractPlayer;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.SkillMetadata;
-import io.lumine.mythic.core.skills.mechanics.ParticleEffect;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderInt;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.mechanics.ParticleEffect;
+import org.bukkit.Location;
+
 import java.util.Collection;
 import java.util.Random;
-import org.bukkit.Location;
 
 public class ParticleRandomEffectMechanic extends ParticleEffect {
    private final PlaceholderInt points;

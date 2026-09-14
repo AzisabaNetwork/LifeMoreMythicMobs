@@ -11,13 +11,14 @@ import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.damage.DamagingMechanic;
 import io.lumine.mythic.core.skills.variables.VariableRegistry;
 import io.lumine.mythic.core.skills.variables.VariableScope;
-import java.util.Map;
 import net.azisaba.lifemoremythicmobs.util.ElementalDefenseMath;
 import net.azisaba.lifemoremythicmobs.util.HoroloElementalDefenseBridge;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import java.util.Map;
 
 /** Mob-to-player typed damage with HoroloCore's per-element armor calculation. */
 public final class MobTypedDamageMechanic extends DamagingMechanic implements ITargetedEntitySkill {

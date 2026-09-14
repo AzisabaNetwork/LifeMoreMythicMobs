@@ -2,8 +2,9 @@ package net.azisaba.lifemoremythicmobs.util.CharReorderGui;
 
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.skills.SkillMetadata;
-import java.util.UUID;
 import org.bukkit.inventory.Inventory;
+
+import java.util.UUID;
 
 public class CharReorderSession {
    private final UUID playerId;

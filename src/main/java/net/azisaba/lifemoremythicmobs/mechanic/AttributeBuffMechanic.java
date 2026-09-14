@@ -1,29 +1,29 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.INoTargetSkill;
 import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AttributeBuffMechanic extends SkillMechanic implements ITargetedEntitySkill, INoTargetSkill {
    private final PlaceholderString attributeName;

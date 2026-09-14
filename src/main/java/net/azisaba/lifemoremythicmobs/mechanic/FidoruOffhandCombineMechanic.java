@@ -1,45 +1,34 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.items.MythicItem;
 import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.items.MythicItem;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.core.utils.jnbt.CompoundTag;
-import java.util.Arrays;
-import javax.annotation.Nullable;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.ChatColor;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Material;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.EventHandler;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import javax.annotation.Nullable;
+import java.util.Arrays;
 
 public class FidoruOffhandCombineMechanic extends SkillMechanic implements ITargetedEntitySkill {
    private static final int[] ITEM_SLOTS = new int[]{10, 12, 14};

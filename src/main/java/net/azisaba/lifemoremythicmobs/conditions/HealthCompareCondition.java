@@ -2,9 +2,9 @@ package net.azisaba.lifemoremythicmobs.conditions;
 
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.skills.SkillCondition;
 import io.lumine.mythic.api.skills.conditions.IEntityCondition;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
+import io.lumine.mythic.core.skills.SkillCondition;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 

@@ -1,11 +1,8 @@
 package net.azisaba.lifemoremythicmobs.util.CharReorderGui;
 
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import org.bukkit.plugin.java.JavaPlugin;
-import net.azisaba.lifemoremythicmobs.util.VariableUtil;
 import io.lumine.mythic.bukkit.MythicBukkit;
-import java.util.Optional;
-import java.util.UUID;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.VariableUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -20,6 +17,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Optional;
+import java.util.UUID;
 
 public class CharReorderGuiListener implements Listener {
    private boolean isOurGui(Inventory inv) {

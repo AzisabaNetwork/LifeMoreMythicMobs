@@ -1,21 +1,20 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.adapters.AbstractPlayer;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.mechanics.ParticleEffect;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.util.Vector;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.util.Vector;
 
 public class DrawQuadParticleMechanic extends ParticleEffect {
    private final Vector p1;

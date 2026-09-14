@@ -2,16 +2,16 @@ package net.azisaba.lifemoremythicmobs.gui;
 
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.spawning.spawners.MythicSpawner;
-import org.bukkit.Bukkit;
 import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 
 import java.util.*;
 import java.util.stream.Collectors;

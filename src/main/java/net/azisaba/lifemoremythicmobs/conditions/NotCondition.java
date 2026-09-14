@@ -1,26 +1,17 @@
 package net.azisaba.lifemoremythicmobs.conditions;
 
-import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.SkillCaster;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.conditions.*;
 import io.lumine.mythic.core.logging.MythicLogger;
 import io.lumine.mythic.core.logging.MythicLogger.DebugLevel;
-import io.lumine.mythic.api.skills.SkillCaster;
 import io.lumine.mythic.core.skills.SkillCondition;
-import io.lumine.mythic.api.skills.SkillMetadata;
-import io.lumine.mythic.api.skills.conditions.ICasterCondition;
-import io.lumine.mythic.api.skills.conditions.IEntityComparisonCondition;
-import io.lumine.mythic.api.skills.conditions.IEntityCondition;
-import io.lumine.mythic.api.skills.conditions.IEntityLocationComparisonCondition;
-import io.lumine.mythic.api.skills.conditions.ILocationComparisonCondition;
-import io.lumine.mythic.api.skills.conditions.ILocationCondition;
-import io.lumine.mythic.api.skills.conditions.ISkillMetaComparisonCondition;
-import io.lumine.mythic.api.skills.conditions.ISkillMetaCondition;
-
-
 import io.lumine.mythic.core.skills.conditions.CustomCondition;
 import io.lumine.mythic.core.skills.conditions.InvalidCondition;
+import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 
 public class NotCondition
    extends SkillCondition

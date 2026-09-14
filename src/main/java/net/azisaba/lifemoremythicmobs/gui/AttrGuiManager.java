@@ -6,13 +6,6 @@ import net.azisaba.lifemoremythicmobs.gui.menus.MainMenu;
 import net.azisaba.lifemoremythicmobs.gui.menus.ValueMenu;
 import net.azisaba.lifemoremythicmobs.session.AttrEditSession;
 import net.azisaba.lifemoremythicmobs.util.AttrLists;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.Map.Entry;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -29,6 +22,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 public class AttrGuiManager implements Listener {
    private final LifeMoreMythicMobs plugin;

@@ -1,24 +1,24 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import net.azisaba.lifemoremythicmobs.util.CharReorderGui.CharReorderGuiManager;
-import net.azisaba.lifemoremythicmobs.util.CharReorderGui.CharReorderSession;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.INoTargetSkill;
 import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
-import java.util.ArrayList;
-import java.util.List;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.CharReorderGui.CharReorderGuiManager;
+import net.azisaba.lifemoremythicmobs.util.CharReorderGui.CharReorderSession;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CharReorderGuiMechanic extends SkillMechanic implements INoTargetSkill, ITargetedEntitySkill {
    private final PlaceholderString text;

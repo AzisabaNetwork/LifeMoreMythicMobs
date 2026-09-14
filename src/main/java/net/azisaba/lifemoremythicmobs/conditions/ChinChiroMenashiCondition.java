@@ -1,21 +1,22 @@
 package net.azisaba.lifemoremythicmobs.conditions;
 
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.logging.MythicLogger;
 import io.lumine.mythic.api.skills.Skill;
-import io.lumine.mythic.core.skills.SkillCondition;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.conditions.IEntityCondition;
 import io.lumine.mythic.api.skills.conditions.ILocationCondition;
 import io.lumine.mythic.api.skills.conditions.ISkillMetaCondition;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderInt;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.logging.MythicLogger;
+import io.lumine.mythic.core.skills.SkillCondition;
+import org.bukkit.Bukkit;
+
 import java.util.Arrays;
 import java.util.Optional;
-import org.bukkit.Bukkit;
 
 public class ChinChiroMenashiCondition extends SkillCondition implements ISkillMetaCondition, IEntityCondition, ILocationCondition {
    private PlaceholderInt d1;

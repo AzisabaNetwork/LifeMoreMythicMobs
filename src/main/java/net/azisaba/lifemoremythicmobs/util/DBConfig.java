@@ -1,8 +1,9 @@
 package net.azisaba.lifemoremythicmobs.util;
 
+import org.bukkit.configuration.ConfigurationSection;
+
 import java.util.Objects;
 import java.util.Properties;
-import org.bukkit.configuration.ConfigurationSection;
 
 public class DBConfig {
    private final String driver;

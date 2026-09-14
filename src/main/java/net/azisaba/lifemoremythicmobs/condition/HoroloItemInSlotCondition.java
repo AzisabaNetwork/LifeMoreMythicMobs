@@ -6,11 +6,12 @@ import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.conditions.IEntityCondition;
 import io.lumine.mythic.api.skills.conditions.ISkillMetaCondition;
 import io.lumine.mythic.core.skills.SkillCondition;
-import java.util.ArrayList;
-import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class HoroloItemInSlotCondition extends SkillCondition implements IEntityCondition, ISkillMetaCondition {
   private final String mmid, operator;

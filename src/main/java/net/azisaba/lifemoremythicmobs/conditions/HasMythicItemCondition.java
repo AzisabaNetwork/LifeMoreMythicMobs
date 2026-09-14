@@ -1,14 +1,11 @@
 package net.azisaba.lifemoremythicmobs.conditions;
 
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.api.items.ItemManager;
-import io.lumine.mythic.core.items.MythicItem;
-import io.lumine.mythic.core.skills.SkillCondition;
 import io.lumine.mythic.api.skills.conditions.IEntityCondition;
-import io.lumine.mythic.core.utils.jnbt.CompoundTag;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillCondition;
+import net.azisaba.lifemoremythicmobs.util.ItemUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -18,38 +15,26 @@ public class HasMythicItemCondition extends SkillCondition implements IEntityCon
 
    public HasMythicItemCondition(MythicLineConfig config) {
       super(config.getLine());
-      this.itemName = config.getString("item", "");
-      this.amount = config.getInteger("amount", 1);
+      this.itemName = config.getString(new String[]{"item", "i", "mmitem", "id", "mmid"}, "");
+      this.amount = config.getInteger(new String[]{"amount", "a"}, 1);
    }
 
    @Override
    public boolean check(AbstractEntity entity) {
-      if (!entity.isPlayer()) {
+      if (!entity.isPlayer() || this.itemName.isEmpty()) {
          return false;
       }
 
       Player player = (Player)BukkitAdapter.adapt(entity);
-      ItemManager itemManager = MythicBukkit.inst().getItemManager();
-      MythicItem mythicItem = (MythicItem)itemManager.getItem(this.itemName).orElse(null);
-      if (mythicItem == null) {
-         return false;
-      }
-
       int count = 0;
-      ItemStack[] var9;
-      int var8 = (var9 = player.getInventory().getContents()).length;
 
-      for (int var7 = 0; var7 < var8; var7++) {
-         ItemStack item = var9[var7];
-         if (item != null) {
-            CompoundTag tag = MythicBukkit.inst().getVolatileCodeHandler().getItemHandler().getNBTData(item);
-            if (tag != null) {
-               String mythicType = tag.getString("MYTHIC_TYPE");
-               if (mythicType != null && mythicType.equalsIgnoreCase(this.itemName)) {
-                  count += item.getAmount();
-                  if (count >= this.amount) {
-                     return true;
-                  }
+      for (ItemStack item : player.getInventory().getContents()) {
+         if (item != null && !item.getType().isAir()) {
+            String mythicType = ItemUtil.getMythicType(item);
+            if (mythicType != null && mythicType.equalsIgnoreCase(this.itemName)) {
+               count += item.getAmount();
+               if (count >= this.amount) {
+                  return true;
                }
             }
          }

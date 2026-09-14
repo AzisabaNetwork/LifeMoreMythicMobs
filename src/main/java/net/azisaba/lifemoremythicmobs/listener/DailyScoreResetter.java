@@ -1,14 +1,15 @@
 package net.azisaba.lifemoremythicmobs.listener;
 
 import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import org.bukkit.Bukkit;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class DailyScoreResetter {
    private static final String SERVER_NAME = "lifeevent";

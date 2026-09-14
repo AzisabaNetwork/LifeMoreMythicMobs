@@ -2,10 +2,11 @@ package net.azisaba.lifemoremythicmobs.targeters;
 
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.targeters.ILocationSelector;
 import io.lumine.mythic.core.utils.annotations.MythicTargeter;
+
 import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 

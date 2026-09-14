@@ -13,6 +13,7 @@ import io.lumine.mythic.bukkit.utils.Schedulers;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
 import net.azisaba.lifemoremythicmobs.util.AuraSkillHelper;
+import net.azisaba.lifemoremythicmobs.util.GlobalCooldownManager;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -26,12 +27,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
-import net.azisaba.lifemoremythicmobs.util.GlobalCooldownManager;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ModifyPlayerAttributeMechanic extends SkillMechanic implements ITargetedEntitySkill, Listener {

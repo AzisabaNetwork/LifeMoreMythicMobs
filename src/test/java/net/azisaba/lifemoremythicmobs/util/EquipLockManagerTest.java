@@ -1,7 +1,9 @@
 package net.azisaba.lifemoremythicmobs.util;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Tests for EquipLockManager - lock/unlock tracking logic.

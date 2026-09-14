@@ -2,8 +2,8 @@ package net.azisaba.lifemoremythicmobs.conditions;
 
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.skills.SkillCondition;
 import io.lumine.mythic.api.skills.conditions.IEntityCondition;
+import io.lumine.mythic.core.skills.SkillCondition;
 
 public class NotHasAuraCondition extends SkillCondition implements IEntityCondition {
    private final String auraName;

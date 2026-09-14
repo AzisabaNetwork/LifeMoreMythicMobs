@@ -16,9 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-
-import java.util.Objects;
-
 public class ChangeItemNBTMechanic extends SkillMechanic implements ITargetedEntitySkill {
     protected final String tag;
     protected final PlaceholderString value;

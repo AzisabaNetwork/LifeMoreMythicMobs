@@ -3,12 +3,11 @@ package net.azisaba.lifemoremythicmobs.commands;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.azisaba.lifemoremythicmobs.gui.UpgradeGUI;
 import net.azisaba.lifemoremythicmobs.upgrade.UpgradeStatManager;
-import org.bukkit.Bukkit;
 import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 

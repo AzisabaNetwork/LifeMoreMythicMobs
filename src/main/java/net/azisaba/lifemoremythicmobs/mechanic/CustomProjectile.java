@@ -4,7 +4,6 @@ import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.core.skills.projectiles.Projectile;
-import io.lumine.mythic.core.skills.projectiles.Projectile.ProjectileTracker;
 
 public class CustomProjectile extends Projectile {
    private final CustomProjectileMechanic mechanic;

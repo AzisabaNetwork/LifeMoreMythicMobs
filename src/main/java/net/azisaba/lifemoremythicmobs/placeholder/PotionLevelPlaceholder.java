@@ -1,11 +1,9 @@
 package net.azisaba.lifemoremythicmobs.placeholder;
 
-import net.azisaba.lifemoremythicmobs.util.PlaceholderFactory;
-
 import io.lumine.mythic.api.adapters.AbstractEntity;
-import io.lumine.mythic.core.skills.placeholders.Placeholder;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
 import io.lumine.mythic.bukkit.BukkitAdapter;
+import net.azisaba.lifemoremythicmobs.util.PlaceholderFactory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;

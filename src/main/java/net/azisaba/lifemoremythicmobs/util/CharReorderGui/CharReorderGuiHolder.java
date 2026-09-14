@@ -1,9 +1,9 @@
 package net.azisaba.lifemoremythicmobs.util.CharReorderGui;
 
-import java.util.UUID;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public class CharReorderGuiHolder implements InventoryHolder {
    private final UUID owner;

@@ -6,15 +6,15 @@ import io.lumine.mythic.api.skills.ITargetedEntitySkill;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
-import io.lumine.mythic.core.skills.variables.VariableRegistry;
-import io.lumine.mythic.core.skills.variables.VariableScope;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.damage.DamagingMechanic;
-
-import java.util.Map;
+import io.lumine.mythic.core.skills.variables.VariableRegistry;
+import io.lumine.mythic.core.skills.variables.VariableScope;
 import net.azisaba.lifemoremythicmobs.util.HoroloElementalDefenseBridge;
 import org.bukkit.entity.Player;
+
+import java.util.Map;
 
 public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEntitySkill {
 

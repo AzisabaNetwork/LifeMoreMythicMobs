@@ -1,7 +1,7 @@
 package net.azisaba.lifemoremythicmobs.gui;
 
-import org.bukkit.Bukkit;
 import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
