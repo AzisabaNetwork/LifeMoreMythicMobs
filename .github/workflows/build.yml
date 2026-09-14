@@ -1,10 +1,14 @@
 name: Build & Artifact Upload
 
 on:
-  push:
   workflow_dispatch:
-
-permissions: {}
+  push:
+    branches:
+      - "ver/1.15.2"
+      - "ver/1.21.11"
+    paths-ignore:
+      - "**.md"
+      - "renovate.json"
 
 jobs:
   build:
