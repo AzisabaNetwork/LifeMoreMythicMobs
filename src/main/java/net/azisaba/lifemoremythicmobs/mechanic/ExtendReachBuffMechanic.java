@@ -297,8 +297,26 @@ public class ExtendReachBuffMechanic extends SkillMechanic implements ITargetedE
    }
 
    private double getVanillaAttackSpeed(ItemStack weapon) {
-      return 4.0 + weapon.getType().getDefaultAttributeModifiers(org.bukkit.inventory.EquipmentSlot.HAND)
-         .get(org.bukkit.attribute.Attribute.ATTACK_SPEED).stream().mapToDouble(org.bukkit.attribute.AttributeModifier::getAmount).sum();
+      switch (weapon.getType()) {
+         case DIAMOND_SWORD:
+         case IRON_SWORD:
+         case STONE_SWORD:
+         case WOODEN_SWORD:
+         case GOLDEN_SWORD:
+            return 1.6;
+         case DIAMOND_AXE:
+            return 1.0;
+         case IRON_AXE:
+            return 0.9;
+         case STONE_AXE:
+         case WOODEN_AXE:
+         case GOLDEN_AXE:
+            return 0.8;
+         case TRIDENT:
+            return 1.1;
+         default:
+            return 1.0;
+      }
    }
 
    private void performReachCheck(Player player) {
@@ -403,8 +421,26 @@ public class ExtendReachBuffMechanic extends SkillMechanic implements ITargetedE
    }
 
    private static double getVanillaWeaponDamage(ItemStack weapon) {
-      return 1.0 + weapon.getType().getDefaultAttributeModifiers(org.bukkit.inventory.EquipmentSlot.HAND)
-         .get(org.bukkit.attribute.Attribute.ATTACK_DAMAGE).stream().mapToDouble(org.bukkit.attribute.AttributeModifier::getAmount).sum();
+      switch (weapon.getType()) {
+         case DIAMOND_SWORD:
+            return 7.0;
+         case IRON_SWORD:
+            return 6.0;
+         case STONE_SWORD:
+            return 5.0;
+         case WOODEN_SWORD:
+         case GOLDEN_SWORD:
+            return 4.0;
+         case DIAMOND_AXE:
+         case IRON_AXE:
+         case STONE_AXE:
+            return 9.0;
+         case WOODEN_AXE:
+         case GOLDEN_AXE:
+            return 7.0;
+         default:
+            return 1.0;
+      }
    }
 
    private double applyEnchantmentsAndEffects(Player player, double baseDamage) {
