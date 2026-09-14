@@ -9,8 +9,9 @@ import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
 import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -82,16 +83,17 @@ public class LotteryRewardMechanic extends SkillMechanic implements ITargetedEnt
          ItemStack item = var36[var34];
          if (item != null && item.getType() == Material.PAPER) {
             ItemMeta meta = item.getItemMeta();
-            if (meta != null && meta.hasDisplayName() && meta.hasLore() && ChatColor.stripColor(meta.getDisplayName()).contains("くろねこ印のたからくじ")) {
-               List<String> lore = meta.getLore();
-               if (lore.size() >= 6
-                  && ChatColor.stripColor(lore.get(0)).contains(ym)
-                  && ChatColor.stripColor(lore.get(2)).equals(player.getName())
-                  && ChatColor.stripColor(lore.get(5)).matches("\\d{6}")) {
-                  int from = Integer.parseInt(ChatColor.stripColor(lore.get(5)));
+            if (meta != null && meta.hasDisplayName() && meta.hasLore() && meta.displayName() != null && LegacyText.plain(meta.displayName()).contains("くろねこ印のたからくじ")) {
+               List<Component> lore = meta.lore();
+               if (lore != null
+                  && lore.size() >= 6
+                  && LegacyText.plain(lore.get(0)).contains(ym)
+                  && LegacyText.plain(lore.get(2)).equals(player.getName())
+                  && LegacyText.plain(lore.get(5)).matches("\\d{6}")) {
+                  int from = Integer.parseInt(LegacyText.plain(lore.get(5)));
                   int to = from;
-                  if (lore.size() >= 8 && ChatColor.stripColor(lore.get(6)).equals("～") && ChatColor.stripColor(lore.get(7)).matches("\\d{6}")) {
-                     to = Integer.parseInt(ChatColor.stripColor(lore.get(7)));
+                  if (lore.size() >= 8 && LegacyText.plain(lore.get(6)).equals("～") && LegacyText.plain(lore.get(7)).matches("\\d{6}")) {
+                     to = Integer.parseInt(LegacyText.plain(lore.get(7)));
                   }
 
                   IgaDebugLogger.log(this.getClass(), "該当くじ番号範囲: " + from + " ～ " + to);

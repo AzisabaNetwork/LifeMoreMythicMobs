@@ -11,8 +11,9 @@ import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,7 +37,7 @@ public class RotteryRewardRedeeGuiMechanic extends SkillMechanic implements ITar
    private final LifeMoreMythicMobs plugin = JavaPlugin.getPlugin(LifeMoreMythicMobs.class);
    private final PlaceholderInt ticksA;
    private final PlaceholderInt ticksB;
-   private static final String TITLE = ChatColor.translateAlternateColorCodes('&', "&6宝くじを換金ちゅう");
+   private static final Component TITLE = LegacyText.ampersandComponent("&6宝くじを換金ちゅう");
    private static final int SLOT_A = 11;
    private static final int SLOT_B = 12;
    private static final int SLOT_C = 13;
@@ -114,7 +115,7 @@ public class RotteryRewardRedeeGuiMechanic extends SkillMechanic implements ITar
       ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
       ItemMeta meta = filler.getItemMeta();
       if (meta != null) {
-         meta.setDisplayName(" ");
+         meta.displayName(LegacyText.component(" "));
          filler.setItemMeta(meta);
       }
 
@@ -128,7 +129,7 @@ public class RotteryRewardRedeeGuiMechanic extends SkillMechanic implements ITar
       ItemMeta meta = it.getItemMeta();
       if (meta != null) {
          meta.setCustomModelData(cmd);
-         meta.setDisplayName(ChatColor.RESET + "");
+         meta.displayName(Component.empty());
          it.setItemMeta(meta);
       }
 
@@ -140,7 +141,7 @@ public class RotteryRewardRedeeGuiMechanic extends SkillMechanic implements ITar
       ItemMeta meta = it.getItemMeta();
       if (meta != null) {
          meta.setCustomModelData(cmd);
-         meta.setDisplayName(ChatColor.RESET + "");
+         meta.displayName(Component.empty());
          it.setItemMeta(meta);
       }
 

@@ -11,12 +11,16 @@ import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -71,7 +75,7 @@ public class ReticleTittleMechanic extends SkillMechanic implements INoTargetSki
             this.stopExisting(p);
             this.clearNow(p);
             if (this.stable) {
-               p.sendTitle(glyph, "", fadeIn, stay, fadeOut);
+               this.sendReticleTitle(p, glyph, fadeIn, stay, fadeOut);
                Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(LifeMoreMythicMobs.class), () -> {
                   if (!p.isOnline()) {
                      this.clearFinally(p);
@@ -81,13 +85,12 @@ public class ReticleTittleMechanic extends SkillMechanic implements INoTargetSki
             } else {
                BukkitTask task = (new BukkitRunnable() {
                   int elapsed = 0;
-
                   public void run() {
                      if (!p.isOnline()) {
                         this.cancel();
                         ReticleTittleMechanic.RETICLE_TASKS.remove(p.getUniqueId());
                      } else {
-                        p.sendTitle(glyph, "", fadeIn, stay, fadeOut);
+                        ReticleTittleMechanic.this.sendReticleTitle(p, glyph, fadeIn, stay, fadeOut);
                         this.elapsed = this.elapsed + interval;
                         if (this.elapsed >= duration) {
                            ReticleTittleMechanic.this.clearFinally(p);
@@ -152,21 +155,33 @@ public class ReticleTittleMechanic extends SkillMechanic implements INoTargetSki
       }
    }
 
+   private void sendReticleTitle(Player p, String glyph, int fadeIn, int stay, int fadeOut) {
+      Title.Times times = Title.Times.times(Duration.ofMillis(fadeIn * 50L), Duration.ofMillis(stay * 50L), Duration.ofMillis(fadeOut * 50L));
+      Title title = Title.title(LegacyText.component(glyph), Component.empty(), times);
+      p.showTitle(title);
+   }
+
    private void strongClearTitle(Player p) {
+      p.clearTitle();
       p.resetTitle();
-      p.sendTitle("", "", 0, 0, 0);
-      Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(LifeMoreMythicMobs.class), () -> p.sendTitle("", "", 0, 0, 0), 1L);
+      Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(LifeMoreMythicMobs.class), () -> {
+         p.clearTitle();
+         p.resetTitle();
+      }, 1L);
    }
 
    private void clearNow(Player p) {
+      p.clearTitle();
       p.resetTitle();
-      p.sendTitle("", "", 0, 0, 0);
    }
 
    private void clearFinally(Player p) {
+      p.clearTitle();
       p.resetTitle();
-      p.sendTitle("", "", 0, 0, 0);
-      Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(LifeMoreMythicMobs.class), () -> p.sendTitle("", "", 0, 0, 0), 1L);
+      Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(LifeMoreMythicMobs.class), () -> {
+         p.clearTitle();
+         p.resetTitle();
+      }, 1L);
    }
 
    private static final class TaskAbort extends RuntimeException {

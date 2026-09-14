@@ -15,8 +15,6 @@ import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.utils.Schedulers;
 import io.lumine.mythic.bukkit.utils.items.ItemFactory;
-import io.lumine.mythic.bukkit.utils.version.MinecraftVersions;
-import io.lumine.mythic.bukkit.utils.version.ServerVersion;
 import io.lumine.mythic.core.items.MythicItem;
 import io.lumine.mythic.core.logging.MythicLogger;
 import io.lumine.mythic.core.logging.MythicLogger.DebugLevel;
@@ -405,12 +403,9 @@ public class OrbitalCustomMechanic extends Aura implements ITargetedEntitySkill,
             Schedulers.sync().run(() -> {
                if (!this.hasTerminated()) {
                   AbstractLocation l = this.getBaseLocation().clone().subtract(0.0, 0.5, 0.0);
-                  FallingBlock block;
-                  if (ServerVersion.isAfterOrEq(MinecraftVersions.v1_15)) {
-                     block = BukkitAdapter.adapt(l).getWorld().spawnFallingBlock(BukkitAdapter.adapt(l), this.resolvedBulletMaterial.createBlockData());
-                  } else {
-                     block = BukkitAdapter.adapt(l).getWorld().spawnFallingBlock(BukkitAdapter.adapt(l), this.resolvedBulletMaterial, (byte)0);
-                  }
+                  FallingBlock block = BukkitAdapter.adapt(l).getWorld().spawn(BukkitAdapter.adapt(l), FallingBlock.class, fb -> {
+                     fb.setBlockData(this.resolvedBulletMaterial.createBlockData());
+                  });
 
                   block.setHurtEntities(false);
                   block.setDropItem(false);
@@ -448,7 +443,7 @@ public class OrbitalCustomMechanic extends Aura implements ITargetedEntitySkill,
                if (!this.hasTerminated()) {
                   AbstractLocation l = this.getBaseLocation().clone();
                   ArmorStand as = (ArmorStand)BukkitAdapter.adapt(l).getWorld().spawnEntity(BukkitAdapter.adapt(l), EntityType.ARMOR_STAND);
-                  as.setCustomName("Dinnerbone");
+                  as.customName(net.kyori.adventure.text.Component.text("Dinnerbone"));
                   as.setCustomNameVisible(false);
                   as.setHeadPose(new EulerAngle(0.0, 0.0, 0.0));
                   as.getEquipment().setHelmet(new ItemStack(this.resolvedBulletMaterial));

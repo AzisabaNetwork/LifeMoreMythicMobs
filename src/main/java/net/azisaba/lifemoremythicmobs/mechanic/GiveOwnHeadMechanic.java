@@ -32,7 +32,7 @@ public class GiveOwnHeadMechanic extends SkillMechanic implements ITargetedEntit
       SkullMeta meta = (SkullMeta)head.getItemMeta();
       if (meta != null) {
          meta.setOwningPlayer(player);
-         meta.setDisplayName("§e§o" + player.getName());
+         meta.displayName(net.azisaba.lifemoremythicmobs.util.LegacyText.component("§e§o" + player.getName()));
          head.setItemMeta(meta);
       }
 

@@ -13,8 +13,8 @@ import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -98,10 +98,10 @@ public class HudTextMechanic extends SkillMechanic implements INoTargetSkill, IT
                HudTextMechanic.stopTask(p.getUniqueId(), false);
                this.cancel();
             } else {
-               p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(line));
+               p.sendActionBar(LegacyText.component(line));
                this.passed = this.passed + HudTextMechanic.this.intervalTicks;
                if (this.passed >= HudTextMechanic.this.durationTicks) {
-                  p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
+                  p.sendActionBar(Component.empty());
                   HudTextMechanic.stopTask(p.getUniqueId(), false);
                   this.cancel();
                }
@@ -121,7 +121,7 @@ public class HudTextMechanic extends SkillMechanic implements INoTargetSkill, IT
       if (clearNow) {
          Player p = Bukkit.getPlayer(uuid);
          if (p != null && p.isOnline()) {
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
+            p.sendActionBar(Component.empty());
          }
       }
    }

@@ -13,8 +13,9 @@ import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.core.utils.jnbt.CompoundTag;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,7 +34,7 @@ import java.util.Arrays;
 public class FidoruOffhandCombineMechanic extends SkillMechanic implements ITargetedEntitySkill {
    private static final int[] ITEM_SLOTS = new int[]{10, 12, 14};
    private static final int CONFIRM_SLOT = 31;
-   private static final String GUI_TITLE = ChatColor.DARK_GREEN + "再厳選画面";
+   private static final Component GUI_TITLE = LegacyText.component(LegacyText.DARK_GREEN + "再厳選画面");
    private static final String TARGET_MMID = "Iga_fidoru_offhand";
 
    public FidoruOffhandCombineMechanic(SkillExecutor executor, MythicLineConfig config) { super(executor, config.getLine(), config);
@@ -47,7 +48,7 @@ public class FidoruOffhandCombineMechanic extends SkillMechanic implements ITarg
       Player player = (Player)target.getBukkitEntity();
       IgaDebugLogger.log(this.getClass(), "メカニック開始。プレイヤー: " + player.getName());
       Inventory gui = Bukkit.createInventory(player, 54, GUI_TITLE);
-      ItemStack grayPane = this.createPane((short)7, " ");
+      ItemStack grayPane = this.createPane(Material.GRAY_STAINED_GLASS_PANE, " ");
 
       for (int i = 0; i < gui.getSize(); i++) {
          gui.setItem(i, grayPane);
@@ -61,28 +62,23 @@ public class FidoruOffhandCombineMechanic extends SkillMechanic implements ITarg
          gui.setItem(slot, null);
       }
 
-      gui.setItem(31, this.createPane((short)5, ChatColor.GREEN + "決定"));
+      gui.setItem(31, this.createPane(Material.LIME_STAINED_GLASS_PANE, LegacyText.GREEN + "決定"));
       player.openInventory(gui);
       Bukkit.getPluginManager().registerEvents(new FidoruOffhandCombineMechanic.CombineListener(player, gui), JavaPlugin.getPlugin(LifeMoreMythicMobs.class));
       return SkillResult.SUCCESS;
    }
 
-   private ItemStack createPane(short color, String name) {
-      ItemStack item = new ItemStack(Material.LEGACY_STAINED_GLASS_PANE, 1, color);
+   private ItemStack createPane(Material material, String name) {
+      ItemStack item = new ItemStack(material);
       ItemMeta meta = item.getItemMeta();
-      meta.setDisplayName(name);
+      meta.displayName(net.azisaba.lifemoremythicmobs.util.LegacyText.component(name));
       item.setItemMeta(meta);
       return item;
    }
 
    @Nullable
    public static String getMythicItemIdFromNBT(ItemStack item) {
-      if (item != null && item.getType() != Material.AIR) {
-         CompoundTag tag = MythicBukkit.inst().getVolatileCodeHandler().getItemHandler().getNBTData(item);
-         return tag != null && tag.containsKey("MYTHIC_TYPE") ? tag.getString("MYTHIC_TYPE") : null;
-      } else {
-         return null;
-      }
+      return net.azisaba.lifemoremythicmobs.util.ItemUtil.getMythicType(item);
    }
 
    private class CombineListener implements Listener {
@@ -99,7 +95,7 @@ public class FidoruOffhandCombineMechanic extends SkillMechanic implements ITarg
       public void onClick(InventoryClickEvent e) {
          if (e.getWhoClicked() instanceof Player) {
             if (e.getWhoClicked().equals(this.player)) {
-               if (e.getView().getTitle().equals(FidoruOffhandCombineMechanic.GUI_TITLE)) {
+               if (this.gui.equals(e.getView().getTopInventory())) {
                   int slot = e.getRawSlot();
                   IgaDebugLogger.log(this.getClass(), "クリックされたスロット: " + slot);
                   if (slot < this.gui.getSize() && Arrays.stream(FidoruOffhandCombineMechanic.ITEM_SLOTS).noneMatch(i -> i == slot) && slot != 31) {
@@ -133,17 +129,17 @@ public class FidoruOffhandCombineMechanic extends SkillMechanic implements ITarg
                            if (result != null) {
                               ItemStack item = BukkitAdapter.adapt(result.generateItemStack(1));
                               this.player.getInventory().addItem(new ItemStack[]{item});
-                              this.player.sendMessage(ChatColor.GOLD + "引き換えに成功しました！");
+                              this.player.sendMessage(LegacyText.component(LegacyText.GOLD + "引き換えに成功しました！"));
                               IgaDebugLogger.log(this.getClass(), "合成アイテム付与成功。");
                            } else {
-                              this.player.sendMessage(ChatColor.RED + "引き換えに失敗しました。");
+                              this.player.sendMessage(LegacyText.component(LegacyText.RED + "引き換えに失敗しました。"));
                               IgaDebugLogger.log(this.getClass(), "MythicItem[Iga_fidoru_offhand] が見つかりませんでした。");
                            }
                         } else {
                            Arrays.stream(inputs)
                               .filter(itemx -> itemx != null && itemx.getType() != Material.AIR)
                               .forEach(itemx -> this.player.getInventory().addItem(new ItemStack[]{itemx}));
-                           this.player.sendMessage(ChatColor.RED + "条件を満たしていません。");
+                           this.player.sendMessage(LegacyText.component(LegacyText.RED + "条件を満たしていません。"));
                         }
 
                         this.player.closeInventory();

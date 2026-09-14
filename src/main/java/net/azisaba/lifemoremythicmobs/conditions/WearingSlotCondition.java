@@ -148,7 +148,7 @@ public class WearingSlotCondition extends SkillCondition implements IEntityCondi
             return false;
          }
 
-         if (meta.hasDisplayName() && !meta.getDisplayName().equals(meta2.getDisplayName())) {
+         if (meta.hasDisplayName() && !java.util.Objects.equals(meta.displayName(), meta2.displayName())) {
             MythicLogger.debug(DebugLevel.CONDITION, "! Display doesn't match");
             return false;
          }
@@ -171,7 +171,7 @@ public class WearingSlotCondition extends SkillCondition implements IEntityCondi
                return false;
             }
 
-            if (meta.hasLore() && !meta.getLore().equals(meta2.getLore())) {
+            if (meta.hasLore() && !java.util.Objects.equals(meta.lore(), meta2.lore())) {
                MythicLogger.debug(DebugLevel.CONDITION, "! Lore doesn't match");
                return false;
             }

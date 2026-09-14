@@ -6,8 +6,8 @@ import net.azisaba.lifemoremythicmobs.gui.menus.MainMenu;
 import net.azisaba.lifemoremythicmobs.gui.menus.ValueMenu;
 import net.azisaba.lifemoremythicmobs.session.AttrEditSession;
 import net.azisaba.lifemoremythicmobs.util.AttrLists;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -218,7 +218,7 @@ public class AttrGuiManager implements Listener {
       if (hand != null && hand.getType() != Material.AIR) {
          ItemMeta meta = hand.getItemMeta();
          if (meta == null) {
-            p.sendMessage(ChatColor.RED + "このアイテムには属性を付与できません。");
+            p.sendMessage(LegacyText.component(LegacyText.RED + "このアイテムには属性を付与できません。"));
          } else {
             int applied = 0;
 
@@ -233,7 +233,8 @@ public class AttrGuiManager implements Listener {
                   Collection<AttributeModifier> mods = meta.getAttributeModifiers(attr);
                   if (mods != null && !mods.isEmpty()) {
                      for (AttributeModifier m : new ArrayList<>(mods)) {
-                        if (m.getSlot() == null || m.getSlot() == set.getSlot()) {
+                        org.bukkit.inventory.EquipmentSlotGroup sg = m.getSlotGroup();
+                        if (sg == null || sg.test(set.getSlot())) {
                            meta.removeAttributeModifier(attr, m);
                         }
                      }
@@ -244,7 +245,8 @@ public class AttrGuiManager implements Listener {
                      }
                   }
 
-                  AttributeModifier mod = new AttributeModifier(UUID.randomUUID(), attr.name(), amount, op, set.getSlot());
+                  org.bukkit.NamespacedKey modKey = new org.bukkit.NamespacedKey("lifemoremythicmobs", "attr_" + attr.getKey().getKey() + "_" + set.getSlot().name().toLowerCase(Locale.ROOT));
+                  AttributeModifier mod = new AttributeModifier(modKey, amount, op, set.getSlot().getGroup());
                   meta.addAttributeModifier(attr, mod);
                   applied++;
                }
@@ -252,7 +254,7 @@ public class AttrGuiManager implements Listener {
 
             if (applied > 0) {
                hand.setItemMeta(meta);
-               p.sendMessage(ChatColor.GREEN + "適用: " + ChatColor.WHITE + applied + ChatColor.GRAY + " 件の属性を更新しました。");
+               p.sendMessage(LegacyText.component(LegacyText.GREEN + "適用: " + LegacyText.WHITE + applied + LegacyText.GRAY + " 件の属性を更新しました。"));
 
                for (AttrEditSession.AttrSetting set : s.all().values()) {
                   set.setValue(-2.0);
@@ -260,11 +262,11 @@ public class AttrGuiManager implements Listener {
 
                Bukkit.getScheduler().runTask(this.plugin, () -> p.closeInventory());
             } else {
-               p.sendMessage(ChatColor.GRAY + "適用対象がありません（すべて未設定）。");
+               p.sendMessage(LegacyText.component(LegacyText.GRAY + "適用対象がありません（すべて未設定）。"));
             }
          }
       } else {
-         p.sendMessage(ChatColor.RED + "メインハンドにアイテムを持ってください。");
+         p.sendMessage(LegacyText.component(LegacyText.RED + "メインハンドにアイテムを持ってください。"));
       }
    }
 
@@ -273,7 +275,7 @@ public class AttrGuiManager implements Listener {
    }
 
    private static String readable(Attribute a) {
-      return a.name().replace("GENERIC_", "").toLowerCase().replace('_', ' ');
+      return a.getKey().getKey().replace("generic_", "").replace('_', ' ');
    }
 
    private void refreshValueHeader(Player p, AttrEditSession s) {
@@ -283,8 +285,8 @@ public class AttrGuiManager implements Listener {
             double display = s.cur().getDraftOrSaved();
             ItemStack it = new ItemStack(Material.BOOK);
             ItemMeta im = it.getItemMeta();
-            im.setDisplayName(ChatColor.GRAY + "現在値: " + ChatColor.WHITE + (display == -2.0 ? ChatColor.RED + "未設定" : String.format("%.2f", display)));
-            im.setLore(Collections.singletonList(ChatColor.DARK_GRAY + " -『未設定に戻す』で未設定へ"));
+            im.displayName(LegacyText.component(LegacyText.GRAY + "現在値: " + LegacyText.WHITE + (display == -2.0 ? LegacyText.RED + "未設定" : String.format("%.2f", display))));
+            im.lore(LegacyText.components(Collections.singletonList(LegacyText.DARK_GRAY + " -『未設定に戻す』で未設定へ")));
             it.setItemMeta(im);
             inv.setItem(4, it);
          }

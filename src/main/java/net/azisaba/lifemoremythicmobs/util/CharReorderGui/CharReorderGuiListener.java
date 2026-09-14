@@ -2,9 +2,9 @@ package net.azisaba.lifemoremythicmobs.util.CharReorderGui;
 
 import io.lumine.mythic.bukkit.MythicBukkit;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import net.azisaba.lifemoremythicmobs.util.VariableUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -150,8 +150,10 @@ public class CharReorderGuiListener implements Listener {
 
    private String getChar(ItemStack is) {
       ItemMeta meta = is.getItemMeta();
-      String name = meta != null && meta.hasDisplayName() ? meta.getDisplayName() : "";
-      return ChatColor.stripColor(name);
+      if (meta != null && meta.hasDisplayName() && meta.displayName() != null) {
+         return LegacyText.plain(meta.displayName());
+      }
+      return "";
    }
 
    private String buildResultString(Inventory inv, int maxChars) {

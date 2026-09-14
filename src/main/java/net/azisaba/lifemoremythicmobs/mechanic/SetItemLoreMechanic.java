@@ -10,12 +10,14 @@ import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
 import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
-import org.bukkit.ChatColor;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SetItemLoreMechanic extends SkillMechanic implements ITargetedEntitySkill {
@@ -43,13 +45,13 @@ public class SetItemLoreMechanic extends SkillMechanic implements ITargetedEntit
          if (meta == null) {
             return SkillResult.ERROR;
          } else {
-            List<String> lore = meta.getLore();
+            List<Component> lore = meta.lore();
             if (lore == null) {
                return SkillResult.ERROR;
             } else if (this.line >= 0 && this.line < lore.size()) {
-               String newText = ChatColor.translateAlternateColorCodes('&', this.text.get(data));
-               lore.set(this.line, newText);
-               meta.setLore(lore);
+               List<Component> newLore = new ArrayList<>(lore);
+               newLore.set(this.line, LegacyText.ampersandComponent(this.text.get(data)));
+               meta.lore(newLore);
                item.setItemMeta(meta);
                return SkillResult.SUCCESS;
             } else {

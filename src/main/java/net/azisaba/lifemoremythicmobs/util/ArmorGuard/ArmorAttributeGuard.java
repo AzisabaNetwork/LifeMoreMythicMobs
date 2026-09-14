@@ -86,21 +86,21 @@ public class ArmorAttributeGuard {
       }
    }
 
-   private static UUID o2UUID(Attribute attr) {
-      return UUID.nameUUIDFromBytes(("IgaO2Guard:" + attr.name()).getBytes());
+   private static org.bukkit.NamespacedKey o2Key(Attribute attr) {
+      return new org.bukkit.NamespacedKey("lifemoremythicmobs", "o2guard_" + attr.getKey().getKey());
    }
 
-   private static UUID addUUID(Attribute attr) {
-      return UUID.nameUUIDFromBytes(("IgaClamp:" + attr.name()).getBytes());
+   private static org.bukkit.NamespacedKey addKey(Attribute attr) {
+      return new org.bukkit.NamespacedKey("lifemoremythicmobs", "clamp_" + attr.getKey().getKey());
    }
 
    private void guardAttribute(LivingEntity e, Attribute attr, double o2Min, double o2Max, boolean negToZero, double finalMin, double finalMax) {
       AttributeInstance inst = e.getAttribute(attr);
       if (inst != null) {
-         UUID myO2 = o2UUID(attr);
-         UUID myAdd = addUUID(attr);
-         removeByUUID(inst, myO2);
-         removeByUUID(inst, myAdd);
+         org.bukkit.NamespacedKey myO2 = o2Key(attr);
+         org.bukkit.NamespacedKey myAdd = addKey(attr);
+         removeByKey(inst, myO2);
+         removeByKey(inst, myAdd);
          List<AttributeModifier> mods = new ArrayList<>(inst.getModifiers());
          List<AttributeModifier> addMods = filter(mods, Operation.ADD_NUMBER, myO2, myAdd);
          List<AttributeModifier> o1Mods = filter(mods, Operation.ADD_SCALAR, myO2, myAdd);
@@ -126,7 +126,7 @@ public class ArmorAttributeGuard {
          }
 
          target = clamp(target, o2Min, o2Max);
-         removeByUUID(inst, myO2);
+         removeByKey(inst, myO2);
          boolean degenerateProd = !Double.isFinite(prod) || Math.abs(prod) < EPS;
          double patch;
          if (target != 0.0 && !degenerateProd) {
@@ -145,7 +145,7 @@ public class ArmorAttributeGuard {
          }
 
          if (patch != 0.0) {
-            AttributeModifier m = new AttributeModifier(myO2, "IgaO2Guard", patch, Operation.MULTIPLY_SCALAR_1);
+            AttributeModifier m = new AttributeModifier(myO2, patch, Operation.MULTIPLY_SCALAR_1);
             inst.addModifier(m);
             if (this.settings.debug) {
                this.logDebug(e, attr, "O2 patch (safe) applied: patch=" + patch + " prod=" + prod + " target=" + target);
@@ -161,9 +161,9 @@ public class ArmorAttributeGuard {
          double v1 = v0 + base * sumAmount(o1Mods);
          double v2 = v1 * productFactor(o2Mods);
          if (!Double.isFinite(v2)) {
-            removeByUUID(inst, myO2);
-            removeByUUID(inst, myAdd);
-            AttributeModifier kill = new AttributeModifier(myO2, "IgaO2Guard", -1.0, Operation.MULTIPLY_SCALAR_1);
+            removeByKey(inst, myO2);
+            removeByKey(inst, myAdd);
+            AttributeModifier kill = new AttributeModifier(myO2, -1.0, Operation.MULTIPLY_SCALAR_1);
             inst.addModifier(kill);
             if (this.settings.debug) {
                this.logDebug(e, attr, "v2 non-finite -> forcing O2=0 with patch=-1.0");
@@ -171,14 +171,14 @@ public class ArmorAttributeGuard {
          } else {
             double clamped = clamp(v2, finalMin, finalMax);
             double needAdd = clamped - v2;
-            removeByUUID(inst, myAdd);
+            removeByKey(inst, myAdd);
             if (Double.isFinite(needAdd)) {
                if (Math.abs(needAdd) > ADD_CAP) {
                   needAdd = Math.copySign(ADD_CAP, needAdd);
                }
 
                if (Math.abs(needAdd) > 1.0E-9) {
-                  AttributeModifier patchAdd = new AttributeModifier(myAdd, "IgaClamp", needAdd, Operation.ADD_NUMBER);
+                  AttributeModifier patchAdd = new AttributeModifier(myAdd, needAdd, Operation.ADD_NUMBER);
                   inst.addModifier(patchAdd);
                   if (this.settings.debug) {
                      this.logDebug(e, attr, String.format("Final clamp: v2=%.6f -> %.6f (add %.6f)", v2, clamped, needAdd));
@@ -193,18 +193,16 @@ public class ArmorAttributeGuard {
       }
    }
 
-   private static List<AttributeModifier> filter(Collection<AttributeModifier> src, Operation op, UUID exclude1, UUID exclude2) {
+   private static List<AttributeModifier> filter(Collection<AttributeModifier> src, Operation op, org.bukkit.NamespacedKey exclude1, org.bukkit.NamespacedKey exclude2) {
       return src.stream()
          .filter(m -> m.getOperation() == op)
-         .filter(m -> exclude1 == null || !m.getUniqueId().equals(exclude1))
-         .filter(m -> exclude2 == null || !m.getUniqueId().equals(exclude2))
+         .filter(m -> exclude1 == null || !m.getKey().equals(exclude1))
+         .filter(m -> exclude2 == null || !m.getKey().equals(exclude2))
          .collect(Collectors.toList());
    }
 
-   private static void removeByUUID(AttributeInstance inst, UUID uuid) {
-      for (AttributeModifier m : inst.getModifiers().stream().filter(mx -> mx.getUniqueId().equals(uuid)).collect(Collectors.toList())) {
-         inst.removeModifier(m);
-      }
+   private static void removeByKey(AttributeInstance inst, org.bukkit.NamespacedKey key) {
+      inst.removeModifier(key);
    }
 
    private static double sumAmount(Collection<AttributeModifier> mods) {
@@ -240,7 +238,7 @@ public class ArmorAttributeGuard {
    }
 
    private void logDebug(LivingEntity e, Attribute attr, String msg) {
-      IgaDebugLogger.log(this.getClass(), "[Debug][" + e.getType().name() + "@" + e.getUniqueId() + "][" + attr.name() + "] " + msg);
+      IgaDebugLogger.log(this.getClass(), "[Debug][" + e.getType().name() + "@" + e.getUniqueId() + "][" + attr.getKey().getKey() + "] " + msg);
    }
 }
 

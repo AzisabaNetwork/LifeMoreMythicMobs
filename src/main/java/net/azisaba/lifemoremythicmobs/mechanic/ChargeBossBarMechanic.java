@@ -10,8 +10,8 @@ import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
@@ -58,8 +58,8 @@ public class ChargeBossBarMechanic extends SkillMechanic implements ITargetedEnt
    private SkillResult castAtEntitySync(SkillMetadata data, AbstractEntity target) {
       Player player = (Player)target.getBukkitEntity();
       UUID uuid = player.getUniqueId();
-      String resolvedTitle = ChatColor.translateAlternateColorCodes('&', this.barTitleRaw.get(data));
-      String titleKey = ChatColor.stripColor(resolvedTitle).toLowerCase();
+      String resolvedTitle = LegacyText.translateAlternateColorCodes('&', this.barTitleRaw.get(data));
+      String titleKey = LegacyText.stripColor(resolvedTitle).toLowerCase();
       String resolvedBarKey = this.barKeyRaw != null ? this.barKeyRaw.get(data) : null;
       String key = resolvedBarKey != null ? resolvedBarKey : titleKey;
       ConcurrentMap<String, ChargeBossBarMechanic.BossBarHolder> playerBars = bossBars.computeIfAbsent(uuid, k -> new ConcurrentHashMap<>());

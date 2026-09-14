@@ -11,7 +11,7 @@ import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.damage.DamagingMechanic;
 import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
-import org.bukkit.ChatColor;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -64,7 +64,7 @@ public class KillMessageDamageMechanic extends DamagingMechanic implements ITarg
       Entity bt = BukkitAdapter.adapt(target);
       Entity bc = BukkitAdapter.adapt(data.getCaster().getEntity());
       String msgRaw = this.message.get(data);
-      String msg = ChatColor.translateAlternateColorCodes(
+      String msg = LegacyText.translateAlternateColorCodes(
          '&', msgRaw.replace("{caster}", bc != null ? bc.getName() : "Unknown").replace("{victim}", bt.getName())
       );
       boolean appliedPending = false;
