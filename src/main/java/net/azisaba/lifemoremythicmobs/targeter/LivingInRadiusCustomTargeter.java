@@ -1,4 +1,4 @@
-package net.azisaba.lifemoremythicmobs.targeters;
+package net.azisaba.lifemoremythicmobs.targeter;
 
 import com.google.common.collect.Sets;
 import io.lumine.mythic.api.adapters.AbstractEntity;

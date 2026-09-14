@@ -1,4 +1,4 @@
-package net.azisaba.lifemoremythicmobs.placeholders;
+package net.azisaba.lifemoremythicmobs.placeholder;
 
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.skills.SkillMetadata;

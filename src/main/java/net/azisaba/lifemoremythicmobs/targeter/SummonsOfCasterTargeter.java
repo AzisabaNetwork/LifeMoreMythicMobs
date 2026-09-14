@@ -1,4 +1,4 @@
-package net.azisaba.lifemoremythicmobs.targeters;
+package net.azisaba.lifemoremythicmobs.targeter;
 
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;

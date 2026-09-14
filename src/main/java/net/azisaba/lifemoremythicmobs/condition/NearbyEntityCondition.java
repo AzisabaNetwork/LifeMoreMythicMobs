@@ -1,4 +1,4 @@
-package net.azisaba.lifemoremythicmobs.conditions;
+package net.azisaba.lifemoremythicmobs.condition;
 
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
