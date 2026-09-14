@@ -1,10 +1,11 @@
 package net.azisaba.lifemoremythicmobs.util;
 
+import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.events.MythicTargeterLoadEvent;
-import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.core.skills.targeters.IEntitySelector;
 import io.lumine.mythic.core.utils.annotations.MythicTargeter;
+
 import java.lang.reflect.Constructor;
 import java.util.Locale;
 import java.util.logging.Level;

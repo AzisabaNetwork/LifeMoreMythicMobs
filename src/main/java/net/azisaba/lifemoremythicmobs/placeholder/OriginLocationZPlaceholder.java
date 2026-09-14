@@ -1,15 +1,13 @@
-package net.azisaba.lifemoremythicmobs.placeholders;
-
-import net.azisaba.lifemoremythicmobs.util.PlaceholderFactory;
+package net.azisaba.lifemoremythicmobs.placeholder;
 
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.skills.SkillMetadata;
-import io.lumine.mythic.core.skills.placeholders.Placeholder;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
+import net.azisaba.lifemoremythicmobs.util.PlaceholderFactory;
 
-public class OriginLocationXPlaceholder {
+public class OriginLocationZPlaceholder {
    public static void register(PlaceholderManager manager) {
-      manager.register("origin_l_x", PlaceholderFactory.meta((placeholderMeta, s) -> {
+      manager.register("origin_l_z", PlaceholderFactory.meta((placeholderMeta, s) -> {
          if (!(placeholderMeta instanceof SkillMetadata)) {
             return "0";
          }
@@ -20,8 +18,8 @@ public class OriginLocationXPlaceholder {
             return "null";
          }
 
-         double x = origin.getX();
-         return String.valueOf(x);
+         double z = origin.getZ();
+         return String.valueOf(z);
       }));
    }
 }

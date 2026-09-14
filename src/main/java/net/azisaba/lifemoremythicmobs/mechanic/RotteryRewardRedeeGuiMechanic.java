@@ -1,71 +1,43 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import io.lumine.mythic.api.adapters.AbstractEntity;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderInt;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.ChatColor;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Material;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.EventHandler;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.EventPriority;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.player.PlayerSwapHandItemsEvent;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RotteryRewardRedeeGuiMechanic extends SkillMechanic implements ITargetedEntitySkill {
    private final LifeMoreMythicMobs plugin = JavaPlugin.getPlugin(LifeMoreMythicMobs.class);
    private final PlaceholderInt ticksA;
    private final PlaceholderInt ticksB;
-   private static final String TITLE = ChatColor.translateAlternateColorCodes('&', "&6宝くじを換金ちゅう");
+   private static final Component TITLE = LegacyText.ampersandComponent("&6宝くじを換金ちゅう");
    private static final int SLOT_A = 11;
    private static final int SLOT_B = 12;
    private static final int SLOT_C = 13;
@@ -143,7 +115,7 @@ public class RotteryRewardRedeeGuiMechanic extends SkillMechanic implements ITar
       ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
       ItemMeta meta = filler.getItemMeta();
       if (meta != null) {
-         meta.setDisplayName(" ");
+         meta.displayName(LegacyText.component(" "));
          filler.setItemMeta(meta);
       }
 
@@ -157,7 +129,7 @@ public class RotteryRewardRedeeGuiMechanic extends SkillMechanic implements ITar
       ItemMeta meta = it.getItemMeta();
       if (meta != null) {
          meta.setCustomModelData(cmd);
-         meta.setDisplayName(ChatColor.RESET + "");
+         meta.displayName(Component.empty());
          it.setItemMeta(meta);
       }
 
@@ -169,7 +141,7 @@ public class RotteryRewardRedeeGuiMechanic extends SkillMechanic implements ITar
       ItemMeta meta = it.getItemMeta();
       if (meta != null) {
          meta.setCustomModelData(cmd);
-         meta.setDisplayName(ChatColor.RESET + "");
+         meta.displayName(Component.empty());
          it.setItemMeta(meta);
       }
 

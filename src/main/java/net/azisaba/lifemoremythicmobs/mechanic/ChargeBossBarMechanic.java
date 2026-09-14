@@ -1,21 +1,17 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
@@ -23,6 +19,10 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class ChargeBossBarMechanic extends SkillMechanic implements ITargetedEntitySkill {
    private static final ConcurrentMap<UUID, ConcurrentMap<String, ChargeBossBarMechanic.BossBarHolder>> bossBars = new ConcurrentHashMap<>();
@@ -58,8 +58,8 @@ public class ChargeBossBarMechanic extends SkillMechanic implements ITargetedEnt
    private SkillResult castAtEntitySync(SkillMetadata data, AbstractEntity target) {
       Player player = (Player)target.getBukkitEntity();
       UUID uuid = player.getUniqueId();
-      String resolvedTitle = ChatColor.translateAlternateColorCodes('&', this.barTitleRaw.get(data));
-      String titleKey = ChatColor.stripColor(resolvedTitle).toLowerCase();
+      String resolvedTitle = LegacyText.translateAlternateColorCodes('&', this.barTitleRaw.get(data));
+      String titleKey = LegacyText.stripColor(resolvedTitle).toLowerCase();
       String resolvedBarKey = this.barKeyRaw != null ? this.barKeyRaw.get(data) : null;
       String key = resolvedBarKey != null ? resolvedBarKey : titleKey;
       ConcurrentMap<String, ChargeBossBarMechanic.BossBarHolder> playerBars = bossBars.computeIfAbsent(uuid, k -> new ConcurrentHashMap<>());

@@ -3,15 +3,10 @@ package net.azisaba.lifemoremythicmobs.util;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractWorld;
 import io.lumine.mythic.api.skills.SkillMetadata;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
+
 import javax.annotation.Nullable;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MetaSkillVariableStore {
    private static final Map<String, String> GLOBAL = new ConcurrentHashMap<>();

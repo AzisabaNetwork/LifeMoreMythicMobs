@@ -1,24 +1,19 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.api.skills.IParentSkill;
-import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.api.skills.Skill;
-import io.lumine.mythic.api.skills.SkillMetadata;
-import io.lumine.mythic.api.skills.SkillResult;
-import io.lumine.mythic.core.skills.auras.Aura;
-import io.lumine.mythic.core.skills.auras.Aura.AuraTracker;
+import io.lumine.mythic.api.skills.*;
+import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.utils.Events;
-import java.util.Optional;
-import java.util.UUID;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.auras.Aura;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+
+import java.util.Optional;
+import java.util.UUID;
 
 public class OnSwingMechanic extends Aura implements ITargetedEntitySkill {
    private Optional<Skill> onSwingSkill = Optional.empty();

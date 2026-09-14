@@ -1,16 +1,12 @@
 package net.azisaba.lifemoremythicmobs.config;
 
 import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class IgaConfigService {
    private final JavaPlugin plugin;

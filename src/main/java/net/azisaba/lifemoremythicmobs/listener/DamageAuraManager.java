@@ -2,8 +2,8 @@ package net.azisaba.lifemoremythicmobs.listener;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.UUID;
 import java.util.Map.Entry;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DamageAuraManager {

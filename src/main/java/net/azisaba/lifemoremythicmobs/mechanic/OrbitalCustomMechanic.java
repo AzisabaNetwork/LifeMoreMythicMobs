@@ -1,54 +1,35 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.adapters.AbstractVector;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.items.MythicItem;
-import io.lumine.mythic.core.logging.MythicLogger;
-import io.lumine.mythic.core.logging.MythicLogger.DebugLevel;
-import io.lumine.mythic.core.mobs.ActiveMob;
 import io.lumine.mythic.api.mobs.MythicMob;
 import io.lumine.mythic.api.mobs.entities.SpawnReason;
-import io.lumine.mythic.core.skills.AbstractSkill;
-import io.lumine.mythic.api.skills.IParentSkill;
-import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.api.skills.ITargetedLocationSkill;
-import io.lumine.mythic.api.skills.Skill;
-import io.lumine.mythic.api.skills.SkillMetadata;
-import io.lumine.mythic.api.skills.SkillResult;
-import io.lumine.mythic.core.skills.auras.Aura;
-import io.lumine.mythic.core.skills.auras.Aura.AuraTracker;
+import io.lumine.mythic.api.skills.*;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderFloat;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderInt;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
-import io.lumine.mythic.core.skills.projectiles.ProjectileHitBox;
-import io.lumine.mythic.core.utils.VectorUtils;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.utils.Schedulers;
 import io.lumine.mythic.bukkit.utils.items.ItemFactory;
-import io.lumine.mythic.bukkit.utils.version.MinecraftVersions;
-import io.lumine.mythic.bukkit.utils.version.ServerVersion;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import io.lumine.mythic.core.items.MythicItem;
+import io.lumine.mythic.core.logging.MythicLogger;
+import io.lumine.mythic.core.logging.MythicLogger.DebugLevel;
+import io.lumine.mythic.core.mobs.ActiveMob;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.auras.Aura;
+import io.lumine.mythic.core.skills.projectiles.ProjectileHitBox;
+import io.lumine.mythic.core.utils.VectorUtils;
 import org.bukkit.Material;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.EulerAngle;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class OrbitalCustomMechanic extends Aura implements ITargetedEntitySkill, ITargetedLocationSkill {
    public static final Set<AbstractEntity> BULLET_ENTITIES = ConcurrentHashMap.newKeySet();
@@ -422,12 +403,9 @@ public class OrbitalCustomMechanic extends Aura implements ITargetedEntitySkill,
             Schedulers.sync().run(() -> {
                if (!this.hasTerminated()) {
                   AbstractLocation l = this.getBaseLocation().clone().subtract(0.0, 0.5, 0.0);
-                  FallingBlock block;
-                  if (ServerVersion.isAfterOrEq(MinecraftVersions.v1_15)) {
-                     block = BukkitAdapter.adapt(l).getWorld().spawnFallingBlock(BukkitAdapter.adapt(l), this.resolvedBulletMaterial.createBlockData());
-                  } else {
-                     block = BukkitAdapter.adapt(l).getWorld().spawnFallingBlock(BukkitAdapter.adapt(l), this.resolvedBulletMaterial, (byte)0);
-                  }
+                  FallingBlock block = BukkitAdapter.adapt(l).getWorld().spawn(BukkitAdapter.adapt(l), FallingBlock.class, fb -> {
+                     fb.setBlockData(this.resolvedBulletMaterial.createBlockData());
+                  });
 
                   block.setHurtEntities(false);
                   block.setDropItem(false);
@@ -465,7 +443,7 @@ public class OrbitalCustomMechanic extends Aura implements ITargetedEntitySkill,
                if (!this.hasTerminated()) {
                   AbstractLocation l = this.getBaseLocation().clone();
                   ArmorStand as = (ArmorStand)BukkitAdapter.adapt(l).getWorld().spawnEntity(BukkitAdapter.adapt(l), EntityType.ARMOR_STAND);
-                  as.setCustomName("Dinnerbone");
+                  as.customName(net.kyori.adventure.text.Component.text("Dinnerbone"));
                   as.setCustomNameVisible(false);
                   as.setHeadPose(new EulerAngle(0.0, 0.0, 0.0));
                   as.getEquipment().setHelmet(new ItemStack(this.resolvedBulletMaterial));

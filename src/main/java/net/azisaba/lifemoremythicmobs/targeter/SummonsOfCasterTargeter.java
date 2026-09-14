@@ -1,22 +1,23 @@
-package net.azisaba.lifemoremythicmobs.targeters;
+package net.azisaba.lifemoremythicmobs.targeter;
 
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.skills.SkillExecutor;
-import io.lumine.mythic.core.mobs.ActiveMob;
 import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.mobs.ActiveMob;
+import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.targeters.IEntitySelector;
-import java.util.Optional;
-import java.util.HashSet;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class SummonsOfCasterTargeter extends IEntitySelector {
    public SummonsOfCasterTargeter(SkillExecutor executor, MythicLineConfig config) {

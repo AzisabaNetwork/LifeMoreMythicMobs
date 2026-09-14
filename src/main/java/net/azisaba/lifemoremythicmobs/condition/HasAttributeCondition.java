@@ -1,16 +1,21 @@
-package net.azisaba.lifemoremythicmobs.conditions;
+package net.azisaba.lifemoremythicmobs.condition;
 
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.skills.SkillCondition;
 import io.lumine.mythic.api.skills.conditions.IEntityCondition;
-import java.util.Collection;
+import io.lumine.mythic.core.skills.SkillCondition;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Collection;
+import java.util.Locale;
 
 public class HasAttributeCondition extends SkillCondition implements IEntityCondition {
    private final String slot;
@@ -19,9 +24,20 @@ public class HasAttributeCondition extends SkillCondition implements IEntityCond
 
    public HasAttributeCondition(MythicLineConfig config) {
       super(config.getLine());
-      this.slot = config.getString(new String[]{"slot", "s"}, "HEAD", new String[0]).toUpperCase();
-      this.attributeSlot = config.getString(new String[]{"attributeslot", "as"}, "HEAD", new String[0]).toUpperCase();
-      this.attribute = Attribute.valueOf(config.getString(new String[]{"attribute", "a"}, "GENERIC_ARMOR", new String[0]).toUpperCase());
+      this.slot = config.getString(new String[]{"slot", "s"}, "HEAD").toUpperCase(Locale.ROOT);
+      this.attributeSlot = config.getString(new String[]{"attributeslot", "as"}, "HEAD").toUpperCase(Locale.ROOT);
+      String attrRaw = config.getString(new String[]{"attribute", "a"}, "ARMOR");
+      this.attribute = parseAttribute(attrRaw);
+   }
+
+   private static Attribute parseAttribute(String name) {
+      if (name == null || name.isEmpty()) return Attribute.ARMOR;
+      String clean = name.toLowerCase(Locale.ROOT).replace("generic_", "");
+      Attribute attr = Registry.ATTRIBUTE.get(NamespacedKey.minecraft(clean));
+      if (attr != null) return attr;
+      attr = Registry.ATTRIBUTE.get(NamespacedKey.minecraft(name.toLowerCase(Locale.ROOT)));
+      if (attr != null) return attr;
+      return Attribute.ARMOR;
    }
 
    public boolean check(AbstractEntity entity) {
@@ -33,7 +49,7 @@ public class HasAttributeCondition extends SkillCondition implements IEntityCond
       ItemStack item = this.getItemFromSlot(player, this.slot);
       if (item != null && item.hasItemMeta()) {
          ItemMeta meta = item.getItemMeta();
-         if (meta == null) {
+         if (meta == null || this.attribute == null) {
             return false;
          }
 
@@ -44,7 +60,8 @@ public class HasAttributeCondition extends SkillCondition implements IEntityCond
          }
 
          for (AttributeModifier mod : modifiers) {
-            if (mod.getSlot() == slotEnum) {
+            EquipmentSlotGroup slotGroup = mod.getSlotGroup();
+            if (slotGroup != null && slotGroup.test(slotEnum)) {
                return true;
             }
          }

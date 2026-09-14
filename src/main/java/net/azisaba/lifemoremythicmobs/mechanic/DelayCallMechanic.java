@@ -1,20 +1,16 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.api.skills.INoTargetSkill;
-import io.lumine.mythic.api.skills.Skill;
-import io.lumine.mythic.api.skills.SkillManager;
-import io.lumine.mythic.core.skills.SkillMechanic;
-import io.lumine.mythic.api.skills.SkillMetadata;
-import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.api.skills.*;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
-import java.util.Optional;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Optional;
 
 public class DelayCallMechanic extends SkillMechanic implements INoTargetSkill {
    private final PlaceholderDouble ticks;

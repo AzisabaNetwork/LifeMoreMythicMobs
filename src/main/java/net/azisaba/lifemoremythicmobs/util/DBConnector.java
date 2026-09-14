@@ -2,12 +2,13 @@ package net.azisaba.lifemoremythicmobs.util;
 
 import io.lumine.mythic.bukkit.utils.storage.sql.hikari.HikariConfig;
 import io.lumine.mythic.bukkit.utils.storage.sql.hikari.HikariDataSource;
+import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Objects;
-import javax.annotation.Nullable;
-import org.jetbrains.annotations.NotNull;
 
 public class DBConnector {
    @Nullable

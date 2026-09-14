@@ -1,9 +1,10 @@
 package net.azisaba.lifemoremythicmobs.util;
 
-import java.lang.reflect.Method;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+
+import java.lang.reflect.Method;
 
 /** Optional, reflection-only bridge so LifeMoreMythicMobs remains usable without HoroloCore. */
 public final class HoroloElementalDefenseBridge {

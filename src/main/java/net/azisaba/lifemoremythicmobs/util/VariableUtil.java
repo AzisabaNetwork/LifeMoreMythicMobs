@@ -1,8 +1,8 @@
 package net.azisaba.lifemoremythicmobs.util;
 
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.skills.variables.VariableRegistry;
 import io.lumine.mythic.core.skills.variables.VariableScope;
 

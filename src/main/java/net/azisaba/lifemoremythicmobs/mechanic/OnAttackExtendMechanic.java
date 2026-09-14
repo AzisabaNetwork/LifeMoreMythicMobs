@@ -1,20 +1,19 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
 import io.lumine.mythic.api.adapters.AbstractEntity;
-import io.lumine.mythic.bukkit.BukkitAdapter;
-import io.lumine.mythic.bukkit.adapters.BukkitTriggerMetadata;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.IParentSkill;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
-import io.lumine.mythic.core.skills.auras.Aura.AuraTracker;
-import io.lumine.mythic.core.skills.mechanics.OnAttackMechanic;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.bukkit.adapters.BukkitTriggerMetadata;
 import io.lumine.mythic.bukkit.utils.Events;
-import java.util.Optional;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.mechanics.OnAttackMechanic;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import java.util.Optional;
 
 public class OnAttackExtendMechanic extends OnAttackMechanic {
    private final boolean useFinal;

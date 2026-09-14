@@ -1,9 +1,7 @@
 package net.azisaba.lifemoremythicmobs.util;
 
-import io.lumine.mythic.api.mobs.MythicMob;
-import io.lumine.mythic.bukkit.MythicBukkit;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.core.skills.variables.VariableRegistry;
 import io.lumine.mythic.core.skills.variables.VariableScope;
 import org.bukkit.NamespacedKey;
@@ -16,8 +14,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ItemUtil {

@@ -1,24 +1,20 @@
-package net.azisaba.lifemoremythicmobs.conditions;
+package net.azisaba.lifemoremythicmobs.condition;
 
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractLocation;
-import io.lumine.mythic.bukkit.BukkitAdapter;
-import io.lumine.mythic.bukkit.compatibility.WorldGuardSupport;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.skills.SkillCondition;
 import io.lumine.mythic.api.skills.conditions.IEntityCondition;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.bukkit.compatibility.WorldGuardSupport;
+import io.lumine.mythic.core.skills.SkillCondition;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import org.bukkit.entity.Entity;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class WorldNotInConfigCondition extends SkillCondition implements IEntityCondition {
    private final Set<String> excludeWorldsLower;

@@ -1,26 +1,24 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.adapters.AbstractVector;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.logging.MythicLogger;
 import io.lumine.mythic.api.skills.Skill;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.logging.MythicLogger;
+import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.mechanics.ProjectileMechanic;
 import io.lumine.mythic.core.skills.projectiles.ProjectileBulletType;
-import io.lumine.mythic.core.skills.projectiles.Projectile.ProjectileTracker;
 import io.lumine.mythic.core.utils.BlockUtil;
 import io.lumine.mythic.core.utils.MythicUtil;
-import java.util.HashSet;
-import java.util.Map.Entry;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
+
+import java.util.HashSet;
 
 public class CustomProjectileMechanic extends ProjectileMechanic {
    private final String pathType;

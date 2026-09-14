@@ -1,29 +1,29 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.INoTargetSkill;
 import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AttributeBuffMechanic extends SkillMechanic implements ITargetedEntitySkill, INoTargetSkill {
    private final PlaceholderString attributeName;
@@ -71,22 +71,22 @@ public class AttributeBuffMechanic extends SkillMechanic implements ITargetedEnt
             Operation op = parseOperation(safeLower(this.operation.get(data, target)));
             long ticks = Math.max(1L, Math.round(this.duration.get(data, target) * 20.0));
             String keyArg = this.key.get(data, target);
-            String key = !"<attr>".equals(keyArg) && keyArg != null && !keyArg.isEmpty() ? keyArg : attr.name();
+            String key = !"<attr>".equals(keyArg) && keyArg != null && !keyArg.isEmpty() ? keyArg : attr.getKey().getKey();
             AttributeInstance inst = le.getAttribute(attr);
             if (inst == null) {
                if (this.log) {
-                  IgaDebugLogger.log(this.getClass(), String.format("entity %s has no attribute %s, skip.", le.getType(), attr.name()));
+                  IgaDebugLogger.log(this.getClass(), String.format("entity %s has no attribute %s, skip.", le.getType(), attr.getKey().getKey()));
                }
 
                return SkillResult.ERROR;
             } else {
-               UUID uuid = UUID.nameUUIDFromBytes(("IgaAttrBuff:" + attr.name() + ":" + key).getBytes());
-               inst.getModifiers().stream().filter(m -> m.getUniqueId().equals(uuid)).forEach(inst::removeModifier);
+               org.bukkit.NamespacedKey modKey = new org.bukkit.NamespacedKey("lifemoremythicmobs", "buff_" + sanitizeKey(attr.getKey().getKey() + "_" + key));
+               inst.removeModifier(modKey);
                amount = clampFinite(amount, -1024.0, 1024.0);
-               AttributeModifier mod = new AttributeModifier(uuid, "IgaAttrBuff:" + key, amount, op);
+               AttributeModifier mod = new AttributeModifier(modKey, amount, op);
                inst.addModifier(mod);
                if (this.log) {
-                  IgaDebugLogger.log(this.getClass(), String.format("add %s amount=%.5f op=%s key=%s to=%s", attr.name(), amount, op.name(), key, le.getName()));
+                  IgaDebugLogger.log(this.getClass(), String.format("add %s amount=%.5f op=%s key=%s to=%s", attr.getKey().getKey(), amount, op.name(), key, le.getName()));
                }
 
                if (this.healToMax && attr == Attribute.MAX_HEALTH) {
@@ -97,7 +97,7 @@ public class AttributeBuffMechanic extends SkillMechanic implements ITargetedEnt
                   }
                }
 
-               this.scheduleTimeRemoval(le, attr, uuid, ticks);
+               this.scheduleTimeRemoval(le, attr, modKey, ticks);
                return SkillResult.SUCCESS;
             }
          } else {
@@ -172,12 +172,16 @@ public class AttributeBuffMechanic extends SkillMechanic implements ITargetedEnt
       return s;
    }
 
+   private static String sanitizeKey(String s) {
+      return s.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9/._-]", "_");
+   }
+
    private static Attribute parseAttribute(String name) {
-      try {
-         return Attribute.valueOf(name);
-      } catch (IllegalArgumentException e) {
-         return null;
-      }
+      if (name == null || name.isEmpty()) return null;
+      String clean = name.toLowerCase(Locale.ROOT).replace("generic_", "");
+      Attribute attr = org.bukkit.Registry.ATTRIBUTE.get(org.bukkit.NamespacedKey.minecraft(clean));
+      if (attr != null) return attr;
+      return org.bukkit.Registry.ATTRIBUTE.get(org.bukkit.NamespacedKey.minecraft(name.toLowerCase(Locale.ROOT)));
    }
 
    private static Operation parseOperation(String op) {
@@ -228,17 +232,17 @@ public class AttributeBuffMechanic extends SkillMechanic implements ITargetedEnt
       }
    }
 
-   private void scheduleTimeRemoval(LivingEntity le, Attribute attr, UUID uuid, long delayTicks) {
-      String genKey = genKey(le, attr, uuid);
+   private void scheduleTimeRemoval(LivingEntity le, Attribute attr, org.bukkit.NamespacedKey key, long delayTicks) {
+      String genKey = genKey(le, attr, key);
       int myGen = GEN_MAP.merge(genKey, 1, (oldV, n) -> this.refresh ? oldV + 1 : oldV + 1);
       Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(LifeMoreMythicMobs.class), () -> {
          Integer g = GEN_MAP.get(genKey);
          if (g != null && g == myGen) {
             AttributeInstance inst = le.getAttribute(attr);
             if (inst != null) {
-               inst.getModifiers().stream().filter(m -> m.getUniqueId().equals(uuid)).forEach(inst::removeModifier);
+               inst.removeModifier(key);
                if (this.log) {
-                  IgaDebugLogger.log(this.getClass(), String.format("removed %s uuid=%s from=%s", attr.name(), uuid, le.getName()));
+                  IgaDebugLogger.log(this.getClass(), String.format("removed %s key=%s from=%s", attr.getKey().getKey(), key, le.getName()));
                }
 
                if (attr == Attribute.MAX_HEALTH) {
@@ -257,8 +261,8 @@ public class AttributeBuffMechanic extends SkillMechanic implements ITargetedEnt
       }, delayTicks);
    }
 
-   private static String genKey(LivingEntity le, Attribute attr, UUID uuid) {
-      return le.getUniqueId() + "|" + attr.name() + "|" + uuid.toString();
+   private static String genKey(LivingEntity le, Attribute attr, org.bukkit.NamespacedKey key) {
+      return le.getUniqueId() + "|" + attr.getKey().getKey() + "|" + key.toString();
    }
 }
 

@@ -1,9 +1,10 @@
 package net.azisaba.lifemoremythicmobs.session;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.inventory.EquipmentSlot;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class AttrEditSession {
    public static final double UNSET = -2.0;

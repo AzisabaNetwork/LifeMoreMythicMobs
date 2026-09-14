@@ -1,21 +1,17 @@
 package net.azisaba.lifemoremythicmobs.mechanic.mahjong;
 
-import net.azisaba.lifemoremythicmobs.util.VariableUtil;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.core.skills.SkillMechanic;
-import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.util.VariableUtil;
 import org.json.JSONArray;
+
+import java.util.*;
 
 public class MahjongHaiyamaInitMechanic extends SkillMechanic implements ITargetedEntitySkill {
    private final String varName;

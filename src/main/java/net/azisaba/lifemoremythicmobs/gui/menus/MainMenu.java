@@ -2,9 +2,8 @@ package net.azisaba.lifemoremythicmobs.gui.menus;
 
 import net.azisaba.lifemoremythicmobs.gui.holder.GuiHolder;
 import net.azisaba.lifemoremythicmobs.session.AttrEditSession;
-import java.util.Arrays;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -13,12 +12,14 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Arrays;
+
 public class MainMenu {
    private static Attribute[] sOrder;
 
    public static Inventory build(Player p, AttrEditSession s) {
       Inventory inv = Bukkit.createInventory(
-         new GuiHolder(GuiHolder.Type.MAIN), 27, ChatColor.GOLD + "Attribute: " + ChatColor.YELLOW + readable(s.currentAttr())
+         new GuiHolder(GuiHolder.Type.MAIN), 27, LegacyText.component(LegacyText.GOLD + "Attribute: " + LegacyText.YELLOW + readable(s.currentAttr()))
       );
 
       for (int i = 0; i < 7; i++) {
@@ -30,36 +31,36 @@ public class MainMenu {
          AttrEditSession.AttrSetting set = s.getSetting(a);
          double v = set.getSaved();
          AttrEditSession.Mode m = set.getSavedMode();
-         String summary = ChatColor.DARK_GRAY
+         String summary = LegacyText.DARK_GRAY
             + " ["
             + slotName(set.getSlot())
             + "] "
-            + (m == AttrEditSession.Mode.ADD ? ChatColor.GRAY + fmtSigned(v) : ChatColor.GRAY + fmtSignedPct(v));
-         im.setDisplayName((center ? ChatColor.AQUA + "[選択中] " : ChatColor.WHITE + "") + readable(a));
-         im.setLore(Arrays.asList(ChatColor.DARK_GRAY + "値 " + (set.getValue() == -2.0 ? ChatColor.RED + "未設定" : summary)));
+            + (m == AttrEditSession.Mode.ADD ? LegacyText.GRAY + fmtSigned(v) : LegacyText.GRAY + fmtSignedPct(v));
+         im.displayName(LegacyText.component((center ? LegacyText.AQUA + "[選択中] " : LegacyText.WHITE + "") + readable(a)));
+         im.lore(LegacyText.components(Arrays.asList(LegacyText.DARK_GRAY + "値 " + (set.getValue() == -2.0 ? LegacyText.RED + "未設定" : summary))));
          it.setItemMeta(im);
          inv.setItem(10 + i, it);
       }
 
       inv.setItem(
-         20, named(Material.ARMOR_STAND, ChatColor.YELLOW + "スロット: " + ChatColor.WHITE + slotName(s.cur().getSlot()) + ChatColor.GRAY + "（左/右クリックで切替）")
+         20, named(Material.ARMOR_STAND, LegacyText.YELLOW + "スロット: " + LegacyText.WHITE + slotName(s.cur().getSlot()) + LegacyText.GRAY + "（左/右クリックで切替）")
       );
-      inv.setItem(22, named(Material.LIME_CONCRETE, ChatColor.GREEN + "決定（まとめて適用）"));
-      inv.setItem(24, named(Material.REPEATER, ChatColor.YELLOW + "数値設定へ"));
-      inv.setItem(0, named(Material.BOOK, ChatColor.GRAY + "外側クリック: 左=前 / 右=次"));
+      inv.setItem(22, named(Material.LIME_CONCRETE, LegacyText.GREEN + "決定（まとめて適用）"));
+      inv.setItem(24, named(Material.REPEATER, LegacyText.YELLOW + "数値設定へ"));
+      inv.setItem(0, named(Material.BOOK, LegacyText.GRAY + "外側クリック: 左=前 / 右=次"));
       return inv;
    }
 
    private static ItemStack named(Material m, String name) {
       ItemStack it = new ItemStack(m);
       ItemMeta im = it.getItemMeta();
-      im.setDisplayName(name);
+      im.displayName(LegacyText.component(name));
       it.setItemMeta(im);
       return it;
    }
 
    private static String readable(Attribute a) {
-      return a.name().replace("GENERIC_", "").toLowerCase().replace('_', ' ');
+      return a.getKey().getKey().replace("generic_", "").replace('_', ' ');
    }
 
    private static String slotName(EquipmentSlot s) {
@@ -82,11 +83,11 @@ public class MainMenu {
    }
 
    private static String fmtSigned(double v) {
-      return v == -2.0 ? ChatColor.RED + "未設定" : (v > 0.0 ? "+" : "") + String.format("%.2f", v);
+      return v == -2.0 ? LegacyText.RED + "未設定" : (v > 0.0 ? "+" : "") + String.format("%.2f", v);
    }
 
    private static String fmtSignedPct(double v) {
-      return v == -2.0 ? ChatColor.RED + "未設定" : (v > 0.0 ? "+" : "") + String.format("%.2f%%", v);
+      return v == -2.0 ? LegacyText.RED + "未設定" : (v > 0.0 ? "+" : "") + String.format("%.2f%%", v);
    }
 
    public static void initOrder(Attribute[] order) {

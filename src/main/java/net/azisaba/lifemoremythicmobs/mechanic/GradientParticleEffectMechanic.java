@@ -1,29 +1,25 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.adapters.AbstractPlayer;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.api.skills.ITargetedLocationSkill;
-import io.lumine.mythic.api.skills.SkillMetadata;
-import io.lumine.mythic.api.skills.SkillResult;
-import io.lumine.mythic.api.skills.ThreadSafetyLevel;
-import io.lumine.mythic.core.skills.mechanics.ParticleEffect;
+import io.lumine.mythic.api.skills.*;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderFloat;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderInt;
-import io.lumine.mythic.core.utils.MythicUtil;
+import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.utils.Schedulers;
 import io.lumine.mythic.bukkit.utils.serialize.Chroma;
-import java.awt.Color;
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicInteger;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.mechanics.ParticleEffect;
+import io.lumine.mythic.core.utils.MythicUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle.DustOptions;
 import org.bukkit.plugin.Plugin;
+
+import java.awt.*;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GradientParticleEffectMechanic extends ParticleEffect implements ITargetedEntitySkill, ITargetedLocationSkill {
    private final PlaceholderInt durationTicks;

@@ -1,21 +1,22 @@
-package net.azisaba.lifemoremythicmobs.conditions;
+package net.azisaba.lifemoremythicmobs.condition;
 
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.mobs.ActiveMob;
 import io.lumine.mythic.api.skills.SkillCaster;
-import io.lumine.mythic.core.skills.SkillCondition;
 import io.lumine.mythic.api.skills.conditions.ICasterCondition;
-import java.util.Optional;
-import java.util.Collection;
-import java.util.UUID;
-import java.util.concurrent.Future;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.mobs.ActiveMob;
+import io.lumine.mythic.core.skills.SkillCondition;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.Future;
 
 public class HutagoAngelNearbyCondition extends SkillCondition implements ICasterCondition {
    private final double radius;

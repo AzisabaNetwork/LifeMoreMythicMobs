@@ -1,8 +1,5 @@
 package net.azisaba.lifemoremythicmobs.listener;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -15,6 +12,10 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 public class KillMessageDamageListener implements Listener {
    private final Plugin plugin;

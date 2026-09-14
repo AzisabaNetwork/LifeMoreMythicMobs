@@ -1,14 +1,15 @@
-package net.azisaba.lifemoremythicmobs.conditions;
+package net.azisaba.lifemoremythicmobs.condition;
 
-import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.skills.SkillCondition;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.conditions.ISkillMetaCondition;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderInt;
+import io.lumine.mythic.core.skills.SkillCondition;
+import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
+import org.bukkit.Bukkit;
+
 import java.util.Arrays;
 import java.util.UUID;
-import org.bukkit.Bukkit;
 
 public class ChinChiro456Condition extends SkillCondition implements ISkillMetaCondition {
    private final PlaceholderInt v1;

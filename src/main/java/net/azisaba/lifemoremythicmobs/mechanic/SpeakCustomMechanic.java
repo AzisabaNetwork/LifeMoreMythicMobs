@@ -1,29 +1,24 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.adapters.AbstractPlayer;
-import io.lumine.mythic.bukkit.BukkitAdapter;
-import io.lumine.mythic.core.holograms.types.SpeechBubble;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.api.skills.INoTargetSkill;
-import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.api.skills.SkillCaster;
-import io.lumine.mythic.api.skills.SkillMetadata;
-import io.lumine.mythic.api.skills.SkillResult;
-import io.lumine.mythic.core.skills.auras.Aura;
-import io.lumine.mythic.core.skills.auras.Aura.AuraTracker;
+import io.lumine.mythic.api.skills.*;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderInt;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
 import io.lumine.mythic.api.volatilecode.virtual.PacketTextDisplay;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.holograms.types.SpeechBubble;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.auras.Aura;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 public class SpeakCustomMechanic extends Aura implements INoTargetSkill, ITargetedEntitySkill {
    private final PlaceholderString message;

@@ -2,18 +2,19 @@ package net.azisaba.lifemoremythicmobs.util.CharReorderGui;
 
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.skills.SkillMetadata;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CharReorderGuiManager {
    private static final Map<UUID, CharReorderSession> SESSIONS = new ConcurrentHashMap<>();
@@ -28,7 +29,7 @@ public class CharReorderGuiManager {
    ) {
       close(player);
       CharReorderGuiHolder holder = new CharReorderGuiHolder(player.getUniqueId());
-      Inventory inv = Bukkit.createInventory(holder, 27, ChatColor.translateAlternateColorCodes('&', title));
+      Inventory inv = Bukkit.createInventory(holder, 27, LegacyText.ampersandComponent(title));
       ItemStack filter = pane(Material.GRAY_STAINED_GLASS_PANE, " ");
 
       for (int i = 0; i < inv.getSize(); i++) {
@@ -69,14 +70,14 @@ public class CharReorderGuiManager {
 
    public static ItemStack charPane(String ch, boolean selected) {
       Material m = selected ? Material.YELLOW_STAINED_GLASS_PANE : Material.LIME_STAINED_GLASS_PANE;
-      return pane(m, ChatColor.GREEN + ch);
+      return pane(m, LegacyText.GREEN + ch);
    }
 
    public static ItemStack pane(Material mat, String name) {
       ItemStack is = new ItemStack(mat);
       ItemMeta meta = is.getItemMeta();
       if (meta != null) {
-         meta.setDisplayName(name == null ? " " : name);
+         meta.displayName(LegacyText.component(name == null ? " " : name));
          is.setItemMeta(meta);
       }
 
@@ -87,7 +88,7 @@ public class CharReorderGuiManager {
       ItemStack is = new ItemStack(Material.EMERALD_BLOCK);
       ItemMeta meta = is.getItemMeta();
       if (meta != null) {
-         meta.setDisplayName(ChatColor.AQUA + "決定");
+         meta.displayName(LegacyText.component(LegacyText.AQUA + "決定"));
          is.setItemMeta(meta);
       }
 

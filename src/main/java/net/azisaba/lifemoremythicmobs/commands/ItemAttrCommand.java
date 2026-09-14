@@ -1,14 +1,15 @@
 package net.azisaba.lifemoremythicmobs.commands;
 
 import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import java.util.Collections;
-import java.util.List;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Collections;
+import java.util.List;
 
 public class ItemAttrCommand implements CommandExecutor, TabCompleter {
    public boolean onCommand(CommandSender s, Command cmd, String label, String[] args) {

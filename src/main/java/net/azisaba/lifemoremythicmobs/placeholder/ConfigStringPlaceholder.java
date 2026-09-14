@@ -1,9 +1,8 @@
-package net.azisaba.lifemoremythicmobs.placeholders;
+package net.azisaba.lifemoremythicmobs.placeholder;
 
+import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
 import net.azisaba.lifemoremythicmobs.util.PlaceholderFactory;
 
-import io.lumine.mythic.core.skills.placeholders.Placeholder;
-import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,11 +1,9 @@
-package net.azisaba.lifemoremythicmobs.placeholders;
-
-import net.azisaba.lifemoremythicmobs.util.PlaceholderFactory;
+package net.azisaba.lifemoremythicmobs.placeholder;
 
 import io.lumine.mythic.api.adapters.AbstractLocation;
 import io.lumine.mythic.api.skills.SkillMetadata;
-import io.lumine.mythic.core.skills.placeholders.Placeholder;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderManager;
+import net.azisaba.lifemoremythicmobs.util.PlaceholderFactory;
 
 public class OriginLocationYPlaceholder {
    public static void register(PlaceholderManager manager) {

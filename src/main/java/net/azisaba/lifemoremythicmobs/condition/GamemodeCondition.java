@@ -1,14 +1,15 @@
-package net.azisaba.lifemoremythicmobs.conditions;
+package net.azisaba.lifemoremythicmobs.condition;
 
-import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.skills.SkillCondition;
 import io.lumine.mythic.api.skills.conditions.IEntityCondition;
-import java.util.ArrayList;
-import java.util.List;
+import io.lumine.mythic.core.skills.SkillCondition;
+import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GamemodeCondition extends SkillCondition implements IEntityCondition {
    private final List<GameMode> validModes = new ArrayList<>();

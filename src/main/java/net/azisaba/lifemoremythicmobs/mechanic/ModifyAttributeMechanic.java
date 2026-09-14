@@ -8,10 +8,8 @@ import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.SkillMechanic;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -20,6 +18,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 
 public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedEntitySkill {
    private final PlaceholderString slot;
@@ -32,9 +35,20 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
       super(executor, config.getLine(), config);
       this.slot = PlaceholderString.of(config.getString(new String[]{"slot", "s"}, "HEAD").toUpperCase());
       this.attributeSlot = PlaceholderString.of(config.getString(new String[]{"attributeSlot", "as"}, "HEAD").toUpperCase());
-      this.attribute = Attribute.valueOf(config.getString(new String[]{"attribute", "a"}, "GENERIC_ARMOR").toUpperCase());
+      String attrRaw = config.getString(new String[]{"attribute", "a"}, "ARMOR");
+      this.attribute = parseAttribute(attrRaw);
       this.rawValue = PlaceholderString.of(config.getString(new String[]{"value", "v"}, "0.0"));
       this.mode = PlaceholderString.of(config.getString(new String[]{"mode", "m"}, "overwrite").toLowerCase());
+   }
+
+   private static Attribute parseAttribute(String name) {
+      if (name == null || name.isEmpty()) return Attribute.ARMOR;
+      String clean = name.toLowerCase(Locale.ROOT).replace("generic_", "");
+      Attribute attr = org.bukkit.Registry.ATTRIBUTE.get(org.bukkit.NamespacedKey.minecraft(clean));
+      if (attr != null) return attr;
+      attr = org.bukkit.Registry.ATTRIBUTE.get(org.bukkit.NamespacedKey.minecraft(name.toLowerCase(Locale.ROOT)));
+      if (attr != null) return attr;
+      return Attribute.ARMOR;
    }
 
    @Override
@@ -50,7 +64,7 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
       ItemStack item = this.getItemFromSlot(player, slot);
       if (item != null && item.getType() != Material.AIR) {
          ItemMeta meta = item.getItemMeta();
-         if (meta == null) {
+         if (meta == null || this.attribute == null) {
             return SkillResult.ERROR;
          }
 
@@ -61,7 +75,7 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
          double baseAmount = 0.0;
          if (mods != null) {
             for (AttributeModifier mod : mods) {
-               if (mod.getSlot() == equipmentSlot) {
+               if (mod.getSlotGroup() != null && mod.getSlotGroup().test(equipmentSlot)) {
                   matched = mod;
                   baseAmount = mod.getAmount();
                   baseOp = mod.getOperation();
@@ -100,8 +114,9 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
          }
 
          if (mode.equals("overwrite") || mode.equals("add") || matched != null) {
+            org.bukkit.NamespacedKey key = new org.bukkit.NamespacedKey("lifemoremythicmobs", "mm_" + this.attribute.getKey().getKey().replace("generic_", "") + "_" + equipmentSlot.name().toLowerCase(Locale.ROOT));
             meta.addAttributeModifier(
-               this.attribute, new AttributeModifier(UUID.randomUUID(), "mm-" + this.attribute.name(), finalAmount, newOp, equipmentSlot)
+               this.attribute, new AttributeModifier(key, finalAmount, newOp, equipmentSlot.getGroup())
             );
             this.updateLore(meta, this.attribute, finalAmount, newOp, equipmentSlot);
          }
@@ -118,7 +133,11 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
       String displayName = this.getAttributeDisplayName(attribute);
       String sectionTitle = "§7" + this.getSlotDescription(slot);
       String entry = (value >= 0.0 ? "§9" : "§c") + displayName + " " + this.formatAmount(value, op);
-      List<String> lore = meta.hasLore() ? new ArrayList<>(meta.getLore()) : new ArrayList<>();
+      List<Component> existingLore = meta.hasLore() && meta.lore() != null ? new ArrayList<>(meta.lore()) : new ArrayList<>();
+      List<String> lore = new ArrayList<>(existingLore.size());
+      for (Component c : existingLore) {
+         lore.add(LegacyText.serialize(c));
+      }
       boolean sectionFound = false;
       boolean entryUpdated = false;
 
@@ -151,7 +170,7 @@ public class ModifyAttributeMechanic extends SkillMechanic implements ITargetedE
          lore.add(entry);
       }
 
-      meta.setLore(lore);
+      meta.lore(LegacyText.components(lore));
    }
 
    private String getSlotDescription(EquipmentSlot slot) {

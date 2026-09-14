@@ -1,8 +1,9 @@
 package net.azisaba.lifemoremythicmobs.util;
 
-import io.lumine.mythic.core.skills.SkillCondition;
 import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.core.skills.SkillCondition;
 import io.lumine.mythic.core.skills.conditions.ConditionAction;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 

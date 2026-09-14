@@ -1,22 +1,18 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.ITargetedEntitySkill;
 import io.lumine.mythic.api.skills.Skill;
-import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderString;
-import java.util.HashMap;
-import java.util.Map;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,6 +24,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CallSkillFromGUIMechanic extends SkillMechanic implements ITargetedEntitySkill {
    private final PlaceholderString title;
@@ -58,16 +57,17 @@ public class CallSkillFromGUIMechanic extends SkillMechanic implements ITargeted
       }
 
       Player player = (Player)target.getBukkitEntity();
-      String titleStr = ChatColor.translateAlternateColorCodes('&', this.title.get(data));
-      Inventory gui = Bukkit.createInventory(player, 54, titleStr);
+      String titleStr = net.azisaba.lifemoremythicmobs.util.LegacyText.translateAlternateColorCodes('&', this.title.get(data));
+      Inventory gui = Bukkit.createInventory(player, 54, net.azisaba.lifemoremythicmobs.util.LegacyText.component(titleStr));
 
       for (int slot = 0; slot < 54; slot++) {
          PlaceholderString name = this.slotDisplays.get(slot);
          PlaceholderString skill = this.slotSkills.get(slot);
-         ItemStack item = new ItemStack(Material.LEGACY_STAINED_GLASS_PANE, 1, (short)(name != null && skill != null ? 5 : 7));
+         boolean active = name != null && skill != null;
+         ItemStack item = new ItemStack(active ? Material.LIME_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE);
          ItemMeta meta = item.getItemMeta();
          if (name != null) {
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name.get(data)));
+            meta.displayName(net.azisaba.lifemoremythicmobs.util.LegacyText.ampersandComponent(name.get(data)));
          }
 
          item.setItemMeta(meta);
@@ -76,18 +76,18 @@ public class CallSkillFromGUIMechanic extends SkillMechanic implements ITargeted
 
       player.openInventory(gui);
       Bukkit.getPluginManager()
-         .registerEvents(new CallSkillFromGUIMechanic.CallSkillFromGUIListener(player, titleStr, data.deepClone()), JavaPlugin.getPlugin(LifeMoreMythicMobs.class));
+         .registerEvents(new CallSkillFromGUIMechanic.CallSkillFromGUIListener(player, gui, data.deepClone()), JavaPlugin.getPlugin(LifeMoreMythicMobs.class));
       return SkillResult.SUCCESS;
    }
 
    private class CallSkillFromGUIListener implements Listener {
       private final Player player;
-      private final String guiTitle;
+      private final Inventory gui;
       private final SkillMetadata metadata;
 
-      public CallSkillFromGUIListener(Player player, String guiTitle, SkillMetadata metadata) {
+      public CallSkillFromGUIListener(Player player, Inventory gui, SkillMetadata metadata) {
          this.player = player;
-         this.guiTitle = guiTitle;
+         this.gui = gui;
          this.metadata = metadata;
       }
 
@@ -95,7 +95,7 @@ public class CallSkillFromGUIMechanic extends SkillMechanic implements ITargeted
       public void onInventoryClick(InventoryClickEvent event) {
          if (event.getWhoClicked() instanceof Player) {
             if (event.getWhoClicked().equals(this.player)) {
-               if (event.getView().getTitle().equals(this.guiTitle)) {
+               if (this.gui.equals(event.getView().getTopInventory())) {
                   event.setCancelled(true);
                   int slot = event.getSlot();
                   PlaceholderString skillName = CallSkillFromGUIMechanic.this.slotSkills.get(slot);

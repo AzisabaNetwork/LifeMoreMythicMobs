@@ -1,22 +1,22 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
 import io.lumine.mythic.api.adapters.AbstractVector;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.INoTargetSkill;
 import io.lumine.mythic.api.skills.IParentSkill;
-import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.core.skills.mechanics.MissileMechanic.MissileTracker;
 import io.lumine.mythic.core.skills.mechanics.ProjectileMechanic.ProjectileMechanicTracker;
-import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
 import io.lumine.mythic.core.skills.projectiles.Projectile.ProjectileTracker;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class ProjectileVelocityMechanic extends SkillMechanic implements INoTargetSkill {
    private static final Logger log = LoggerFactory.getLogger(ProjectileVelocityMechanic.class);

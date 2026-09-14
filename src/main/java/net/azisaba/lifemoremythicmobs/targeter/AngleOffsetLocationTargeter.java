@@ -1,21 +1,18 @@
-package net.azisaba.lifemoremythicmobs.targeters;
+package net.azisaba.lifemoremythicmobs.targeter;
 
-import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import io.lumine.mythic.api.adapters.AbstractLocation;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
-import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.targeters.ILocationSelector;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
 import org.bukkit.Location;
 import org.bukkit.World;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AngleOffsetLocationTargeter extends ILocationSelector {
    private final PlaceholderDouble hOffset;

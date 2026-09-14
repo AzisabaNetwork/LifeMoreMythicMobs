@@ -1,53 +1,43 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
-import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
-import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
-import net.azisaba.lifemoremythicmobs.util.VariableUtil;
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
 import io.lumine.mythic.api.skills.ITargetedEntitySkill;
 import io.lumine.mythic.api.skills.Skill;
-import io.lumine.mythic.core.skills.SkillMechanic;
 import io.lumine.mythic.api.skills.SkillMetadata;
 import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.bukkit.BukkitAdapter;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.skills.SkillExecutor;
+import io.lumine.mythic.core.skills.SkillMechanic;
+import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
+import net.azisaba.lifemoremythicmobs.util.IgaDebugLogger;
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import net.azisaba.lifemoremythicmobs.util.VariableUtil;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.ChatColor;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.Material;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.EventHandler;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.Listener;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class SelectionFidoruGUIMechanic extends SkillMechanic implements ITargetedEntitySkill {
    private static final String[][] OPTIONS = new String[][]{
       {"盾たるエルベ", "沈めるネーベル"}, {"導きのゼーレ", "内に秘めしアルカナム", "満ちるガイスト"}, {"飛翔せしヴィレ", "囁くギフト", "光差すゼーゲン"}, {"祝福のヴォーゲ", "燃えるケルン", "煌きのクラフトフェルト"}
    };
    private static final int GUI_SIZE = 54;
-   private static final String GUI_TITLE = ChatColor.DARK_PURPLE + "能力設定メニュー";
+   private static final Component GUI_TITLE = LegacyText.component(LegacyText.DARK_PURPLE + "能力設定メニュー");
    private static final int DECIDE_SLOT = 49;
    private final Map<UUID, int[]> selections = new HashMap<>();
    private final Map<UUID, Inventory> openInventories = new HashMap<>();
@@ -94,28 +84,25 @@ public class SelectionFidoruGUIMechanic extends SkillMechanic implements ITarget
          }
       }
 
-      ItemStack confirm = new ItemStack(Material.LEGACY_STAINED_GLASS_PANE);
-      confirm.setDurability((short)5);
+      ItemStack confirm = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
       ItemMeta meta = confirm.getItemMeta();
-      meta.setDisplayName(ChatColor.GREEN + "決定");
+      meta.displayName(LegacyText.component(LegacyText.GREEN + "決定"));
       confirm.setItemMeta(meta);
       gui.setItem(49, confirm);
    }
 
    private ItemStack createOptionPane(String name, boolean selected) {
-      ItemStack item = new ItemStack(Material.LEGACY_STAINED_GLASS_PANE);
-      item.setDurability((short)(selected ? 10 : 7));
+      ItemStack item = new ItemStack(selected ? Material.PURPLE_STAINED_GLASS_PANE : Material.GRAY_STAINED_GLASS_PANE);
       ItemMeta meta = item.getItemMeta();
-      meta.setDisplayName(ChatColor.YELLOW + name);
+      meta.displayName(LegacyText.component(LegacyText.YELLOW + name));
       item.setItemMeta(meta);
       return item;
    }
 
    private ItemStack createDummyPane() {
-      ItemStack item = new ItemStack(Material.LEGACY_STAINED_GLASS_PANE);
-      item.setDurability((short)15);
+      ItemStack item = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
       ItemMeta meta = item.getItemMeta();
-      meta.setDisplayName(" ");
+      meta.displayName(LegacyText.component(" "));
       item.setItemMeta(meta);
       return item;
    }
@@ -137,7 +124,7 @@ public class SelectionFidoruGUIMechanic extends SkillMechanic implements ITarget
       @EventHandler
       public void onInventoryClick(InventoryClickEvent event) {
          if (event.getWhoClicked().equals(this.player)) {
-            if (event.getView().getTitle().equals(SelectionFidoruGUIMechanic.GUI_TITLE)) {
+            if (this.gui.equals(event.getView().getTopInventory())) {
                event.setCancelled(true);
                int slot = event.getRawSlot();
                IgaDebugLogger.log(this.getClass(), "Clicked slot: " + slot);

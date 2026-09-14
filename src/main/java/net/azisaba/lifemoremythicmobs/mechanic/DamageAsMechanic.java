@@ -1,24 +1,23 @@
 package net.azisaba.lifemoremythicmobs.mechanic;
 
-import io.lumine.mythic.core.skills.SkillExecutor;
-
 import io.lumine.mythic.api.adapters.AbstractEntity;
-import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.ITargetedEntitySkill;
+import io.lumine.mythic.api.skills.SkillMetadata;
+import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
+import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.core.logging.MythicLogger;
 import io.lumine.mythic.core.logging.MythicLogger.DebugLevel;
 import io.lumine.mythic.core.mobs.ActiveMob;
-import io.lumine.mythic.api.skills.ITargetedEntitySkill;
-import io.lumine.mythic.api.skills.SkillCaster;
-import io.lumine.mythic.api.skills.SkillMetadata;
-import io.lumine.mythic.api.skills.SkillResult;
+import io.lumine.mythic.core.skills.SkillExecutor;
 import io.lumine.mythic.core.skills.damage.DamagingMechanic;
-import io.lumine.mythic.api.skills.placeholders.PlaceholderDouble;
-import java.util.Optional;
-import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+
+import java.util.Optional;
+import java.util.UUID;
 
 public class DamageAsMechanic extends DamagingMechanic implements ITargetedEntitySkill {
    private final PlaceholderDouble amount;

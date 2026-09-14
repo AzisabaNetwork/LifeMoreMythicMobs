@@ -4,15 +4,11 @@ import net.azisaba.lifemoremythicmobs.LifeMoreMythicMobs;
 import net.azisaba.lifemoremythicmobs.upgrade.UpgradeStatManager;
 import net.azisaba.lifemoremythicmobs.upgrade.UpgradeStatManager.StatType;
 import net.azisaba.lifemoremythicmobs.util.LegacyText;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class StatsCommand extends SubCommand {
 

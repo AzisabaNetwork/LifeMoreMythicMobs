@@ -1,32 +1,29 @@
-package net.azisaba.lifemoremythicmobs.conditions;
+package net.azisaba.lifemoremythicmobs.condition;
 
-import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.api.adapters.AbstractEntity;
-import io.lumine.mythic.bukkit.adapters.BukkitItemStack;
-import io.lumine.mythic.core.drops.EquipSlot;
 import io.lumine.mythic.api.config.MythicLineConfig;
+import io.lumine.mythic.api.skills.conditions.IEntityCondition;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.bukkit.adapters.BukkitItemStack;
+import io.lumine.mythic.bukkit.utils.version.MinecraftVersions;
+import io.lumine.mythic.bukkit.utils.version.ServerVersion;
+import io.lumine.mythic.core.drops.EquipSlot;
 import io.lumine.mythic.core.items.MythicItem;
 import io.lumine.mythic.core.logging.MythicLogger;
 import io.lumine.mythic.core.logging.MythicLogger.DebugLevel;
 import io.lumine.mythic.core.skills.SkillCondition;
-import io.lumine.mythic.api.skills.conditions.IEntityCondition;
 import io.lumine.mythic.core.utils.annotations.MythicField;
-import io.lumine.mythic.bukkit.utils.version.MinecraftVersions;
-import io.lumine.mythic.bukkit.utils.version.ServerVersion;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.*;
+import java.util.stream.Collectors;
+
 public class WearingSlotCondition extends SkillCondition implements IEntityCondition {
-   @MythicField(name = "armorslot", aliases = {"slot", "s"}, description = "The equip slot to check (HEAD/CHEST/LEGS/FEET/HAND/OFFHAND)")
+   @MythicField(name = "armorslot", aliases = {"slot", "s", "where", "w"}, description = "The equip slot to check (HEAD/CHEST/LEGS/FEET/HAND/OFFHAND)")
    private EquipSlot slot;
    @MythicField(name = "material", aliases = {"mmitem", "m"}, description = "A material or MythicItem name to check for")
    private String itemNamesRaw;
@@ -42,10 +39,10 @@ public class WearingSlotCondition extends SkillCondition implements IEntityCondi
 
    public WearingSlotCondition(String line, MythicLineConfig mlc) {
       super(line);
-      String s = mlc.getString(new String[]{"armorslot", "slot", "s"}, "NONE", new String[0]).toUpperCase();
+      String s = mlc.getString(new String[]{"armorslot", "slot", "s", "where", "w"}, "NONE").toUpperCase();
       this.itemNamesRaw = mlc.getString(
-         new String[]{"material", "mat", "m", "mythicmobsitem", "mmitem", "mmi", "item"}, "DIRT", new String[]{this.getConditionVar()}
-      );
+         new String[]{"material", "mat", "m", "mythicmobsitem", "mmitem", "mmi", "item"}, "DIRT",
+              this.getConditionVar());
       this.checklore = mlc.getBoolean(new String[]{"checklore", "cl"}, false);
       this.inventorySlot = mlc.getInteger(new String[]{"inventoryslot", "invslot", "index"}, -1);
       this.slot = EquipSlot.of(s);
@@ -75,9 +72,9 @@ public class WearingSlotCondition extends SkillCondition implements IEntityCondi
    }
 
    public boolean check(AbstractEntity e) {
-      MythicLogger.debug(DebugLevel.CONDITION, "Checking WEARINGSLOT Condition...", new Object[0]);
+      MythicLogger.debug(DebugLevel.CONDITION, "Checking WEARINGSLOT Condition...");
       if (!e.isLiving()) {
-         MythicLogger.debug(DebugLevel.CONDITION, "! Entity is not living, returning false", new Object[0]);
+         MythicLogger.debug(DebugLevel.CONDITION, "! Entity is not living, returning false");
          return false;
       }
 
@@ -85,14 +82,14 @@ public class WearingSlotCondition extends SkillCondition implements IEntityCondi
       ItemStack slotItem;
       if (this.inventorySlot > 0) {
          if (!(le instanceof Player)) {
-            MythicLogger.debug(DebugLevel.CONDITION, "! inventoryslot is set but entity is not a player, returning false", new Object[0]);
+            MythicLogger.debug(DebugLevel.CONDITION, "! inventoryslot is set but entity is not a player, returning false");
             return false;
          }
 
          Player p = (Player)le;
          int idx = this.inventorySlot - 1;
          if (idx < 0 || idx > 35) {
-            MythicLogger.debug(DebugLevel.CONDITION, "! inventoryslot out of range (1-36), returning false", new Object[0]);
+            MythicLogger.debug(DebugLevel.CONDITION, "! inventoryslot out of range (1-36), returning false");
             return false;
          }
 
@@ -111,7 +108,7 @@ public class WearingSlotCondition extends SkillCondition implements IEntityCondi
          } else if (this.slot == EquipSlot.OFFHAND) {
             slotItem = le.getEquipment().getItemInOffHand();
          } else {
-            MythicLogger.debug(DebugLevel.CONDITION, "! Invalid or NONE slot used and no inventoryslot set, returning false", new Object[0]);
+            MythicLogger.debug(DebugLevel.CONDITION, "! Invalid or NONE slot used and no inventoryslot set, returning false");
             return false;
          }
       }
@@ -119,27 +116,27 @@ public class WearingSlotCondition extends SkillCondition implements IEntityCondi
       if (slotItem != null && slotItem.getType() != Material.AIR) {
          for (ItemStack candidate : this.items) {
             if (this.matches(candidate, slotItem)) {
-               MythicLogger.debug(DebugLevel.CONDITION, "+ Item matches (OR), returning true", new Object[0]);
+               MythicLogger.debug(DebugLevel.CONDITION, "+ Item matches (OR), returning true");
                return true;
             }
          }
 
-         MythicLogger.debug(DebugLevel.CONDITION, "! No candidates matched, returning false", new Object[0]);
+         MythicLogger.debug(DebugLevel.CONDITION, "! No candidates matched, returning false");
          return false;
       } else {
-         MythicLogger.debug(DebugLevel.CONDITION, "! Slot item was null or AIR, returning false", new Object[0]);
+         MythicLogger.debug(DebugLevel.CONDITION, "! Slot item was null or AIR, returning false");
          return false;
       }
    }
 
    private boolean matches(ItemStack expected, ItemStack actual) {
       if (!expected.getType().equals(actual.getType())) {
-         MythicLogger.debug(DebugLevel.CONDITION, "! Type doesn't match", new Object[0]);
+         MythicLogger.debug(DebugLevel.CONDITION, "! Type doesn't match");
          return false;
       }
 
       if (expected.hasItemMeta() != actual.hasItemMeta()) {
-         MythicLogger.debug(DebugLevel.CONDITION, "! Meta state doesn't match", new Object[0]);
+         MythicLogger.debug(DebugLevel.CONDITION, "! Meta state doesn't match");
          return false;
       }
 
@@ -147,35 +144,35 @@ public class WearingSlotCondition extends SkillCondition implements IEntityCondi
          ItemMeta meta = expected.getItemMeta();
          ItemMeta meta2 = actual.getItemMeta();
          if (meta.hasDisplayName() != meta2.hasDisplayName()) {
-            MythicLogger.debug(DebugLevel.CONDITION, "! Display doesn't match", new Object[0]);
+            MythicLogger.debug(DebugLevel.CONDITION, "! Display doesn't match");
             return false;
          }
 
-         if (meta.hasDisplayName() && !meta.getDisplayName().equals(meta2.getDisplayName())) {
-            MythicLogger.debug(DebugLevel.CONDITION, "! Display doesn't match", new Object[0]);
+         if (meta.hasDisplayName() && !java.util.Objects.equals(meta.displayName(), meta2.displayName())) {
+            MythicLogger.debug(DebugLevel.CONDITION, "! Display doesn't match");
             return false;
          }
 
          if (ServerVersion.isAfterOrEq(MinecraftVersions.v1_14)) {
             if (meta.hasCustomModelData() != meta2.hasCustomModelData()) {
-               MythicLogger.debug(DebugLevel.CONDITION, "! CustomModelData doesn't match", new Object[0]);
+               MythicLogger.debug(DebugLevel.CONDITION, "! CustomModelData doesn't match");
                return false;
             }
 
             if (meta.hasCustomModelData() && meta.getCustomModelData() != meta2.getCustomModelData()) {
-               MythicLogger.debug(DebugLevel.CONDITION, "! CustomModelData doesn't match", new Object[0]);
+               MythicLogger.debug(DebugLevel.CONDITION, "! CustomModelData doesn't match");
                return false;
             }
          }
 
          if (this.checklore) {
             if (meta.hasLore() != meta2.hasLore()) {
-               MythicLogger.debug(DebugLevel.CONDITION, "! Lore presence doesn't match", new Object[0]);
+               MythicLogger.debug(DebugLevel.CONDITION, "! Lore presence doesn't match");
                return false;
             }
 
-            if (meta.hasLore() && !meta.getLore().equals(meta2.getLore())) {
-               MythicLogger.debug(DebugLevel.CONDITION, "! Lore doesn't match", new Object[0]);
+            if (meta.hasLore() && !java.util.Objects.equals(meta.lore(), meta2.lore())) {
+               MythicLogger.debug(DebugLevel.CONDITION, "! Lore doesn't match");
                return false;
             }
          }
