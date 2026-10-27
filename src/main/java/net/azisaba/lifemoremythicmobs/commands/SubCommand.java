@@ -1,5 +1,7 @@
 package net.azisaba.lifemoremythicmobs.commands;
 
+import net.azisaba.lifemoremythicmobs.util.LegacyText;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,6 +12,19 @@ public abstract class SubCommand {
     public abstract @NotNull String getName();
 
     public abstract void execute(@NotNull Player player, @NotNull String[] args);
+
+    /** Entry point used by {@link RootCommand}. Override to also accept the console. */
+    public void execute(@NotNull CommandSender sender, @NotNull String[] args) {
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(LegacyText.RED + "プレイヤーのみが実行できます");
+            return;
+        }
+        execute(player, args);
+    }
+
+    public @NotNull List<String> suggest(@NotNull CommandSender sender, @NotNull String[] args) {
+        return sender instanceof Player player ? suggest(player, args) : Collections.emptyList();
+    }
 
     public @NotNull List<String> suggest(@NotNull Player player, @NotNull String[] args) {
         return Collections.emptyList();

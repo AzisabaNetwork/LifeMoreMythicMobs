@@ -5,7 +5,6 @@ import net.azisaba.lifemoremythicmobs.util.LegacyText;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +25,8 @@ public class RootCommand implements TabExecutor {
                 new FindMythicMobCommand(plugin),
                 new SpawnerToolCommand(plugin),
                 new UpgradeCommand(plugin),
-                new StatsCommand(plugin)
+                new StatsCommand(plugin),
+                new ReloadFileCommand(plugin)
         );
     }
 
@@ -34,10 +34,6 @@ public class RootCommand implements TabExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
             sendHelp(sender);
-            return true;
-        }
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(LegacyText.RED + "プレイヤーのみが実行できます");
             return true;
         }
         SubCommand subCommand = commands.stream()
@@ -54,7 +50,7 @@ public class RootCommand implements TabExecutor {
             return true;
         }
 
-        subCommand.execute((Player) sender, Arrays.copyOfRange(args, 1, args.length));
+        subCommand.execute(sender, Arrays.copyOfRange(args, 1, args.length));
         return true;
     }
 
@@ -72,11 +68,11 @@ public class RootCommand implements TabExecutor {
                     .filter(name -> name.toLowerCase().startsWith(args[0].toLowerCase()))
                     .collect(Collectors.toList());
         }
-        if (args.length >= 2 && sender instanceof Player) {
+        if (args.length >= 2) {
             return commands.stream()
                     .filter(subCommand -> subCommand.getName().equalsIgnoreCase(args[0]))
                     .findFirst()
-                    .map(subCommand -> subCommand.suggest((Player) sender, Arrays.copyOfRange(args, 1, args.length)))
+                    .map(subCommand -> subCommand.suggest(sender, Arrays.copyOfRange(args, 1, args.length)))
                     .orElse(Collections.emptyList());
         }
         return Collections.emptyList();

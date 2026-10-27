@@ -34,5 +34,8 @@ permissions:
   lifemoremythicmobs.command.stats:
     description: Allows use of /lmmm stats command
     default: true
+  lifemoremythicmobs.command.reloadfile:
+    description: Allows use of /lmmm reloadFile command
+    default: op
   itemattreditor.use:
     default: op

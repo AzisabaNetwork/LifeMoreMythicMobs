@@ -2,6 +2,12 @@
 
 このプラグインが追加するMechanics, Conditions, Placeholdersの詳細について記載しています。
 
+## Commands
+
+| Command | Description |
+|:--------|:------------|
+| [/lmmm reloadFile](commands/reloadFile.md) | MythicMobs の1ファイルだけを全体リロードせずに読み直す |
+
 ## Mechanics
 
 | Mechanic | Description |
