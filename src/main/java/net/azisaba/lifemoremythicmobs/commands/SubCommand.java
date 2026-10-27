@@ -11,6 +11,15 @@ import java.util.List;
 public abstract class SubCommand {
     public abstract @NotNull String getName();
 
+    /** Short names that also select this subcommand (not shown in help or completion). */
+    public @NotNull List<String> getAliases() {
+        return Collections.emptyList();
+    }
+
+    public boolean matches(@NotNull String label) {
+        return getName().equalsIgnoreCase(label) || getAliases().stream().anyMatch(label::equalsIgnoreCase);
+    }
+
     public abstract void execute(@NotNull Player player, @NotNull String[] args);
 
     /** Entry point used by {@link RootCommand}. Override to also accept the console. */

@@ -77,8 +77,21 @@ final class CrucibleBridge {
         if (wasComplete) manager.getClass().getMethod("markLoadComplete").invoke(manager);
     }
 
-    /** Must be called between {@link #beginLoad} and {@link #endLoad}, which snapshot the lookup maps. */
-    void refresh(@NotNull MythicItem item, @NotNull Collection<SkillMechanic> staleMechanics, @NotNull ObjectTransplant tx) throws ReflectiveOperationException {
+    /** Key of Crucible's legacy name lookup (material + display name), built the same way as ItemManager.registerItem. */
+    static @Nullable String displayKey(@NotNull MythicItem item) {
+        if (item.getMaterial() == null) return null;
+        String name = item.getDisplayName();
+        if (name != null && name.startsWith(String.valueOf(ChatColor.WHITE))) name = name.substring(2);
+        return item.getMaterial().toString().toUpperCase() + "_" + name;
+    }
+
+    /**
+     * Must be called between {@link #beginLoad} and {@link #endLoad}, which snapshot the lookup maps.
+     * {@code previousItem} / {@code previousDisplayKey} describe the entry before the reload, so stale lookup
+     * keys are dropped directly instead of scanning the whole maps for every item.
+     */
+    void refresh(@NotNull MythicItem item, @Nullable MythicItem previousItem, @Nullable String previousDisplayKey,
+                 @NotNull Collection<SkillMechanic> staleMechanics, @NotNull ObjectTransplant tx) throws ReflectiveOperationException {
         Object old = itemsById.get(item.getInternalName());
         if (old == null) {
             registerItem.invoke(manager, item);
@@ -96,13 +109,10 @@ final class CrucibleBridge {
         tx.copyFields(created, old, Collections.emptySet());
         tx.rebind(old, created, old, new ArrayList<>());
 
-        itemsByObj.values().removeIf(v -> v == old);
+        if (previousItem != null && previousItem != item) itemsByObj.remove(previousItem, old);
         itemsByObj.put(item, old);
-        itemsByDisplay.values().removeIf(v -> v == old);
-        if (item.getMaterial() != null) {
-            String name = item.getDisplayName();
-            if (name != null && name.startsWith(String.valueOf(ChatColor.WHITE))) name = name.substring(2);
-            itemsByDisplay.putIfAbsent(item.getMaterial().toString().toUpperCase() + "_" + name, old);
-        }
+        if (previousDisplayKey != null) itemsByDisplay.remove(previousDisplayKey, old);
+        String key = displayKey(item);
+        if (key != null) itemsByDisplay.putIfAbsent(key, old);
     }
 }

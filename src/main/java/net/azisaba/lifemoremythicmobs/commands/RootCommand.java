@@ -37,7 +37,7 @@ public class RootCommand implements TabExecutor {
             return true;
         }
         SubCommand subCommand = commands.stream()
-                .filter(cmd -> cmd.getName().equalsIgnoreCase(args[0]))
+                .filter(cmd -> cmd.matches(args[0]))
                 .findFirst()
                 .orElse(null);
         if (subCommand == null) {
@@ -70,7 +70,7 @@ public class RootCommand implements TabExecutor {
         }
         if (args.length >= 2) {
             return commands.stream()
-                    .filter(subCommand -> subCommand.getName().equalsIgnoreCase(args[0]))
+                    .filter(subCommand -> subCommand.matches(args[0]))
                     .findFirst()
                     .map(subCommand -> subCommand.suggest(sender, Arrays.copyOfRange(args, 1, args.length)))
                     .orElse(Collections.emptyList());

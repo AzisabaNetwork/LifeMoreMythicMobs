@@ -85,14 +85,48 @@ public final class MythicFileReloader {
         return files;
     }
 
-    public @NotNull Report reload(@NotNull File target) throws IOException, InvalidConfigurationException {
+    /** Whether the file is (or, once created, would be) read by MythicMobs as a mob, skill or item file. */
+    public static boolean isConfigFile(@NotNull File target) {
         File file = canonical(target);
-        if (!file.isFile()) throw new IOException("ファイルが見つかりません: " + file);
-        new YamlConfiguration().load(file); // abort before touching anything if the YAML is broken
+        for (ConfigFileType type : List.of(ConfigFileType.ITEM, ConfigFileType.SKILL, ConfigFileType.MOB)) {
+            if (knownFiles(type).containsKey(file)) return true;
+            for (Pack pack : MythicBukkit.inst().getPackManager().getPacks()) {
+                for (File folder : pack.getPackFolders(type.info.dataFolder(), false, type.info.readMono())) {
+                    if (file.toPath().startsWith(canonical(folder).toPath())) return true;
+                }
+            }
+        }
+        return false;
+    }
 
-        Map<ConfigFileType, Pack> types = resolveTypes(file);
-        if (types.isEmpty()) {
-            throw new IOException("MythicMobs の Mobs / Skills / Items フォルダ内のファイルではありません: " + file);
+    public @NotNull Report reload(@NotNull File target) throws IOException, InvalidConfigurationException {
+        return reload(List.of(target));
+    }
+
+    /**
+     * Reloads several files as one batch: all items first, then skills, then mobs, with a single second pass,
+     * so files in the batch can reference names newly added in each other.
+     */
+    public @NotNull Report reload(@NotNull List<File> targets) throws IOException, InvalidConfigurationException {
+        List<File> files = new ArrayList<>();
+        for (File target : targets) {
+            File file = canonical(target);
+            if (!file.isFile()) throw new IOException("ファイルが見つかりません: " + file);
+            try {
+                new YamlConfiguration().load(file); // abort before touching anything if any YAML is broken
+            } catch (InvalidConfigurationException e) {
+                throw new InvalidConfigurationException(describe(file) + ": " + e.getMessage(), e);
+            }
+            if (!files.contains(file)) files.add(file);
+        }
+        Map<File, Map<ConfigFileType, Pack>> typesByFile = new LinkedHashMap<>();
+        for (File file : files) {
+            Map<ConfigFileType, Pack> types = resolveTypes(file);
+            if (types.isEmpty()) {
+                tx.undo();
+                throw new IOException("MythicMobs の Mobs / Skills / Items フォルダ内のファイルではありません: " + file);
+            }
+            typesByFile.put(file, types);
         }
 
         crucible = CrucibleBridge.tryCreate();
@@ -121,7 +155,7 @@ public final class MythicFileReloader {
             }
         };
         logger.addHandler(capture);
-        boolean items = types.containsKey(ConfigFileType.ITEM);
+        boolean items = typesByFile.values().stream().anyMatch(t -> t.containsKey(ConfigFileType.ITEM));
         boolean crucibleWasComplete = false;
         try {
             clock.setReloadingPause(true);
@@ -130,11 +164,13 @@ public final class MythicFileReloader {
                 // Same order as MythicMobs itself: items, skills, mobs
                 if (items) {
                     if (crucible != null) crucibleWasComplete = crucible.beginLoad(tx);
-                    reloadItems(file, types.get(ConfigFileType.ITEM));
+                    reloadItems(filesOf(typesByFile, ConfigFileType.ITEM));
                     if (crucible != null) crucible.runSecondPass(); // Ammo bullet / empty-skill lookups
                 }
-                if (types.containsKey(ConfigFileType.SKILL)) reloadSkills(file, types.get(ConfigFileType.SKILL));
-                if (types.containsKey(ConfigFileType.MOB)) reloadMobs(file, types.get(ConfigFileType.MOB));
+                Map<File, Pack> skillFiles = filesOf(typesByFile, ConfigFileType.SKILL);
+                if (!skillFiles.isEmpty()) reloadSkills(skillFiles);
+                Map<File, Pack> mobFiles = filesOf(typesByFile, ConfigFileType.MOB);
+                if (!mobFiles.isEmpty()) reloadMobs(mobFiles);
             } catch (ReflectiveOperationException | RuntimeException | Error e) {
                 tx.undo();
                 clearComponentCaches();
@@ -170,28 +206,32 @@ public final class MythicFileReloader {
 
     // ---------------------------------------------------------------- skills
 
-    private void reloadSkills(File file, Pack pack) {
+    private void reloadSkills(Map<File, Pack> files) {
         SkillExecutor executor = mythic.getSkillManager();
         Map<String, Skill> registry = ObjectTransplant.getField(executor, "skills");
         Map<String, Skill> before = new HashMap<>(registry);
         tx.snapshot(registry);
-        MythicConfigImpl fileConfig = new MythicConfigImpl(file);
-        boolean mono = isMono(file);
-        Set<String> nodes = new LinkedHashSet<>(NodeListProp.getNodes(file, ""));
-        for (String node : nodes) {
-            try {
-                MythicConfig config = fileConfig.getNestedConfig(node);
-                if (mono && (config.isSet("Id") || config.isSet("Type"))) continue;
-                registry.put(node, new MetaSkill(executor, pack, file, node, config));
-            } catch (Exception | Error ex) {
-                report.errors.add("スキル " + node + ": " + ex);
+        Set<String> nodes = new LinkedHashSet<>();
+        for (Map.Entry<File, Pack> entry : files.entrySet()) {
+            File file = entry.getKey();
+            MythicConfigImpl fileConfig = new MythicConfigImpl(file);
+            boolean mono = isMono(file);
+            for (String node : NodeListProp.getNodes(file, "")) {
+                nodes.add(node);
+                try {
+                    MythicConfig config = fileConfig.getNestedConfig(node);
+                    if (mono && (config.isSet("Id") || config.isSet("Type"))) continue;
+                    registry.put(node, new MetaSkill(executor, entry.getValue(), file, node, config));
+                } catch (Exception | Error ex) {
+                    report.errors.add("スキル " + node + ": " + ex);
+                }
             }
         }
         restoreSkills(registry, before, nodes);
         for (Map.Entry<String, Skill> entry : before.entrySet()) {
             if (!entry.getKey().startsWith("mob:") && !nodes.contains(entry.getKey())
                     && entry.getValue().getConfig() != null && entry.getValue().getConfig().getFile() != null
-                    && file.equals(canonical(entry.getValue().getConfig().getFile()))) {
+                    && files.containsKey(canonical(entry.getValue().getConfig().getFile()))) {
                 report.notInFile.add("スキル " + entry.getKey());
             }
         }
@@ -220,7 +260,7 @@ public final class MythicFileReloader {
 
     // ---------------------------------------------------------------- mobs
 
-    private void reloadMobs(File file, Pack pack) {
+    private void reloadMobs(Map<File, Pack> files) {
         MobExecutor executor = mythic.getMobManager();
         Map<String, MythicMob> mobs = ObjectTransplant.getField(executor, "mmList");
         Map<String, MythicMob> displayLookup = ObjectTransplant.getField(executor, "mmDisplayLookup");
@@ -234,49 +274,56 @@ public final class MythicFileReloader {
         tx.snapshot(vanilla);
         tx.snapshot(stacks);
         tx.snapshot(skillRegistry);
+        Map<MythicMob, String> displayKeys = new IdentityHashMap<>();
+        displayLookup.forEach((display, mob) -> displayKeys.put(mob, display));
 
-        MythicConfigImpl fileConfig = new MythicConfigImpl(file);
-        boolean mono = isMono(file);
-        Set<String> nodes = new LinkedHashSet<>(NodeListProp.getNodes(file, ""));
+        Set<String> nodes = new LinkedHashSet<>();
         List<TemplateUtil.TemplateMob> templates = new ArrayList<>();
-        for (String node : nodes) {
-            // Only construction errors are per-entry; a failure while installing aborts and rolls back everything
-            MythicConfig config;
-            MythicEntityType vanillaType = null;
-            MobType created;
-            try {
-                config = fileConfig.getNestedConfig(node);
-                if (mono && (config.isSet("Id") || config.isSet("Skills") && !config.isSet("Type") && !config.isSet("Id"))) continue;
-                if (BukkitEntityType.getMythicEntity(node) != null) {
-                    vanillaType = MythicEntityType.get(node);
-                } else {
-                    String stack = config.getString("MobStack");
-                    if (stack != null) {
-                        stacks.removeIf(s -> node.equals(s.getName()));
-                        stacks.add(new MobStack(node, stack, file.getAbsolutePath()));
-                        report.replaced.add("MobStack " + node);
-                        continue;
+        for (Map.Entry<File, Pack> entry : files.entrySet()) {
+            File file = entry.getKey();
+            Pack pack = entry.getValue();
+            MythicConfigImpl fileConfig = new MythicConfigImpl(file);
+            boolean mono = isMono(file);
+            for (String node : NodeListProp.getNodes(file, "")) {
+                nodes.add(node);
+                // Only construction errors are per-entry; a failure while installing aborts and rolls back everything
+                MythicConfig config;
+                MythicEntityType vanillaType = null;
+                MobType created;
+                try {
+                    config = fileConfig.getNestedConfig(node);
+                    if (mono && (config.isSet("Id") || config.isSet("Skills") && !config.isSet("Type") && !config.isSet("Id"))) continue;
+                    if (BukkitEntityType.getMythicEntity(node) != null) {
+                        vanillaType = MythicEntityType.get(node);
+                    } else {
+                        String stack = config.getString("MobStack");
+                        if (stack != null) {
+                            stacks.removeIf(s -> node.equals(s.getName()));
+                            stacks.add(new MobStack(node, stack, file.getAbsolutePath()));
+                            report.replaced.add("MobStack " + node);
+                            continue;
+                        }
+                        String template = config.getString("Template");
+                        if (template == null) template = config.getString("Templates");
+                        if (template != null) {
+                            templates.add(new TemplateUtil.TemplateMob(file, pack, node, config, template));
+                            continue;
+                        }
                     }
-                    String template = config.getString("Template");
-                    if (template == null) template = config.getString("Templates");
-                    if (template != null) {
-                        templates.add(new TemplateUtil.TemplateMob(file, pack, node, config, template));
-                        continue;
-                    }
+                    created = new MobType(executor, pack, file, node, config);
+                } catch (Exception | Error ex) {
+                    report.errors.add("Mob " + node + ": " + ex);
+                    continue;
                 }
-                created = new MobType(executor, pack, file, node, config);
-            } catch (Exception | Error ex) {
-                report.errors.add("Mob " + node + ": " + ex);
-                continue;
-            }
-            if (vanillaType != null) {
-                MythicMob installed = installMob(node, created, vanilla.get(vanillaType));
-                vanilla.put(vanillaType, installed);
-                mobs.put(vanillaType.toString(), installed);
-            } else {
-                MythicMob installed = installMob(node, created, before.get(node));
-                mobs.put(node, installed);
-                updateDisplay(displayLookup, installed, config);
+                if (vanillaType != null) {
+                    MythicMob installed = installMob(node, created, vanilla.get(vanillaType));
+                    vanilla.put(vanillaType, installed);
+                    mobs.put(vanillaType.toString(), installed);
+                } else {
+                    MythicMob installed = installMob(node, created, before.get(node));
+                    mobs.put(node, installed);
+                    updateDisplay(displayLookup, displayKeys, installed, config);
+                }
             }
         }
         if (!templates.isEmpty()) {
@@ -287,15 +334,17 @@ public final class MythicFileReloader {
                 if (!(scratch.get(template.id()) instanceof MobType created)) continue;
                 MythicMob installed = installMob(template.id(), created, before.get(template.id()));
                 mobs.put(template.id(), installed);
-                updateDisplay(displayLookup, installed, template.config());
+                updateDisplay(displayLookup, displayKeys, installed, template.config());
             }
-            report.notes.add("Template を使う Mob を含みます。このファイルの Mob を親にしている他ファイルの Mob は更新されません");
+            report.notes.add("Template を使う Mob を含みます。リロード対象外のファイルにある子 Mob は更新されません");
         }
         restoreSkills(skillRegistry, skillsBefore, Collections.emptySet()); // Mob-local MetaSkills (mob:<name>:<skill>)
+        Set<MythicMob> vanillaMobs = Collections.newSetFromMap(new IdentityHashMap<>());
+        vanillaMobs.addAll(vanilla.values());
         for (Map.Entry<String, MythicMob> entry : before.entrySet()) {
             MythicMob mob = entry.getValue();
             if (!nodes.contains(entry.getKey()) && mob.getFile() != null
-                    && file.equals(canonical(mob.getFile())) && !vanilla.containsValue(mob)) {
+                    && files.containsKey(canonical(mob.getFile())) && !vanillaMobs.contains(mob)) {
                 report.notInFile.add("Mob " + entry.getKey());
             }
         }
@@ -346,41 +395,50 @@ public final class MythicFileReloader {
         }
     }
 
-    private static void updateDisplay(Map<String, MythicMob> lookup, MythicMob mob, MythicConfig config) {
-        lookup.values().removeIf(v -> v == mob);
+    private static void updateDisplay(Map<String, MythicMob> lookup, Map<MythicMob, String> keys, MythicMob mob, MythicConfig config) {
+        String previous = keys.remove(mob);
+        if (previous != null) lookup.remove(previous, mob);
         String display = config.getString(new String[]{"Display", "DisplayName"});
-        if (display != null) lookup.put(display, mob);
+        if (display != null) {
+            lookup.put(display, mob);
+            keys.put(mob, display);
+        }
     }
 
     // ---------------------------------------------------------------- items
 
-    private void reloadItems(File file, Pack pack) {
+    private void reloadItems(Map<File, Pack> files) {
         ItemExecutor executor = mythic.getItemManager();
         Map<String, MythicItem> items = ObjectTransplant.getField(executor, "items");
         Map<String, MythicItem> before = new HashMap<>(items);
         tx.snapshot(items);
-        MythicConfigImpl fileConfig = new MythicConfigImpl(file);
-        boolean mono = isMono(file);
-        Set<String> nodes = new LinkedHashSet<>(NodeListProp.getNodes(file, ""));
+        Set<String> nodes = new LinkedHashSet<>();
         List<TemplateUtil.TemplateItem> templates = new ArrayList<>();
-        for (String node : nodes) {
-            MythicItem created;
-            try {
-                MythicConfig config = fileConfig.getNestedConfig(node);
-                if (mono && (config.isSet("Type") && MythicEntityType.get(config.getString("Type")) != null
-                        || config.isSet("Skills") && !config.isSet("Id"))) continue;
-                String template = config.getString("Template");
-                if (template == null) template = config.getString("Templates");
-                if (template != null) {
-                    templates.add(new TemplateUtil.TemplateItem(file, pack, node, config, template));
+        for (Map.Entry<File, Pack> entry : files.entrySet()) {
+            File file = entry.getKey();
+            Pack pack = entry.getValue();
+            MythicConfigImpl fileConfig = new MythicConfigImpl(file);
+            boolean mono = isMono(file);
+            for (String node : NodeListProp.getNodes(file, "")) {
+                nodes.add(node);
+                MythicItem created;
+                try {
+                    MythicConfig config = fileConfig.getNestedConfig(node);
+                    if (mono && (config.isSet("Type") && MythicEntityType.get(config.getString("Type")) != null
+                            || config.isSet("Skills") && !config.isSet("Id"))) continue;
+                    String template = config.getString("Template");
+                    if (template == null) template = config.getString("Templates");
+                    if (template != null) {
+                        templates.add(new TemplateUtil.TemplateItem(file, pack, node, config, template));
+                        continue;
+                    }
+                    created = new MythicItem(pack, file, node, config);
+                } catch (Exception | Error ex) {
+                    report.errors.add("アイテム " + node + ": " + ex);
                     continue;
                 }
-                created = new MythicItem(pack, file, node, config);
-            } catch (Exception | Error ex) {
-                report.errors.add("アイテム " + node + ": " + ex);
-                continue;
+                installItem(items, pack, node, created, before.get(node));
             }
-            installItem(items, pack, node, created, before.get(node));
         }
         if (!templates.isEmpty()) {
             // TemplateUtil registers straight into the executor and refuses existing names
@@ -388,12 +446,12 @@ public final class MythicFileReloader {
             TemplateUtil.handleTemplates(templates, items);
             for (TemplateUtil.TemplateItem template : templates) {
                 MythicItem created = items.get(template.id());
-                if (created != null) installItem(items, pack, template.id(), created, before.get(template.id()));
+                if (created != null) installItem(items, template.pack(), template.id(), created, before.get(template.id()));
             }
-            report.notes.add("Template を使うアイテムを含みます。このファイルのアイテムを親にしている他ファイルのアイテムは更新されません");
+            report.notes.add("Template を使うアイテムを含みます。リロード対象外のファイルにある子アイテムは更新されません");
         }
         for (Map.Entry<String, MythicItem> entry : before.entrySet()) {
-            if (!nodes.contains(entry.getKey()) && file.equals(canonical(entry.getValue().getFile()))) {
+            if (!nodes.contains(entry.getKey()) && files.containsKey(canonical(entry.getValue().getFile()))) {
                 report.notInFile.add("アイテム " + entry.getKey());
             }
         }
@@ -401,6 +459,7 @@ public final class MythicFileReloader {
 
     private void installItem(Map<String, MythicItem> items, Pack pack, String name, MythicItem created, @Nullable MythicItem old) {
         MythicItem installed;
+        String previousDisplayKey = old != null ? CrucibleBridge.displayKey(old) : null;
         if (old != null && old.getClass() == created.getClass()) {
             staleMechanics.addAll(ObjectTransplant.collectMechanics(old));
             tx.copyFields(created, old, Collections.emptySet());
@@ -418,7 +477,7 @@ public final class MythicFileReloader {
         items.put(name, installed);
         if (crucible != null) {
             try {
-                crucible.refresh(installed, staleMechanics, tx);
+                crucible.refresh(installed, old, previousDisplayKey, staleMechanics, tx);
             } catch (ReflectiveOperationException ex) {
                 throw new IllegalStateException("Crucible アイテム " + name + " の再登録に失敗: " + ex, ex);
             }
@@ -426,6 +485,28 @@ public final class MythicFileReloader {
     }
 
     // ---------------------------------------------------------------- shared
+
+    private static Map<File, Pack> filesOf(Map<File, Map<ConfigFileType, Pack>> typesByFile, ConfigFileType type) {
+        Map<File, Pack> files = new LinkedHashMap<>();
+        typesByFile.forEach((file, types) -> {
+            Pack pack = types.get(type);
+            if (pack != null) files.put(file, pack);
+        });
+        return files;
+    }
+
+    /** The Mobs / Skills / Items folders of every loaded pack. */
+    public static @NotNull List<File> configRoots() {
+        List<File> roots = new ArrayList<>();
+        for (ConfigFileType type : List.of(ConfigFileType.ITEM, ConfigFileType.SKILL, ConfigFileType.MOB)) {
+            for (Pack pack : MythicBukkit.inst().getPackManager().getPacks()) {
+                for (File folder : pack.getPackFolders(type.info.dataFolder(), false, type.info.readMono())) {
+                    roots.add(canonical(folder));
+                }
+            }
+        }
+        return roots;
+    }
 
     private Map<ConfigFileType, Pack> resolveTypes(File file) {
         Map<ConfigFileType, Pack> types = new LinkedHashMap<>();
@@ -442,7 +523,7 @@ public final class MythicFileReloader {
                         tx.snapshot(candidate.getConfigFiles(type));
                         candidate.getConfigFiles(type).add(file);
                         types.put(type, candidate);
-                        report.notes.add("新規ファイルとして " + type.name() + " に登録しました");
+                        report.notes.add(describe(file) + " を新規ファイルとして " + type.name() + " に登録しました");
                         break;
                     }
                 }

@@ -1,19 +1,26 @@
 # /lmmm reloadFile
 
-MythicMobs の Mobs / Skills / Items フォルダにある **1ファイルだけ** を、`/mm reload` をせずに読み直します。
+MythicMobs の Mobs / Skills / Items フォルダにある **ファイルやフォルダ単位** で、`/mm reload` をせずに読み直します。
 
 ```
-/lmmm reloadFile <パス | ファイル名>
+/lmmm reloadFile <パス | ファイル名 | フォルダ名>
+/lmm r <パス | ファイル名 | フォルダ名>      (短縮形)
 ```
 
 | 例 | 説明 |
 |:---|:-----|
-| `/lmmm reloadFile skills/igasoraSkills.yml` | `plugins/MythicMobs` からの相対パスで指定 |
-| `/lmmm reloadFile igasoraSkills.yml` | ファイル名だけで指定(同名が複数あると候補を表示して中止) |
+| `/lmm r skills/igasoraSkills.yml` | `plugins/MythicMobs` からの相対パスでファイルを指定 |
+| `/lmm r igasoraSkills.yml` | ファイル名だけで指定(同名が複数あると候補を表示して中止) |
+| `/lmm r skills/Horologium` | フォルダを指定(サブフォルダも含めて全ファイル) |
+| `/lmm r Horologium` | 同名ファイルが無ければ、その名前のフォルダ全部(items / mobs / skills の Horologium をまとめて) |
 
 - 権限: `lifemoremythicmobs.command.reloadfile`(デフォルト OP)
-- コンソールからも実行できます。Tab 補完でファイルを選べます。
-- 最後の全体リロード以降に作った新しいファイルも、パスで指定すれば読み込めます。
+- コンソールからも実行できます。Tab 補完でファイル・フォルダを選べます。
+- 最後の全体リロード以降に作った新しいファイル・フォルダも読み込めます。
+- 複数ファイルは1回でまとめて処理します(アイテム → スキル → Mob の順)。対象ファイル同士で新しく追加した名前を呼び合っていても解決されます。
+
+目安(テストサーバー): Horologium 3フォルダ 33ファイル 約2秒、skills 全体 約5秒、items 全体 約9秒。
+フォルダ全体のような大量のリロード中はサーバーが止まるので、本番では範囲を絞るか `/mm reload` を使ってください。
 
 ## 何が更新されるか
 

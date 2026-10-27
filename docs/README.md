@@ -6,7 +6,7 @@
 
 | Command | Description |
 |:--------|:------------|
-| [/lmmm reloadFile](commands/reloadFile.md) | MythicMobs の1ファイルだけを全体リロードせずに読み直す |
+| [/lmmm reloadFile](commands/reloadFile.md) | MythicMobs のファイル・フォルダを全体リロードせずに読み直す(短縮: `/lmm r`) |
 
 ## Mechanics
 
