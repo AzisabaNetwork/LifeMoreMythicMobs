@@ -8,6 +8,12 @@
 |:--------|:------------|
 | [/lmmm reloadFile](commands/reloadFile.md) | MythicMobs のファイル・フォルダを全体リロードせずに読み直す(短縮: `/lmm r`) |
 
+## Mob Options
+
+| Option | Description |
+|:-------|:------------|
+| [LegacyDamage](mobs/LegacyDamage.md) | ダメージ周りの挙動を MythicMobs 4.12 と同じにする |
+
 ## Mechanics
 
 | Mechanic | Description |

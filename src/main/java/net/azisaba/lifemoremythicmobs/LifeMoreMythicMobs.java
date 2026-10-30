@@ -68,6 +68,8 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
         getServer().getPluginManager().registerEvents(new WorldChangeRemovePotionEffectListener(this), this);
         getServer().getPluginManager().registerEvents(new KillMessageDamageListener(this), this);
         getServer().getPluginManager().registerEvents(new LegacyDamageModifiersListener(), this);
+        getServer().getPluginManager().registerEvents(new LegacySelfDamageListener(this), this);
+        getServer().getPluginManager().registerEvents(new LegacyMobDamageListener(), this);
         getServer().getPluginManager().registerEvents(new CharReorderGuiListener(), this);
         getServer().getPluginManager().registerEvents(new EquipLockListener(), this);
         Bukkit.getScheduler().runTask(this, Register::reloadPlaceholders);
