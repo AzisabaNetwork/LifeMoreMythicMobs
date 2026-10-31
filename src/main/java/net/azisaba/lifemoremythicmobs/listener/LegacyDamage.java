@@ -19,7 +19,8 @@ final class LegacyDamage {
         SELF_DAMAGE("SelfDamage"),
         ENVIRONMENT_TRIGGER("EnvironmentTrigger"),
         CANCELLED_THREAT("CancelledThreat"),
-        ZERO_MODIFIER("ZeroModifier");
+        ZERO_MODIFIER("ZeroModifier"),
+        MOB_ARMOR("MobArmor");
 
         private final String key;
 

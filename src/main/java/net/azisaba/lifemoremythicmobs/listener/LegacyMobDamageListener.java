@@ -2,12 +2,19 @@ package net.azisaba.lifemoremythicmobs.listener;
 
 import io.lumine.mythic.api.adapters.AbstractEntity;
 import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.api.skills.damage.DamageMetadata;
+import io.lumine.mythic.bukkit.events.MythicMobSpawnEvent;
+import io.lumine.mythic.bukkit.events.MythicStatChangeEvent;
 import io.lumine.mythic.bukkit.events.MythicTriggerEvent;
+import io.lumine.mythic.core.skills.stats.Stats;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import io.lumine.mythic.core.skills.SkillTriggers;
 import io.lumine.mythic.core.skills.TriggeredSkill;
 import io.lumine.mythic.core.skills.triggers.meta.DamagedMetadata;
 import io.lumine.mythic.core.skills.triggers.meta.EntityAttackMetadata;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -17,6 +24,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import java.util.IdentityHashMap;
 import java.util.Locale;
 import java.util.Map;
+import org.bukkit.metadata.MetadataValue;
 
 /**
  * Restores how MythicMobs 4.12 treated damage a mob takes, where 5.12 changed it.
@@ -28,6 +36,9 @@ import java.util.Map;
  *       before the threat table, so a boss that is invulnerable for a phase gathers no threat.</li>
  *   <li>A {@code DamageModifiers} value of 0 for an environment cause (e.g. {@code SUFFOCATION 0})
  *       zeroed the damage. 5.12 only does that with {@code Mobs.CancelDamageIfZero}.</li>
+ *   <li>The mob option {@code Armor} was taken off every hit's damage (never below 1) and did not touch
+ *       the vanilla armor attribute. 5.12 sets it as the armor attribute instead, which the armor
+ *       formula turns into a percentage.</li>
  * </ul>
  * Each applies only to mobs that opt in with {@code LegacyDamage} (see {@link LegacyDamage}).
  */
@@ -75,6 +86,69 @@ public final class LegacyMobDamageListener implements Listener {
         if (modifier != null && modifier == 0.0) {
             event.setDamage(0.0);
         }
+    }
+
+    /** 4.12 left the vanilla armor attribute alone: undo MythicMobs setting it from the Armor option. */
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onSpawn(MythicMobSpawnEvent event) {
+        resetArmorAttribute(event.getMob());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onStatChange(MythicStatChangeEvent event) {
+        if (event.getStat() == Stats.ARMOR && event.getCaster() instanceof ActiveMob mob) resetArmorAttribute(mob);
+    }
+
+    private static void resetArmorAttribute(ActiveMob mob) {
+        if (!LegacyDamage.enabled(mob, LegacyDamage.Part.MOB_ARMOR) || mob.getType().getArmor(mob) < 0) return;
+        if (!(mob.getEntity().getBukkitEntity() instanceof LivingEntity living)) return;
+        AttributeInstance armor = living.getAttribute(Attribute.ARMOR);
+        if (armor != null) armor.setBaseValue(vanillaArmor(living, armor));
+    }
+
+    /**
+     * The entity type's own base armor (a zombie has 2). Bukkit only offers the attribute's global default
+     * (0), so this asks the server's DefaultAttributes table (Mojang names, Paper runs mojmapped).
+     */
+    private static double vanillaArmor(LivingEntity entity, AttributeInstance armor) {
+        try {
+            ClassLoader loader = entity.getClass().getClassLoader();
+            Object handle = entity.getClass().getMethod("getHandle").invoke(entity);
+            Object type = handle.getClass().getMethod("getType").invoke(handle);
+            Class<?> entityType = Class.forName("net.minecraft.world.entity.EntityType", false, loader);
+            Object supplier = Class.forName("net.minecraft.world.entity.ai.attributes.DefaultAttributes", false, loader)
+                    .getMethod("getSupplier", entityType).invoke(null, type);
+            Object holder = Class.forName("net.minecraft.world.entity.ai.attributes.Attributes", false, loader)
+                    .getField("ARMOR").get(null);
+            Class<?> holderType = Class.forName("net.minecraft.core.Holder", false, loader);
+            if (!(Boolean) supplier.getClass().getMethod("hasAttribute", holderType).invoke(supplier, holder)) {
+                return armor.getDefaultValue();
+            }
+            return (Double) supplier.getClass().getMethod("getBaseValue", holderType).invoke(supplier, holder);
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            return armor.getDefaultValue();
+        }
+    }
+
+    /** 4.12: {@code damage -= Armor}, at least 1, before the damage modifiers and the armor formula. */
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onArmoredDamage(EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof LivingEntity living)) return;
+        ActiveMob mob = MythicBukkit.inst().getMobManager().getMythicMobInstance(living);
+        if (mob == null || !LegacyDamage.enabled(mob, LegacyDamage.Part.MOB_ARMOR)) return;
+        double armor = mob.getType().getArmor(mob);
+        if (armor <= 0 || isAbsoluteSkillDamage(living)) return;
+        event.setDamage(Math.max(1.0, event.getDamage() - armor));
+    }
+
+    /** {@code damage{ia=true}} set the health directly in 4.12, so Armor never applied to it. */
+    private static boolean isAbsoluteSkillDamage(LivingEntity entity) {
+        for (MetadataValue value : entity.getMetadata("skill-damage")) {
+            if (value.value() instanceof DamageMetadata metadata && Boolean.TRUE.equals(metadata.getIgnoresArmor())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private record Hit(ActiveMob mob, AbstractEntity damager, TriggeredSkill skill) {
