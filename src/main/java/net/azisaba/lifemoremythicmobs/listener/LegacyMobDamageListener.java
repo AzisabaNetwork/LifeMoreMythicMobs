@@ -21,6 +21,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -39,6 +40,8 @@ import org.bukkit.metadata.MetadataValue;
  *   <li>The mob option {@code Armor} was taken off every hit's damage (never below 1) and did not touch
  *       the vanilla armor attribute. 5.12 sets it as the armor attribute instead, which the armor
  *       formula turns into a percentage.</li>
+ *   <li>{@code DamageModifiers} were applied early, so {@code ~onDamaged} auras and other listeners saw the
+ *       modified damage, and never to {@code damage{ia=true}}. 5.12 applies them last, to every hit.</li>
  * </ul>
  * Each applies only to mobs that opt in with {@code LegacyDamage} (see {@link LegacyDamage}).
  */
@@ -130,15 +133,79 @@ public final class LegacyMobDamageListener implements Listener {
         }
     }
 
-    /** 4.12: {@code damage -= Armor}, at least 1, before the damage modifiers and the armor formula. */
+    /**
+     * 4.12 handled a mob's damage in one early step: {@code damage -= Armor} (at least 1), then exactly one
+     * {@code DamageModifiers} entry (the element or SKILL for skill damage, else the damage cause). 5.12
+     * applies the modifiers only at the end, after {@code ~onDamaged} auras and other plugins have read the
+     * damage. Neither touched {@code damage{ia=true}}, which 4.12 applied by setting the health directly.
+     */
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onArmoredDamage(EntityDamageEvent event) {
+    public void onLegacyDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof LivingEntity living)) return;
         ActiveMob mob = MythicBukkit.inst().getMobManager().getMythicMobInstance(living);
-        if (mob == null || !LegacyDamage.enabled(mob, LegacyDamage.Part.MOB_ARMOR)) return;
-        double armor = mob.getType().getArmor(mob);
-        if (armor <= 0 || isAbsoluteSkillDamage(living)) return;
-        event.setDamage(Math.max(1.0, event.getDamage() - armor));
+        if (mob == null) return;
+        boolean absolute = isAbsoluteSkillDamage(living);
+        if (LegacyDamage.enabled(mob, LegacyDamage.Part.MOB_ARMOR)) {
+            double armor = mob.getType().getArmor(mob);
+            if (armor > 0 && !absolute) event.setDamage(Math.max(1.0, event.getDamage() - armor));
+        }
+        if (LegacyDamage.enabled(mob, LegacyDamage.Part.MODIFIER_ORDER)) {
+            Map<String, Double> modifiers = mob.getType().getDamageModifiers();
+            if (modifiers == null || modifiers.isEmpty() && !hiddenModifiers.containsKey(modifiers)) return;
+            Map<String, Double> actual = hideModifiers(event, modifiers);
+            if (!absolute) applyLegacyModifier(event, living, actual.get(legacyDamageType(living, event)));
+        }
+    }
+
+    /** The 4.12 lookup key: the element (or SKILL) of skill damage, otherwise the damage cause. */
+    private static String legacyDamageType(LivingEntity entity, EntityDamageEvent event) {
+        for (MetadataValue value : entity.getMetadata("skill-damage")) {
+            if (value.value() instanceof DamageMetadata metadata) {
+                String element = metadata.getElement();
+                return (element == null || element.isBlank() ? "SKILL" : element).toUpperCase(Locale.ROOT);
+            }
+        }
+        return event.getCause().toString().toUpperCase(Locale.ROOT);
+    }
+
+    private static void applyLegacyModifier(EntityDamageEvent event, LivingEntity entity, Double modifier) {
+        if (modifier == null || modifier == 1.0) return;
+        double damage = event.getDamage() * modifier;
+        // For skill damage MythicMobs later rebuilds the event damage from the skill's amount: scale that too
+        for (MetadataValue value : entity.getMetadata("skill-damage")) {
+            if (value.value() instanceof DamageMetadata metadata) metadata.setAmount(metadata.getAmount() * modifier);
+        }
+        if (damage >= 0.0) {
+            event.setDamage(damage);
+            return;
+        }
+        // a negative modifier heals, as in 4.12
+        event.setDamage(0.0);
+        event.setCancelled(true);
+        entity.setHealth(Math.min(entity.getMaxHealth(), entity.getHealth() - damage));
+    }
+
+    /** Modifier maps emptied for the hit in progress (with what they held), so MythicMobs does not apply them again. */
+    private final Map<Map<String, Double>, Map<String, Double>> hiddenModifiers = new IdentityHashMap<>();
+    private final Map<EntityDamageEvent, Map<String, Double>> hiddenBy = new IdentityHashMap<>();
+
+    /** Empties {@code modifiers} until this event is over and returns their real content (nested hits share it). */
+    private Map<String, Double> hideModifiers(EntityDamageEvent event, Map<String, Double> modifiers) {
+        Map<String, Double> saved = hiddenModifiers.get(modifiers);
+        if (saved != null) return saved; // an outer hit on the same mob type already hid them
+        saved = new HashMap<>(modifiers);
+        hiddenModifiers.put(modifiers, saved);
+        hiddenBy.put(event, modifiers);
+        modifiers.clear();
+        return saved;
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void restoreModifiers(EntityDamageEvent event) {
+        Map<String, Double> modifiers = hiddenBy.remove(event);
+        if (modifiers == null) return;
+        Map<String, Double> saved = hiddenModifiers.remove(modifiers);
+        if (saved != null) modifiers.putAll(saved);
     }
 
     /** {@code damage{ia=true}} set the health directly in 4.12, so Armor never applied to it. */
