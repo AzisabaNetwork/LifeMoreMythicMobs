@@ -148,7 +148,9 @@ public class WearingSlotCondition extends SkillCondition implements IEntityCondi
             return false;
          }
 
-         if (meta.hasDisplayName() && !java.util.Objects.equals(meta.displayName(), meta2.displayName())) {
+         // Compare the legacy (§-coded) text like MM 4.12 did: items made back then store the name as one
+         // "§d§l..." string, while MM 5 stores styled components, so the component trees never match.
+         if (meta.hasDisplayName() && !java.util.Objects.equals(meta.getDisplayName(), meta2.getDisplayName())) {
             MythicLogger.debug(DebugLevel.CONDITION, "! Display doesn't match");
             return false;
          }
@@ -171,7 +173,7 @@ public class WearingSlotCondition extends SkillCondition implements IEntityCondi
                return false;
             }
 
-            if (meta.hasLore() && !java.util.Objects.equals(meta.lore(), meta2.lore())) {
+            if (meta.hasLore() && !java.util.Objects.equals(meta.getLore(), meta2.getLore())) {
                MythicLogger.debug(DebugLevel.CONDITION, "! Lore doesn't match");
                return false;
             }
