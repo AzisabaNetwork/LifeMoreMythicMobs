@@ -40,7 +40,7 @@ dependencies {
     if (mythicMobsJar != null) {
         compileOnly(files(mythicMobsJar))
     } else {
-        compileOnly("io.lumine:Mythic-Dist:5.12.0")
+        compileOnly("io.lumine:Mythic-Dist:5.14.0")
     }
     compileOnly("com.github.MyPetORG.MyPet:mypet-api:5c8ceeac6a")
     compileOnly("org.jetbrains:annotations:24.0.1")

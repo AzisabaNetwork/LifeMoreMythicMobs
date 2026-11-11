@@ -342,7 +342,7 @@ public class CustomProjectileMechanic extends ProjectileMechanic {
             double moveStep = this.velocityMagnitude;
             Vector forward = new Vector(this.baseDirection.getX(), this.baseDirection.getY(), this.baseDirection.getZ());
             Vector move = forward.clone().multiply(moveStep);
-            double time = (double)this.tickCount / CustomProjectileMechanic.this.ticksPerSecond;
+            double time = (double)this.tickCount / CustomProjectileTracker.this.ticksPerSecond;
             double sinValue = Math.sin(time * frequency * 2.0 * Math.PI);
             double sineOffset = amplitude * sinValue;
             AbstractVector axisVector = CustomProjectileMechanic.this.getPerpendicularAxis(this.baseDirection, this.mechanic.sineAxis);
@@ -442,7 +442,7 @@ public class CustomProjectileMechanic extends ProjectileMechanic {
          } else {
             float gravity = this.mechanic.projectileGravity.get(this.context);
             if (gravity != 0.0F) {
-               this.currentVelocity.setY(this.currentVelocity.getY() - gravity / this.mechanic.ticksPerSecond);
+               this.currentVelocity.setY(this.currentVelocity.getY() - gravity / CustomProjectileTracker.this.ticksPerSecond);
             }
          }
 
