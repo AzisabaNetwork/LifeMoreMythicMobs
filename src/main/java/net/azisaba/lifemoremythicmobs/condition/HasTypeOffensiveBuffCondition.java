@@ -6,17 +6,24 @@ import io.lumine.mythic.api.skills.conditions.IEntityCondition;
 import io.lumine.mythic.core.skills.SkillCondition;
 import net.azisaba.lifemoremythicmobs.mechanic.TypeOffensiveBuffMechanic;
 
+import java.util.List;
+
 public class HasTypeOffensiveBuffCondition extends SkillCondition implements IEntityCondition {
 
-    private final String auraName;
+    private final List<String> auraNames;
 
     public HasTypeOffensiveBuffCondition(MythicLineConfig config) {
         super(config.getLine());
-        this.auraName = config.getString(new String[]{"auraName", "aura", "name", "n"}, "typeoffensivebuff");
+        this.auraNames = ConditionMatchUtil.parseCommaSeparated(config.getString(new String[]{"auraName", "aura", "name", "n"}, "typeoffensivebuff"));
     }
 
     @Override
     public boolean check(AbstractEntity entity) {
-        return TypeOffensiveBuffMechanic.hasAura(entity.getUniqueId(), auraName);
+        for (String auraName : auraNames) {
+            if (TypeOffensiveBuffMechanic.hasAura(entity.getUniqueId(), auraName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

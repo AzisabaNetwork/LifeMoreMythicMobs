@@ -6,17 +6,24 @@ import io.lumine.mythic.api.skills.conditions.IEntityCondition;
 import io.lumine.mythic.core.skills.SkillCondition;
 import net.azisaba.lifemoremythicmobs.mechanic.TypeBuffMechanic;
 
+import java.util.List;
+
 public class HasTypeBuffCondition extends SkillCondition implements IEntityCondition {
 
-    private final String auraName;
+    private final List<String> auraNames;
 
     public HasTypeBuffCondition(MythicLineConfig config) {
         super(config.getLine());
-        this.auraName = config.getString(new String[]{"auraName", "aura", "name", "n"}, "typebuff");
+        this.auraNames = ConditionMatchUtil.parseCommaSeparated(config.getString(new String[]{"auraName", "aura", "name", "n"}, "typebuff"));
     }
 
     @Override
     public boolean check(AbstractEntity entity) {
-        return TypeBuffMechanic.hasAura(entity.getUniqueId(), auraName);
+        for (String auraName : auraNames) {
+            if (TypeBuffMechanic.hasAura(entity.getUniqueId(), auraName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

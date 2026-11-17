@@ -14,14 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class HoroloItemInSlotCondition extends SkillCondition implements IEntityCondition, ISkillMetaCondition {
-  private final String mmid, operator;
+  private final List<String> mmids;
+  private final String operator;
   private final int required;
   private final boolean invert;
   private final List<Integer> slots;
 
   public HoroloItemInSlotCondition(MythicLineConfig config) {
     super(config.getLine());
-    mmid = config.getString(new String[] {"mmid", "id"}, "null");
+    mmids = ConditionMatchUtil.parseCommaSeparated(config.getString(new String[] {"mmid", "id"}, "null"));
     invert = config.getBoolean(new String[] {"invert", "i", "逆転"}, false);
     String[] count = parseCount(config.getString(new String[] {"count", "c"}, ">=1"));
     operator = count[0];
@@ -55,10 +56,16 @@ public final class HoroloItemInSlotCondition extends SkillCondition implements I
   }
 
   private int count(Player player) {
+    if (mmids.isEmpty()) return 0;
     try {
       Plugin plugin = Bukkit.getPluginManager().getPlugin("HoroloCore");
       if (plugin == null || !plugin.isEnabled()) return 0;
-      return ((Number) plugin.getClass().getMethod("countStoredMythicItem", java.util.UUID.class, String.class, java.util.Collection.class).invoke(plugin, player.getUniqueId(), mmid, slots)).intValue();
+      var method = plugin.getClass().getMethod("countStoredMythicItem", java.util.UUID.class, String.class, java.util.Collection.class);
+      int total = 0;
+      for (String mmid : mmids) {
+        total += ((Number) method.invoke(plugin, player.getUniqueId(), mmid, slots)).intValue();
+      }
+      return total;
     } catch (ReflectiveOperationException exception) {
       return 0;
     }

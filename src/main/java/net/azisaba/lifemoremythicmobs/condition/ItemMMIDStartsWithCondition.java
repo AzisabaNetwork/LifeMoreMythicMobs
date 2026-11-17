@@ -10,9 +10,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.util.List;
+
 public class ItemMMIDStartsWithCondition extends SkillCondition implements IEntityCondition {
 
-    protected final String prefix;
+    protected final List<String> prefixes;
     protected final boolean ignoreCase;
     protected final boolean hotBar;
     protected final int hotBarNum;
@@ -23,7 +25,7 @@ public class ItemMMIDStartsWithCondition extends SkillCondition implements IEnti
     public ItemMMIDStartsWithCondition(MythicLineConfig config) {
         super(config.getLine());
         this.itemManager = MythicBukkit.inst().getItemManager();
-        this.prefix = config.getString(new String[]{"mmid", "id"}, "");
+        this.prefixes = ConditionMatchUtil.parseCommaSeparated(config.getString(new String[]{"mmid", "id"}, ""));
         this.ignoreCase = config.getBoolean(new String[]{"ignorecase", "ic"}, false);
         this.hotBar = config.getBoolean(new String[]{"hotbar", "hb"}, false);
         this.offHand = config.getBoolean(new String[]{"offhand", "oh"}, false);
@@ -65,9 +67,6 @@ public class ItemMMIDStartsWithCondition extends SkillCondition implements IEnti
         String mmid = MythicBukkit.inst().getItemManager().getMythicTypeFromItem(item);
         if (mmid == null || mmid.isEmpty()) return false;
 
-        String checkID = this.ignoreCase ? mmid.toLowerCase() : mmid;
-        String checkPrefix = this.ignoreCase ? this.prefix.toLowerCase() : this.prefix;
-
-        return checkID.startsWith(checkPrefix);
+        return ConditionMatchUtil.anyStartsWith(mmid, this.prefixes, this.ignoreCase);
     }
 }

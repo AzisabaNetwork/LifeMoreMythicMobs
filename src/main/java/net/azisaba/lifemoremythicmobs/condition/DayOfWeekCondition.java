@@ -7,12 +7,14 @@ import io.lumine.mythic.core.skills.SkillCondition;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public class DayOfWeekCondition extends SkillCondition implements IEntityCondition {
-    private final DayOfWeek dayOfWeek;
+    private final Set<DayOfWeek> daysOfWeek = EnumSet.noneOf(DayOfWeek.class);
 
     private static final Map<String, DayOfWeek> DAY_MAPPING = new HashMap<String, DayOfWeek>() {{
         put("sunday", DayOfWeek.SUNDAY);
@@ -26,13 +28,18 @@ public class DayOfWeekCondition extends SkillCondition implements IEntityConditi
 
     public DayOfWeekCondition(MythicLineConfig config) {
         super(config.getLine());
-        String day = config.getString(new String[] {"day", "d", "曜日"}, "monday").toLowerCase(Locale.ENGLISH);
-        this.dayOfWeek = DAY_MAPPING.get(day);
+        String rawDays = config.getString(new String[] {"day", "d", "曜日"}, "monday");
+        for (String token : ConditionMatchUtil.parseCommaSeparated(rawDays)) {
+            DayOfWeek mapped = DAY_MAPPING.get(token.toLowerCase(Locale.ENGLISH));
+            if (mapped != null) {
+                this.daysOfWeek.add(mapped);
+            }
+        }
     }
 
     @Override
     public boolean check(AbstractEntity abstractEntity) {
         LocalDate now = LocalDate.now();
-        return dayOfWeek == now.getDayOfWeek();
+        return this.daysOfWeek.contains(now.getDayOfWeek());
     }
 }

@@ -4,7 +4,7 @@
 ## Attributes
 | Attribute | Aliases | Description | Default |
 | :-- | :-- | :-- | :-- |
-| mmid | id | 検出したいアイテムのmmid | null |
+| mmid | id | 検出したいアイテムのmmid (カンマ区切りで複数指定可・OR判定) | null |
 | count | c | 条件を満たすのに必要なアイテムの個数 | 1 |
 | slots | s | チェックするインベントリのスロット番号。ホットバーの場合`0~8`。インベントリの場合、左上から数えて`9~36`<br>また、`5-8`のように記述する事で、範囲指定可能。この場合、その範囲内のどこかで条件を満たせばtrueを返します | null |
 | invert | i, 逆転 | trueとfalseの逆転を行うか | false |

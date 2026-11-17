@@ -4,7 +4,7 @@
 ## Attributes
 | Attribute | Aliases | Description | Default |
 | :-- | :-- | :-- | :-- |
-| server | s, サーバー | サーバーの名前を指定 | null |
+| server | s, サーバー | サーバーの名前を指定 (カンマ区切りで複数指定可・OR判定) | null |
 | invert | i, 逆転 | trueとfalseの反転を行うか | false |
 
 ## Examples

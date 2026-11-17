@@ -4,7 +4,7 @@
 ## Attributes
 | Attribute | Aliases | Description | Default |
 | :-- | :-- | :-- | :-- |
-| mmid | id | アイテムのMMIDに含まれているべき文字列 | "" |
+| mmid | id | アイテムのMMIDに含まれているべき文字列 (カンマ区切りで複数指定可・OR判定) | "" |
 | ignorecase | ic | 大文字・小文字を無視するか | false |
 | offhand | oh | チェック対象をオフハンドにするか | false |
 | hotbar | hb | チェック対象をホットバーの特定スロットにするか | false |

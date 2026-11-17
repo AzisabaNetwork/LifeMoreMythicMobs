@@ -4,7 +4,7 @@
 ## Attributes
 | Attribute | Aliases | Description | Default |
 | :-- | :-- | :-- | :-- |
-| mmid | id | アイテムのMMIDの接頭辞 | "" |
+| mmid | id | アイテムのMMIDの接頭辞 (カンマ区切りで複数指定可・OR判定) | "" |
 | ignorecase | ic | 大文字・小文字を無視するか | false |
 | offhand | oh | チェック対象をオフハンドにするか | false |
 | hotbar | hb | チェック対象をホットバーの特定スロットにするか | false |
@@ -17,3 +17,8 @@
  - mmidStartsWith{mmid="cl6_";oh=true}
 ```
 > オフハンドアイテムのmmidが'cl6_'で始まっていたらtrueを返す
+```yml
+ Conditions:
+ - mmidStartsWith{mmid="a,b"}
+```
+> メインハンドアイテムのmmidが'a'または'b'で始まっていたらtrueを返す

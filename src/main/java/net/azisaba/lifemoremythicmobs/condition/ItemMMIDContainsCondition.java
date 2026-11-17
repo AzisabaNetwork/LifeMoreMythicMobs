@@ -10,9 +10,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.util.List;
+
 public class ItemMMIDContainsCondition extends SkillCondition implements IEntityCondition {
 
-    protected final String contains;
+    protected final List<String> substrings;
     protected final boolean ignoreCase;
     protected final boolean hotBar;
     protected final int hotBarNum;
@@ -25,7 +27,7 @@ public class ItemMMIDContainsCondition extends SkillCondition implements IEntity
 
         this.itemManager = MythicBukkit.inst().getItemManager();
 
-        this.contains = config.getString(new String[]{"mmid", "id"}, "");
+        this.substrings = ConditionMatchUtil.parseCommaSeparated(config.getString(new String[]{"mmid", "id"}, ""));
         this.ignoreCase = config.getBoolean(new String[]{"ignorecase", "ic"}, false);
         this.hotBar = config.getBoolean(new String[]{"hotbar", "hb"}, false);
         this.offHand = config.getBoolean(new String[]{"offhand", "oh"}, false);
@@ -63,9 +65,6 @@ public class ItemMMIDContainsCondition extends SkillCondition implements IEntity
         String mmid = MythicBukkit.inst().getItemManager().getMythicTypeFromItem(item);
         if (mmid == null || mmid.isEmpty()) return false;
 
-        String checkID = this.ignoreCase ? mmid.toLowerCase() : mmid;
-        String checkContains = this.ignoreCase ? this.contains.toLowerCase() : this.contains;
-
-        return checkID.contains(checkContains);
+        return ConditionMatchUtil.anyContains(mmid, this.substrings, this.ignoreCase);
     }
 }

@@ -17,7 +17,7 @@ public class ItemInSlotCondition extends SkillCondition implements IEntityCondit
     private static final int MAX_SLOT = 40;
 
     private final boolean invert;
-    private final String mmid;
+    private final List<String> mmids;
     private String operator = ">=";
     private int requiredCount = 1;
     private final List<Integer> slotsToCheck;
@@ -25,7 +25,7 @@ public class ItemInSlotCondition extends SkillCondition implements IEntityCondit
     public ItemInSlotCondition(MythicLineConfig config) {
         super(config.getLine());
 
-        this.mmid = config.getString(new String[]{"mmid", "id"}, "null");
+        this.mmids = ConditionMatchUtil.parseCommaSeparated(config.getString(new String[]{"mmid", "id"}, "null"));
         this.invert = config.getBoolean(new String[]{"invert", "i", "逆転"}, false);
         String countRaw = config.getString(new String[]{"count", "c"}, ">=1");
         parseCount(countRaw);
@@ -84,7 +84,7 @@ public class ItemInSlotCondition extends SkillCondition implements IEntityCondit
             if (item != null && item.getAmount() > 0) {
                 String itemMMID = ItemUtil.getMythicType(item);
 
-                if (this.mmid.equalsIgnoreCase(itemMMID)) {
+                if (ConditionMatchUtil.anyEquals(itemMMID, this.mmids, true)) {
                     foundCount += item.getAmount();
                 }
             }

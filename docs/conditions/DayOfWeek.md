@@ -4,7 +4,7 @@
 ## Attributes
 | Attribute | Aliases | Description | Default |
 | :-- | :-- | :-- | :-- |
-| day | d, 曜日 | 曜日名を指定 (英語) | monday |
+| day | d, 曜日 | 曜日名を指定 (英語・カンマ区切りで複数指定可・OR判定) | monday |
 
 ## Examples
 ```yml
