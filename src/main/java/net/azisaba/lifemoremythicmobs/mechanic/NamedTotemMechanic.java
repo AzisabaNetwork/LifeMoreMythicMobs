@@ -227,10 +227,11 @@ public class NamedTotemMechanic extends Projectile implements ITargetedEntitySki
          this.previousLocation = this.currentLocation.clone();
       }
 
-      public void doHit(HashSet<AbstractEntity> targets) {
+      // MythicMobs 5.14 declares doHit(Collection) abstract on ProjectileTracker; 5.12 has none, so this works on both.
+      public void doHit(java.util.Collection<AbstractEntity> targets) {
          if (NamedTotemMechanic.this.onHitSkill.isPresent() && ((Skill)NamedTotemMechanic.this.onHitSkill.get()).isUsable(this.data)) {
             SkillMetadata sData = this.data.deepClone();
-            sData.setEntityTargets(targets);
+            sData.setEntityTargets(new HashSet<>(targets));
             sData.setOrigin(this.currentLocation.clone());
             ((Skill)NamedTotemMechanic.this.onHitSkill.get()).execute(sData);
          }

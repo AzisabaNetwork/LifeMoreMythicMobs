@@ -29,7 +29,16 @@ public final class HoroloElementalDefenseBridge {
         } catch (ReflectiveOperationException | RuntimeException ignored) { clearCache(); return 0.0D; }
     }
 
+    /** HoroloCore の装飾品・宝玉の値に、elemDefBuff で付けた一時的な値を足したもの */
     public static Stats get(Player player, String element) {
+        Stats base = getHorolo(player, element);
+        if (player == null) return base;
+        double[] add = TempElementalDefense.sum(player.getUniqueId(), element);
+        if (add[0] == 0.0D && add[1] == 0.0D) return base;
+        return new Stats(base.armor() + add[0], base.toughness() + add[1]);
+    }
+
+    private static Stats getHorolo(Player player, String element) {
         if (player == null || element == null || element.isBlank()) {
             return Stats.ZERO;
         }

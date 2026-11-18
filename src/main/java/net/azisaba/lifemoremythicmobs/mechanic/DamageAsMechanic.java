@@ -57,7 +57,7 @@ public class DamageAsMechanic extends DamagingMechanic implements ITargetedEntit
             MythicLogger.debug(DebugLevel.MECHANIC, "+ DamageAsMechanic credit failed, fallback to caster doDamage", new Object[0]);
          }
 
-         this.doDamage(data, target, dmg);
+         net.azisaba.lifemoremythicmobs.util.DamageCompat.doDamage(this, data, target, dmg);
          MythicLogger.debug(DebugLevel.MECHANIC, "+ DamageAsMechanic fallback fired for {0} with {1} power", new Object[]{dmg, data.getPower()});
          return SkillResult.SUCCESS;
       } else {

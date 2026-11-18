@@ -328,6 +328,18 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("DelayCall") ) {
             e.register(new DelayCallMechanic(executor, config));
         }
+        if ( mechanic.equalsIgnoreCase("bdTele") || mechanic.equalsIgnoreCase("BlockTelegraph") ) {
+            e.register(new BlockTelegraphMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("pBossBar") || mechanic.equalsIgnoreCase("PlayerBossBar") ) {
+            e.register(new PlayerBossBarMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("speedCap") ) {
+            e.register(new SpeedCapMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("elemDefBuff") || mechanic.equalsIgnoreCase("ElementalDefenseBuff") ) {
+            e.register(new ElementalDefenseBuffMechanic(executor, config));
+        }
         if ( mechanic.equalsIgnoreCase("AttributeBuff") ) {
             e.register(new AttributeBuffMechanic(executor, config));
         }

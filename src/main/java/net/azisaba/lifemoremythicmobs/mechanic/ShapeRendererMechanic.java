@@ -26,6 +26,8 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
     private final double density;
     private final double rotation;
     private final Color color;
+    private final float size;
+    private final int life;
 
     private final String expX;
     private final String expY;
@@ -40,6 +42,10 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
         this.radius = config.getDouble(new String[]{"radius", "r"}, 2.0);
         this.points = config.getInteger(new String[]{"points", "pt"}, 5);
         this.density = config.getDouble(new String[]{"density", "d"}, 0.2);
+        // 2026-11-15: dust の粒の大きさ（予兆の輪郭を太く見せる）
+        this.size = (float) config.getDouble(new String[]{"size", "sz"}, 1.0);
+        // 2026-11-15: 表示時間（tick）。0 より大きければ dust の代わりに trail（その場で life tick だけ光る。dust は 1 秒ほど残って見づらい）
+        this.life = config.getInteger(new String[]{"life", "lf"}, 0);
         this.rotation = Math.toRadians(config.getDouble(new String[]{"rotation", "rot"}, 0));
 
         this.expX = config.getString(new String[]{"expX", "ex"}, "r*cos(t)");
@@ -84,8 +90,10 @@ public class ShapeRendererMechanic extends SkillMechanic implements ITargetedLoc
     }
 
     private void spawn(Location loc) {
-        if (particle == Particle.DUST) {
-            loc.getWorld().spawnParticle(particle, loc, 1, new Particle.DustOptions(color, 1.0f));
+        if (particle == Particle.DUST && life > 0) {
+            loc.getWorld().spawnParticle(Particle.TRAIL, loc, 1, 0, 0, 0, 0, new Particle.Trail(loc, color, life), true);
+        } else if (particle == Particle.DUST) {
+            loc.getWorld().spawnParticle(particle, loc, 1, new Particle.DustOptions(color, size));
         } else {
             loc.getWorld().spawnParticle(particle, loc, 1, 0, 0, 0, 0);
         }

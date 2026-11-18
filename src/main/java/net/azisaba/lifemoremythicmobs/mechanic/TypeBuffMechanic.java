@@ -278,6 +278,15 @@ public class TypeBuffMechanic extends SkillMechanic implements ITargetedEntitySk
 
         private void executeAuraSkill(Optional<Skill> skillOpt) {
             if (!skillOpt.isPresent()) return;
+            // 共鳴反応などで裏のスレッドから外されたとき、ワールドの Mob を探す処理（getEntity）は main thread でしかできない。
+            // その場合は次の tick に main thread で唱える（2026-11-15: removeCAura から AsyncCatcher に止められた）
+            if (!Bukkit.isPrimaryThread()) {
+                Plugin plugin = Bukkit.getPluginManager().getPlugin("LifeMoreMythicMobs");
+                if (plugin != null && plugin.isEnabled()) {
+                    Bukkit.getScheduler().runTask(plugin, () -> executeAuraSkill(skillOpt));
+                }
+                return;
+            }
             Skill skill = skillOpt.get();
             SkillMetadata meta = originMeta.deepClone();
             AuraSkillHelper.setMeta(meta, getTargetEntity());

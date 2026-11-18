@@ -342,7 +342,7 @@ public class CustomProjectileMechanic extends ProjectileMechanic {
             double moveStep = this.velocityMagnitude;
             Vector forward = new Vector(this.baseDirection.getX(), this.baseDirection.getY(), this.baseDirection.getZ());
             Vector move = forward.clone().multiply(moveStep);
-            double time = (double)this.tickCount / CustomProjectileTracker.this.ticksPerSecond;
+            double time = (double)this.tickCount / net.azisaba.lifemoremythicmobs.util.ProjectileCompat.ticksPerSecond(CustomProjectileMechanic.this, this);
             double sinValue = Math.sin(time * frequency * 2.0 * Math.PI);
             double sineOffset = amplitude * sinValue;
             AbstractVector axisVector = CustomProjectileMechanic.this.getPerpendicularAxis(this.baseDirection, this.mechanic.sineAxis);
@@ -442,7 +442,7 @@ public class CustomProjectileMechanic extends ProjectileMechanic {
          } else {
             float gravity = this.mechanic.projectileGravity.get(this.context);
             if (gravity != 0.0F) {
-               this.currentVelocity.setY(this.currentVelocity.getY() - gravity / CustomProjectileTracker.this.ticksPerSecond);
+               this.currentVelocity.setY(this.currentVelocity.getY() - gravity / net.azisaba.lifemoremythicmobs.util.ProjectileCompat.ticksPerSecond(this.mechanic, this));
             }
          }
 
@@ -477,19 +477,24 @@ public class CustomProjectileMechanic extends ProjectileMechanic {
             }
 
             if (!this.targets.isEmpty()) {
-               if (CustomProjectileMechanic.this.onHitSkill.isPresent()) {
-                  SkillMetadata sData = this.data.deepClone();
-                  sData.setEntityTargets(new HashSet(this.targets));
-                  sData.setOrigin(this.currentLocation.clone());
-                  ((Skill)CustomProjectileMechanic.this.onHitSkill.get()).execute(sData);
-               }
-
-               if (CustomProjectileMechanic.this.stopOnHitEntity) {
-                  this.terminate();
-               }
+               this.doHit(new HashSet<>(this.targets));
             }
 
             this.targets.clear();
+         }
+      }
+
+      // MythicMobs 5.14 declares this abstract on ProjectileTracker (and calls it for lag-compensated hits); 5.12 has no such method.
+      protected void doHit(java.util.Collection<AbstractEntity> hit) {
+         if (CustomProjectileMechanic.this.onHitSkill.isPresent()) {
+            SkillMetadata sData = this.data.deepClone();
+            sData.setEntityTargets(new HashSet<>(hit));
+            sData.setOrigin(this.currentLocation.clone());
+            ((Skill)CustomProjectileMechanic.this.onHitSkill.get()).execute(sData);
+         }
+
+         if (CustomProjectileMechanic.this.stopOnHitEntity) {
+            this.terminate();
          }
       }
 

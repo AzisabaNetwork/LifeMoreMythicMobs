@@ -19,6 +19,8 @@ import java.util.Map;
 public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEntitySkill {
 
     protected final PlaceholderDouble amount;
+    /** The element(s) as written: one element, or several separated by "," or "|". */
+    protected final io.lumine.mythic.api.skills.placeholders.PlaceholderString elementSpec;
 
     public TypedDamageMechanic(SkillExecutor executor, MythicLineConfig config) {
         super(executor, config.getLine(), config);
@@ -28,6 +30,7 @@ public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEn
         this.element = config.getPlaceholderString(
                 new String[]{"element", "e", "damagetype", "type", "t"}, null, new String[0]
         );
+        this.elementSpec = this.element;
     }
 
     @Override
@@ -47,42 +50,15 @@ public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEn
 
         double evaluatedAmount = amount.get(data, target);
         double base = evaluatedAmount * (this.powerAffectsDamage ? data.getPower() : 1.0);
-        String resolvedElement = this.element == null ? null : this.element.get(data.getCaster());
-
-        double multiplier = 1.0;
-        double targetAuraMod = 1.0;
-        int resLevel = 0;
-        double upgradeRes = 0.0;
-        double casterAuraMod = 1.0;
-        int dmgLevel = 0;
-        double upgradeDmg = 0.0;
+        // e=FIRE,ICE: several elements, the hit takes the one dealing the most damage (see ElementChoice)
+        String resolvedElement = net.azisaba.lifemoremythicmobs.util.ElementChoice.choose(
+                net.azisaba.lifemoremythicmobs.util.ElementChoice.parse(
+                        this.elementSpec == null ? null : this.elementSpec.get(data.getCaster())),
+                data, target);
 
         if (resolvedElement != null && !resolvedElement.isEmpty()) {
-
-            // 被ダメ側の補正 (Aura + Upgrade)
-            Map<String, Double> targetMods = TypeBuffMechanic.getCombinedMods(target.getUniqueId());
-            targetAuraMod = targetMods.getOrDefault(resolvedElement, 1.0);
-
-            VariableRegistry targetVars = MythicBukkit.inst().getVariableManager().getRegistry(VariableScope.CASTER, data, target);
-            resLevel = targetVars.getInt("upg_total_" + resolvedElement.toLowerCase() + "_res");
-            upgradeRes = resLevel * 0.01;
-
-            multiplier *= Math.max(0, targetAuraMod - upgradeRes);
-
-            // 与ダメ側の補正 (Aura + Upgrade)
-            Map<String, Double> casterMods = TypeOffensiveBuffMechanic.getCombinedMods(data.getCaster().getEntity().getUniqueId());
-            casterAuraMod = casterMods.getOrDefault(resolvedElement, 1.0);
-            if (data.getCaster().getEntity().getBukkitEntity() instanceof Player player) {
-                casterAuraMod += HoroloElementalDefenseBridge.outgoingDamage(player, resolvedElement);
-            }
-
-            VariableRegistry casterVars = MythicBukkit.inst().getVariableManager().getRegistry(VariableScope.CASTER, data, data.getCaster().getEntity());
-            dmgLevel = casterVars.getInt("upg_total_" + resolvedElement.toLowerCase() + "_dmg");
-            upgradeDmg = dmgLevel * 0.01;
-
-            multiplier *= Math.max(0, casterAuraMod + upgradeDmg);
-
-            base *= multiplier;
+            // 被ダメ側 (Aura + Upgrade) × 与ダメ側 (Aura + Upgrade)
+            base *= net.azisaba.lifemoremythicmobs.util.ElementChoice.multiplier(resolvedElement, data, target);
         }
 
         // Preserve every finite 1.15.2 result, but never pass NaN/Infinity into MM/Bukkit.
@@ -94,8 +70,19 @@ public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEn
             data.getVariables().putString("damage-type", resolvedElement);
         }
 
-        // Delegate metadata construction and all MM damage flags to 5.12 itself.
-        this.doDamage(data, target, base);
+        // Delegate metadata construction and all MM damage flags to 5.12 itself. MM reads the element
+        // (for DamageModifiers and tags) from this.element, so hand it the chosen one for this hit only.
+        io.lumine.mythic.api.skills.placeholders.PlaceholderString previous = this.element;
+        this.element = resolvedElement == null ? null
+                : io.lumine.mythic.api.skills.placeholders.PlaceholderString.of(resolvedElement);
+        try {
+            net.azisaba.lifemoremythicmobs.util.DamageCompat.doDamage(this, data, target, base);
+        } finally {
+            this.element = previous;
+        }
+
+        // 時計塔 8 層の共鳴反応: プレイヤーの属性ダメージなら、どの Mob でも cl8_reso_<属性> を唱えさせる
+        net.azisaba.lifemoremythicmobs.util.ResonanceHook.afterTypedDamage(data.getCaster().getEntity(), target, resolvedElement);
 
         return SkillResult.SUCCESS;
     }

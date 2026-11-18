@@ -23,6 +23,8 @@ import java.util.Map;
 /** Mob-to-player typed damage with HoroloCore's per-element armor calculation. */
 public final class MobTypedDamageMechanic extends DamagingMechanic implements ITargetedEntitySkill {
     private final PlaceholderDouble amount;
+    /** The element(s) as written: one element, or several separated by "," or "|". */
+    private final io.lumine.mythic.api.skills.placeholders.PlaceholderString elementSpec;
     private final boolean configuredIgnoreArmor;
     private final boolean ignoreElementalDefense;
 
@@ -31,6 +33,7 @@ public final class MobTypedDamageMechanic extends DamagingMechanic implements IT
         amount = config.getPlaceholderDouble(new String[]{"amount", "a"}, 1.0D, new String[0]);
         element = config.getPlaceholderString(
                 new String[]{"element", "e", "damagetype", "type", "t"}, null, new String[0]);
+        elementSpec = element;
 
         configuredIgnoreArmor = ignoresArmor;
         ignoreElementalDefense = config.getBoolean(
@@ -52,26 +55,14 @@ public final class MobTypedDamageMechanic extends DamagingMechanic implements IT
 
         double evaluatedAmount = amount.get(data, target);
         double base = evaluatedAmount * (powerAffectsDamage ? data.getPower() : 1.0D);
-        String resolvedElement = element == null ? null : element.get(data.getCaster());
+        // e=FIRE,ICE: several elements, the hit takes the one dealing the most damage (see ElementChoice)
+        String resolvedElement = net.azisaba.lifemoremythicmobs.util.ElementChoice.choose(
+                net.azisaba.lifemoremythicmobs.util.ElementChoice.parse(
+                        elementSpec == null ? null : elementSpec.get(data.getCaster())),
+                data, target);
 
         if (resolvedElement != null && !resolvedElement.isEmpty()) {
-            Map<String, Double> targetMods = TypeBuffMechanic.getCombinedMods(target.getUniqueId());
-            double targetAuraMod = targetMods.getOrDefault(resolvedElement, 1.0D);
-            VariableRegistry targetVars = MythicBukkit.inst().getVariableManager()
-                    .getRegistry(VariableScope.CASTER, data, target);
-            int resLevel = targetVars.getInt("upg_total_" + resolvedElement.toLowerCase() + "_res");
-            base *= Math.max(0.0D, targetAuraMod - resLevel * 0.01D);
-
-            Map<String, Double> casterMods = TypeOffensiveBuffMechanic.getCombinedMods(
-                    data.getCaster().getEntity().getUniqueId());
-            double casterAuraMod = casterMods.getOrDefault(resolvedElement, 1.0D);
-            if (data.getCaster().getEntity().getBukkitEntity() instanceof Player player) {
-                casterAuraMod += HoroloElementalDefenseBridge.outgoingDamage(player, resolvedElement);
-            }
-            VariableRegistry casterVars = MythicBukkit.inst().getVariableManager()
-                    .getRegistry(VariableScope.CASTER, data, data.getCaster().getEntity());
-            int dmgLevel = casterVars.getInt("upg_total_" + resolvedElement.toLowerCase() + "_dmg");
-            base *= Math.max(0.0D, casterAuraMod + dmgLevel * 0.01D);
+            base *= net.azisaba.lifemoremythicmobs.util.ElementChoice.multiplier(resolvedElement, data, target);
         }
 
         double vanillaArmor = 0.0D;
@@ -103,7 +94,14 @@ public final class MobTypedDamageMechanic extends DamagingMechanic implements IT
             data.getVariables().putString("damage-type", resolvedElement);
         }
 
-        doDamage(data, target, base);
+        io.lumine.mythic.api.skills.placeholders.PlaceholderString previous = element;
+        element = resolvedElement == null ? null
+                : io.lumine.mythic.api.skills.placeholders.PlaceholderString.of(resolvedElement);
+        try {
+            net.azisaba.lifemoremythicmobs.util.DamageCompat.doDamage(this, data, target, base);
+        } finally {
+            element = previous;
+        }
         return SkillResult.SUCCESS;
     }
 

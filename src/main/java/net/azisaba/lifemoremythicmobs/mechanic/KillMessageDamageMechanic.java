@@ -81,7 +81,7 @@ public class KillMessageDamageMechanic extends DamagingMechanic implements ITarg
       }
 
       try {
-         this.doDamage(data, target, dmg);
+         net.azisaba.lifemoremythicmobs.util.DamageCompat.doDamage(this, data, target, dmg);
          return SkillResult.SUCCESS;
       } catch (Throwable t) {
          if (appliedPending) {

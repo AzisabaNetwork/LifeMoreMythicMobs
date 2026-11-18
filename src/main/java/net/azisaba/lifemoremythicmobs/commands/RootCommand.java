@@ -26,7 +26,8 @@ public class RootCommand implements TabExecutor {
                 new SpawnerToolCommand(plugin),
                 new UpgradeCommand(plugin),
                 new StatsCommand(plugin),
-                new ReloadFileCommand(plugin)
+                new ReloadFileCommand(plugin),
+                new GetSameItemCommand(plugin)
         );
     }
 
