@@ -11,6 +11,8 @@ import net.azisaba.lifemoremythicmobs.mechanic.mahjong.MahjongHaiyamaInitMechani
 import net.azisaba.lifemoremythicmobs.placeholder.*;
 import net.azisaba.lifemoremythicmobs.targeter.*;
 import net.azisaba.lifemoremythicmobs.util.CustomAura;
+import net.azisaba.lifemoremythicmobs.util.MarkStackManager;
+import net.azisaba.lifemoremythicmobs.util.ParryWindowManager;
 import net.azisaba.lifemoremythicmobs.util.PlaceholderUtil;
 import net.azisaba.lifemoremythicmobs.util.TimerRepository;
 import net.azisaba.lifemoremythicmobs.util.TimerService;
@@ -380,6 +382,44 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("customProjectile") ) {
             e.register(new CustomProjectileMechanic(executor, config));
         }
+
+        // === PvE & Resource Content Expansion Mechanics ===
+        if ( mechanic.equalsIgnoreCase("lmTether") || mechanic.equalsIgnoreCase("TetherBeam") ) {
+            e.register(new TetherBeamMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("lmFloatingText") || mechanic.equalsIgnoreCase("FloatingText") ) {
+            e.register(new FloatingTextMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("lmTowerZone") || mechanic.equalsIgnoreCase("TowerZone") ) {
+            e.register(new TowerZoneMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("lmResourceNode") || mechanic.equalsIgnoreCase("ResourceNode") ) {
+            e.register(new ResourceNodeMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("lmSkillCheck") || mechanic.equalsIgnoreCase("SkillCheck") ) {
+            e.register(new SkillCheckMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("lmVeinMine") || mechanic.equalsIgnoreCase("VeinMine") ) {
+            e.register(new VeinMineMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("lmParryWindow") || mechanic.equalsIgnoreCase("ParryWindow") ) {
+            e.register(new ParryWindowMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("lmMarkStack") || mechanic.equalsIgnoreCase("MarkStack") ) {
+            e.register(new MarkStackMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("lmChainSkill") || mechanic.equalsIgnoreCase("ChainSkill") ) {
+            e.register(new ChainSkillMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("lmThreat") || mechanic.equalsIgnoreCase("ThreatControl") ) {
+            e.register(new ThreatControlMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("lmDash") || mechanic.equalsIgnoreCase("MotionDash") ) {
+            e.register(new MotionDashMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("lmLootRoll") || mechanic.equalsIgnoreCase("LootRoll") ) {
+            e.register(new LootRollMechanic(executor, config));
+        }
     }
 
     @EventHandler
@@ -478,6 +518,32 @@ public class Register implements Listener {
         if (condition.equalsIgnoreCase("warmup")) e.register(new WarmupCondition(config));
         if (condition.equalsIgnoreCase("triggerwithin")) e.register(new TriggerWithinCondition(config, false));
         if (condition.equalsIgnoreCase("triggernotwithin")) e.register(new TriggerWithinCondition(config, true));
+
+        // === PvE & Resource Content Expansion Conditions ===
+        if (condition.equalsIgnoreCase("lmMarkStacks") || condition.equalsIgnoreCase("MarkStacks")) {
+            e.register(new MarkStacksCondition(config));
+        }
+        if (condition.equalsIgnoreCase("lmIsTopThreat") || condition.equalsIgnoreCase("IsTopThreat")) {
+            e.register(new TopThreatCondition(config));
+        }
+        if (condition.equalsIgnoreCase("lmBiome")) {
+            e.register(new BiomeCondition(config));
+        }
+        if (condition.equalsIgnoreCase("lmLightLevel")) {
+            e.register(new LightLevelCondition(config));
+        }
+        if (condition.equalsIgnoreCase("lmBlockCount")) {
+            e.register(new BlockCountCondition(config));
+        }
+        if (condition.equalsIgnoreCase("lmCanSeeSky")) {
+            e.register(new CanSeeSkyCondition(config));
+        }
+        if (condition.equalsIgnoreCase("lmUsingSpear")
+                || condition.equalsIgnoreCase("isUsingSpear")
+                || condition.equalsIgnoreCase("usingSpear")
+                || condition.equalsIgnoreCase("spearReady")) {
+            e.register(new UsingSpearCondition(config));
+        }
     }
 
     @EventHandler
@@ -500,6 +566,8 @@ public class Register implements Listener {
             OriginLocationXPlaceholder.register(manager);
             OriginLocationYPlaceholder.register(manager);
             OriginLocationZPlaceholder.register(manager);
+            MarkStacksPlaceholder.register(manager);
+            EnvironmentPlaceholder.register(manager);
             if (timerService != null && timerRepository != null) {
                 TimerElapsedPlaceholder.register(manager, timerService, timerRepository);
             }
@@ -553,6 +621,8 @@ public class Register implements Listener {
         TypeBuffMechanic.removeAll(uuid);
         TypeOffensiveBuffMechanic.removeAll(uuid);
         CustomAura.removeAll(uuid);
+        MarkStackManager.removeAll(uuid);
+        ParryWindowManager.cancel(uuid);
     }
 
     @EventHandler
@@ -561,6 +631,8 @@ public class Register implements Listener {
         TypeBuffMechanic.removeAll(uuid);
         TypeOffensiveBuffMechanic.removeAll(uuid);
         CustomAura.removeAll(uuid);
+        MarkStackManager.removeAll(uuid);
+        ParryWindowManager.cancel(uuid);
     }
 
     @EventHandler
@@ -569,5 +641,7 @@ public class Register implements Listener {
         TypeBuffMechanic.removeAll(uuid);
         TypeOffensiveBuffMechanic.removeAll(uuid);
         CustomAura.removeAll(uuid);
+        MarkStackManager.removeAll(uuid);
+        ParryWindowManager.cancel(uuid);
     }
 }

@@ -13,6 +13,11 @@ import net.azisaba.lifemoremythicmobs.util.ArmorGuard.ArmorAttributeGuard;
 import net.azisaba.lifemoremythicmobs.util.ArmorGuard.ArmorGuardSettings;
 import net.azisaba.lifemoremythicmobs.util.CharReorderGui.CharReorderGuiListener;
 import net.azisaba.lifemoremythicmobs.util.DBConnector;
+import net.azisaba.lifemoremythicmobs.util.ManagedEntityRegistry;
+import net.azisaba.lifemoremythicmobs.util.MarkStackManager;
+import net.azisaba.lifemoremythicmobs.util.ParryWindowManager;
+import net.azisaba.lifemoremythicmobs.util.ResourceNodeManager;
+import net.azisaba.lifemoremythicmobs.util.SkillCheckManager;
 import net.azisaba.lifemoremythicmobs.util.TickCounter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
@@ -72,6 +77,11 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
         getServer().getPluginManager().registerEvents(new LegacyMobDamageListener(), this);
         getServer().getPluginManager().registerEvents(new CharReorderGuiListener(), this);
         getServer().getPluginManager().registerEvents(new EquipLockListener(), this);
+        ManagedEntityRegistry.init(this);
+        getServer().getPluginManager().registerEvents(new ManagedEntityRegistry(), this);
+        getServer().getPluginManager().registerEvents(new ResourceNodeListener(), this);
+        getServer().getPluginManager().registerEvents(new SkillCheckListener(), this);
+        getServer().getPluginManager().registerEvents(new ParryWindowListener(), this);
         Bukkit.getScheduler().runTask(this, Register::reloadPlaceholders);
         TickCounter.start();
         // The scoreboard manager is not available until the worlds have finished loading.
@@ -98,6 +108,11 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
 
     @Override
     public void onDisable() {
+        ResourceNodeManager.clearAll();
+        SkillCheckManager.clearAll();
+        ParryWindowManager.clearAll();
+        MarkStackManager.clearAll();
+        ManagedEntityRegistry.shutdownAll();
         ModifyPlayerAttributeMechanic.shutdown();
         if (armorGuard != null) armorGuard.unregister();
         DBConnector.close();

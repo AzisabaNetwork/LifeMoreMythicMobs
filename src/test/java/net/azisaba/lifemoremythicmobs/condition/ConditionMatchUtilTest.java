@@ -50,4 +50,15 @@ class ConditionMatchUtilTest {
         assertFalse(ConditionMatchUtil.anyEquals("life3", servers, true));
         assertFalse(ConditionMatchUtil.anyEquals(null, servers, true));
     }
+
+    @Test
+    void isSpearMaterialNameMatchesVanillaSpearsAndOptionalTrident() {
+        assertTrue(ConditionMatchUtil.isSpearMaterialName("DIAMOND_SPEAR", false));
+        assertTrue(ConditionMatchUtil.isSpearMaterialName("COPPER_SPEAR", false));
+        assertTrue(ConditionMatchUtil.isSpearMaterialName("NETHERITE_SPEAR", false));
+        assertFalse(ConditionMatchUtil.isSpearMaterialName("DIAMOND_SWORD", false));
+        assertFalse(ConditionMatchUtil.isSpearMaterialName("TRIDENT", false));
+        assertTrue(ConditionMatchUtil.isSpearMaterialName("TRIDENT", true));
+        assertFalse(ConditionMatchUtil.isSpearMaterialName(null, true));
+    }
 }

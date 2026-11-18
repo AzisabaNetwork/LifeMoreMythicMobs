@@ -61,4 +61,14 @@ final class ConditionMatchUtil {
         }
         return false;
     }
+
+    static boolean isSpearMaterialName(String materialName, boolean includeTrident) {
+        if (materialName == null) {
+            return false;
+        }
+        if (materialName.endsWith("_SPEAR")) {
+            return true;
+        }
+        return includeTrident && "TRIDENT".equals(materialName);
+    }
 }
