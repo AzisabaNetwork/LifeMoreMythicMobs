@@ -157,6 +157,11 @@ public class Register implements Listener {
         if ( mechanic.equalsIgnoreCase("typeOffensiveBuff") || mechanic.equalsIgnoreCase("tOffensiveBuff") ) {
             e.register(new TypeOffensiveBuffMechanic(executor, config));
         }
+        if ( net.azisaba.lifemoremythicmobs.util.DamageMechanicOverride.isActive()
+                && ( mechanic.equalsIgnoreCase("damage") || mechanic.equalsIgnoreCase("d") ) ) {
+            // MythicMobs' own damage was taken out of its table (replace-damage-mechanic): run it as tDamage
+            e.register(new TypedDamageMechanic(executor, config));
+        }
         if ( mechanic.equalsIgnoreCase("typeDamage") || mechanic.equalsIgnoreCase("tDamage") ) {
             e.register(new TypedDamageMechanic(executor, config));
         }

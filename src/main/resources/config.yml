@@ -40,3 +40,8 @@ armorGuard:
 
 # Copy the existing IgaCustomMythicMobs database section here on the server.
 # Timer persistence is enabled automatically when this section is configured.
+
+# MythicMobs 標準の damage{...}(短縮名 d)を tDamage として動かす。
+# tDamage は damage の指定をすべて受け付け、属性バフ・強化・複数属性(e=A,B)も効く。
+# type= / t= も属性として読む(4.12 の damage と同じ)。変更後はサーバーの再起動が必要。
+replace-damage-mechanic: true

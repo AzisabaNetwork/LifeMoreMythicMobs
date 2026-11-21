@@ -63,6 +63,17 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
             itemAttr.setExecutor(itemAttrCommand);
             itemAttr.setTabCompleter(itemAttrCommand);
         }
+        if (getConfig().getBoolean("replace-damage-mechanic", true)) {
+            net.azisaba.lifemoremythicmobs.util.DamageMechanicOverride.apply(getLogger());
+            if (net.azisaba.lifemoremythicmobs.util.DamageMechanicOverride.isActive()) {
+                // MythicMobs already built its skills (with its own damage) while it was enabling, before
+                // this plugin. Rebuild them once so every damage{...} becomes tDamage from the start.
+                Bukkit.getScheduler().runTask(this, () -> {
+                    getLogger().info("damage を tDamage として読み直すため、MythicMobs を1回リロードします。");
+                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mythicmobs reload");
+                });
+            }
+        }
         getServer().getPluginManager().registerEvents(new Register(), this);
         getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.listener.SpawnerToolListener(this), this);
         getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.listener.SpawnerManagerListener(this), this);
