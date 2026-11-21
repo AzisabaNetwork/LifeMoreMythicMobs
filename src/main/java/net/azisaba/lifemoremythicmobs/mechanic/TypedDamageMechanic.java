@@ -21,6 +21,8 @@ public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEn
     protected final PlaceholderDouble amount;
     /** The element(s) as written: one element, or several separated by "," or "|". */
     protected final io.lumine.mythic.api.skills.placeholders.PlaceholderString elementSpec;
+    /** crit=true / critChance / critDamage (off unless written). */
+    protected final net.azisaba.lifemoremythicmobs.util.CriticalHit critical;
 
     public TypedDamageMechanic(SkillExecutor executor, MythicLineConfig config) {
         super(executor, config.getLine(), config);
@@ -31,6 +33,7 @@ public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEn
                 new String[]{"element", "e", "damagetype", "type", "t"}, null, new String[0]
         );
         this.elementSpec = this.element;
+        this.critical = net.azisaba.lifemoremythicmobs.util.CriticalHit.fromConfig(config);
     }
 
     @Override
@@ -59,6 +62,13 @@ public class TypedDamageMechanic extends DamagingMechanic implements ITargetedEn
         if (resolvedElement != null && !resolvedElement.isEmpty()) {
             // 被ダメ側 (Aura + Upgrade) × 与ダメ側 (Aura + Upgrade)
             base *= net.azisaba.lifemoremythicmobs.util.ElementChoice.multiplier(resolvedElement, data, target);
+        }
+
+        // クリティカル (crit=true のときだけ)。属性・バフ・強化の後、Mob の DamageModifiers の前に掛ける
+        if (critical.enabled()) {
+            double critMultiplier = critical.roll(data, target);
+            base *= critMultiplier;
+            data.getVariables().putString("critical", critMultiplier != 1.0D ? "true" : "false");
         }
 
         // Preserve every finite 1.15.2 result, but never pass NaN/Infinity into MM/Bukkit.
