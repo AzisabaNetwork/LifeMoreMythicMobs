@@ -165,6 +165,8 @@ public final class LegacyMobDamageListener implements Listener {
                 return (element == null || element.isBlank() ? "SKILL" : element).toUpperCase(Locale.ROOT);
             }
         }
+        String melee = MeleeElementListener.elementOf(event); // MeleeElement の直殴りは属性として扱う
+        if (melee != null) return melee.toUpperCase(Locale.ROOT);
         return event.getCause().toString().toUpperCase(Locale.ROOT);
     }
 

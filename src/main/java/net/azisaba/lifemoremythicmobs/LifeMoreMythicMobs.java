@@ -86,6 +86,7 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
         getServer().getPluginManager().registerEvents(new LegacyDamageModifiersListener(), this);
         getServer().getPluginManager().registerEvents(new LegacySelfDamageListener(this), this);
         getServer().getPluginManager().registerEvents(new LegacyMobDamageListener(), this);
+        getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.listener.MeleeElementListener(), this);
         getServer().getPluginManager().registerEvents(new CharReorderGuiListener(), this);
         getServer().getPluginManager().registerEvents(new EquipLockListener(), this);
         ManagedEntityRegistry.init(this);
