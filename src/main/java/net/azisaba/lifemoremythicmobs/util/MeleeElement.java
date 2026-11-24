@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * The element of a direct melee hit (ENTITY_ATTACK), set with {@code MeleeElement: FIRE} in a MythicMobs
  * item (the attacker's main-hand item) or mob definition. Without it the hit stays plain ENTITY_ATTACK.
+ * Several elements ({@code FIRE,ICE}) are returned as written; the listener picks one per hit.
  */
 public final class MeleeElement {
     public static final String KEY = "MeleeElement";

@@ -8,6 +8,7 @@ import io.lumine.mythic.core.skills.variables.VariableManager;
 import io.lumine.mythic.core.skills.variables.VariableScope;
 import net.azisaba.lifemoremythicmobs.mechanic.TypeBuffMechanic;
 import net.azisaba.lifemoremythicmobs.mechanic.TypeOffensiveBuffMechanic;
+import net.azisaba.lifemoremythicmobs.util.ElementChoice;
 import net.azisaba.lifemoremythicmobs.util.ElementalDefenseMath;
 import net.azisaba.lifemoremythicmobs.util.HoroloElementalDefenseBridge;
 import net.azisaba.lifemoremythicmobs.util.MeleeElement;
@@ -22,6 +23,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,12 +53,22 @@ public final class MeleeElementListener implements Listener {
         if (!(event.getDamager() instanceof LivingEntity attacker)) return;
         if (!(event.getEntity() instanceof LivingEntity target)) return;
         if (target.hasMetadata("skill-damage")) return; // skill damage (damage / tDamage) has its own element
-        String element = MeleeElement.of(attacker);
-        if (element == null) return;
+        List<String> elements = ElementChoice.parse(MeleeElement.of(attacker));
+        if (elements.isEmpty()) return;
+        ActiveMob mob = MythicBukkit.inst().getMobManager().getMythicMobInstance(target);
+        // MeleeElement: FIRE,ICE は tDamage と同じく、この相手にいちばん効く属性を1つ選ぶ（同点は先に書いた方）
+        String element = elements.get(0);
+        double best = Double.NEGATIVE_INFINITY;
+        for (String candidate : elements) {
+            double score = multiplier(candidate, attacker, target) * mobModifier(mob, candidate);
+            if (score > best) {
+                best = score;
+                element = candidate;
+            }
+        }
         ELEMENTS.put(event, element);
 
         double damage = event.getDamage() * multiplier(element, attacker, target);
-        ActiveMob mob = MythicBukkit.inst().getMobManager().getMythicMobInstance(target);
         if (mob != null && !LegacyDamage.enabled(mob, LegacyDamage.Part.MODIFIER_ORDER)) {
             Map<String, Double> mods = mob.getType().getDamageModifiers();
             if (mods != null) {
@@ -91,6 +103,11 @@ public final class MeleeElementListener implements Listener {
         if (attacker instanceof Player player) attackMod += HoroloElementalDefenseBridge.outgoingDamage(player, element);
         int dmg = vars.getRegistry(VariableScope.CASTER, a).getInt("upg_total_" + element.toLowerCase() + "_dmg");
         return m * Math.max(0.0D, attackMod + dmg * 0.01D);
+    }
+
+    private static double mobModifier(ActiveMob mob, String element) {
+        if (mob == null || mob.getType().getDamageModifiers() == null) return 1.0D;
+        return mob.getType().getDamageModifiers().getOrDefault(element.toUpperCase(), 1.0D);
     }
 
     private static double attribute(LivingEntity entity, Attribute attribute) {

@@ -13,6 +13,11 @@ FlameGolem:         # Mob：この Mob の直殴りが FIRE になる
   MeleeElement: FIRE
 ```
 
+## 複数の属性
+`MeleeElement: FIRE,ICE` のように、`,` か縦棒で区切って複数書ける(tDamage の `e=` と同じ)。
+殴った相手ごとに、いちばんダメージが大きくなる属性を1つ選ぶ。比べるのは、下のバフ・強化・宝玉の倍率と、
+受けた Mob の `DamageModifiers` を掛けた結果。同じ値なら先に書いた方。何も無ければ先頭の属性。
+
 ## 属性が付いた直殴りの扱い
 tDamage の属性ダメージと同じ扱いになる。
 
