@@ -18,7 +18,10 @@
 
 | Mechanic | Description |
 |:---------|:------------|
+| [addItemCount](mechanics/addItemCount.md) | アイテムに保存した数を増やす（説明文の行つき） |
 | [ChangeMythicItem](mechanics/ChangeMythicItem.md) | MythicItem の変換 |
+| [critChance](mechanics/critChance.md) | 近接攻撃のクリティカル率を足す（全部足して 1 回抽選） |
+| [critChanceBuff](mechanics/critChanceBuff.md) | 時間つきのクリティカル率 |
 | [fakeWorldBorder](mechanics/fakeWorldBorder.md) | プレイヤーの視界にのみ偽のワールドボーダーを出現させる |
 | [fakeSoundDistortion](mechanics/fakeSoundDistortion.md) | 指定した音を歪ませて再生する |
 | [lmChainSkill](mechanics/lmChainSkill.md) | ターゲット間を連鎖するスキル・パーティクル線 |
@@ -34,8 +37,11 @@
 | [lmTowerZone](mechanics/lmTowerZone.md) | 塔踏み・頭割り・防衛サークルギミック |
 | [lmVeinMine](mechanics/lmVeinMine.md) | 鉱脈・隣接ブロックの一括採掘／置換 |
 | [MMLuckEval](mechanics/MMLuckEval.md) | MMのLuckステータスを使用した計算 |
+| [momentumDash](mechanics/momentumDash.md) | 動いている方向へ押し出す |
 | [nullRecovery](mechanics/nullRecovery.md) | Null値のリカバリ |
 | [particleverticalring](mechanics/particleverticalring.md) | 垂直リング状のパーティクル |
+| [scaleDamage](mechanics/scaleDamage.md) | この一撃のダメージを倍にする（落下なども） |
+| [scaleHeal](mechanics/scaleHeal.md) | この回復量を倍にする |
 | [setFirstPersonView](mechanics/setFirstPersonView.md) | 一人称視点の設定 |
 | [SetVarDisplayName](mechanics/SetVarDisplayName.md) | 変数を用いたDisplayNameの設定 |
 | [SetVarLoreLine](mechanics/SetVarLoreLine.md) | 変数を用いたLore行の設定 |
@@ -58,6 +64,7 @@
 | [DayOfWeek](conditions/DayOfWeek.md) | 曜日チェック |
 | [HasEmptyInventorySlot](conditions/HasEmptyInventorySlot.md) | 空のインベントリスロット有無チェック |
 | [isPet](conditions/isPet.md) | myPetのモブかどうかチェック |
+| [itemCount](conditions/itemCount.md) | アイテムに保存した数があるか（使うと減らす） |
 | [ItemInSlot](conditions/ItemInSlot.md) | 特定スロットのアイテムチェック |
 | [lmBiome](conditions/lmBiome.md) | バイオーム一致チェック |
 | [lmBlockCount](conditions/lmBlockCount.md) | 周囲ブロック数の判定 |
@@ -85,3 +92,13 @@
 各MechanicやConditionの詳細については、各ドキュメントを参照してください。
 
 また、[GitHub Wiki](https://github.com/AzisabaNetwork/LifeMoreMythicMobs/wiki)も合わせてご確認ください。
+
+## FFCore から移したもの（2.8.0）
+
+FFCore.jar は外してよい（両方あると効果が二重になるので、残っていると起動時に警告を出す）。保存データのキーは `ffcore:` のまま。
+
+- Mechanic `addTeam` / `noHeal` / `weakSign`、プレースホルダー `<caster.attr.damage>`（`<caster.attack>` と同じ）: 名前も書き方もそのまま
+- ワールド free_field: 最大 HP ×4（ハートは元の見た目）、ripperC〜C3 の防具強度。体力・Mana のアクションバーは HoroloCore の HUD があるので廃止
+- 戦闘スコアのドロップ（addTeam）、FFGGR のレイドの蓄積値（3000 でボス）
+- コマンド `/scale` `/armors`
+- 装備の効果（ラッキー装備・逆鱗に触れる・堅牢な不死鳥の盾・エアリアルK・ロード・タルタロスの鎧・霊魂魂とクラック・虹の聖水・変幻始動す原初の剣斧）は、上の Mechanic で MythicMobs の側に書いた

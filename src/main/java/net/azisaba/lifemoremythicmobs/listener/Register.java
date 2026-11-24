@@ -6,6 +6,7 @@ import io.lumine.mythic.bukkit.MythicBukkit;
 import io.lumine.mythic.bukkit.events.*;
 import io.lumine.mythic.core.skills.SkillExecutor;
 import net.azisaba.lifemoremythicmobs.condition.*;
+import net.azisaba.lifemoremythicmobs.freefield.FFMechanics;
 import net.azisaba.lifemoremythicmobs.mechanic.*;
 import net.azisaba.lifemoremythicmobs.mechanic.mahjong.MahjongHaiyamaInitMechanic;
 import net.azisaba.lifemoremythicmobs.placeholder.*;
@@ -41,6 +42,36 @@ public class Register implements Listener {
         String mechanic = e.getMechanicName();
         MythicLineConfig config = e.getConfig();
         SkillExecutor executor = e.getContainer().getManager();
+
+        // === Equipment effects (formerly FFCore, now written in MythicMobs) ===
+        if ( mechanic.equalsIgnoreCase("critChance") ) {
+            e.register(new CritChanceMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("critChanceBuff") ) {
+            e.register(new CritChanceBuffMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("scaleDamage") ) {
+            e.register(new ScaleDamageMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("scaleHeal") ) {
+            e.register(new ScaleHealMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("addItemCount") ) {
+            e.register(new AddItemCountMechanic(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("momentumDash") ) {
+            e.register(new MomentumDashMechanic(executor, config));
+        }
+        // === Taken over from FFCore (same names) ===
+        if ( mechanic.equalsIgnoreCase("addTeam") ) {
+            e.register(new FFMechanics.AddTeam(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("noHeal") ) {
+            e.register(new FFMechanics.NoHeal(executor, config));
+        }
+        if ( mechanic.equalsIgnoreCase("weakSign") ) {
+            e.register(new FFMechanics.WeakSign(executor, config));
+        }
 
         // === Existing LifeMore mechanics ===
         if ( mechanic.equalsIgnoreCase("takeinv") ) {
@@ -478,6 +509,9 @@ public class Register implements Listener {
                 condition.equalsIgnoreCase("compareValue")
         ) {
             e.register(new ValCompareCondition(config));
+        }
+        if ( condition.equalsIgnoreCase("itemCount") ) {
+            e.register(new ItemCountCondition(config));
         }
         if ( condition.equalsIgnoreCase("itemInSlot") ) {
             e.register(new ItemInSlotCondition(config));

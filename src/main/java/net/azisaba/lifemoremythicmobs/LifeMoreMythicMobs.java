@@ -94,6 +94,18 @@ public final class LifeMoreMythicMobs extends JavaPlugin{
         getServer().getPluginManager().registerEvents(new ResourceNodeListener(), this);
         getServer().getPluginManager().registerEvents(new SkillCheckListener(), this);
         getServer().getPluginManager().registerEvents(new ParryWindowListener(), this);
+        getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.listener.CritBuffListener(), this);
+        // free_field / FFGGR (formerly FFCore)
+        getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.freefield.FreeFieldListener(this), this);
+        getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.freefield.BattleScoreListener(), this);
+        getServer().getPluginManager().registerEvents(new net.azisaba.lifemoremythicmobs.freefield.FFCombatListener(), this);
+        for (String name : new String[]{"scale", "armors"}) {
+            PluginCommand command = getCommand(name);
+            if (command != null) command.setExecutor(new net.azisaba.lifemoremythicmobs.freefield.FFCommands());
+        }
+        if (getServer().getPluginManager().getPlugin("FFCore") != null) {
+            getLogger().warning("FFCore の機能は LifeMoreMythicMobs に入りました。FFCore.jar を外してください（両方あると効果が二重になります）。");
+        }
         Bukkit.getScheduler().runTask(this, Register::reloadPlaceholders);
         TickCounter.start();
         // The scoreboard manager is not available until the worlds have finished loading.

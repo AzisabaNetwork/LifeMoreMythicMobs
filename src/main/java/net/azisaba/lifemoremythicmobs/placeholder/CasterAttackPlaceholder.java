@@ -10,7 +10,8 @@ import org.bukkit.entity.LivingEntity;
 
 public class CasterAttackPlaceholder {
     public static void register(PlaceholderManager manager) {
-        manager.register("caster.attack", PlaceholderFactory.meta(((placeholderMeta, s) -> {
+        for (String name : new String[]{"caster.attack", "caster.attr.damage"}) { // caster.attr.damage: FFCore name
+            manager.register(name, PlaceholderFactory.meta(((placeholderMeta, s) -> {
             Entity entity = BukkitAdapter.adapt(placeholderMeta.getCaster().getEntity());
             if (entity instanceof LivingEntity) {
                 LivingEntity living = (LivingEntity) entity;
@@ -20,5 +21,6 @@ public class CasterAttackPlaceholder {
             }
             return "0.0";
         })));
+        }
     }
 }

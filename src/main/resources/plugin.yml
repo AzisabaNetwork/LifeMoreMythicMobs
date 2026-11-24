@@ -14,6 +14,12 @@ commands:
     description: Open attribute editor for main-hand item
     usage: /itemattr
     permission: itemattreditor.use
+  scale:
+    description: "セットヘルススケールコマンド"
+    permission: FFCore.Command.Scale
+  armors:
+    description: "アーマー値確認"
+    permission: FFCore.Command.Armors
 
 permissions:
   lifemoremythicmobs.lmmm:
@@ -39,3 +45,7 @@ permissions:
     default: op
   itemattreditor.use:
     default: op
+  FFCore.Command.Scale:
+    default: true
+  FFCore.Command.Armors:
+    default: true
