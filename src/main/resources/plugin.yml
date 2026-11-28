@@ -43,6 +43,9 @@ permissions:
   lifemoremythicmobs.command.reloadfile:
     description: Allows use of /lmmm reloadFile command
     default: op
+  lifemoremythicmobs.command.var:
+    description: Allows use of /lmmm var command
+    default: op
   itemattreditor.use:
     default: op
   FFCore.Command.Scale:

@@ -27,7 +27,8 @@ public class RootCommand implements TabExecutor {
                 new UpgradeCommand(plugin),
                 new StatsCommand(plugin),
                 new ReloadFileCommand(plugin),
-                new GetSameItemCommand(plugin)
+                new GetSameItemCommand(plugin),
+                new VariableCommand(plugin)
         );
     }
 
